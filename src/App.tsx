@@ -1,0 +1,1615 @@
+import React, { useState, useRef } from "react";
+import { motion } from "motion/react";
+import confetti from "canvas-confetti";
+import { UserProfile, Course, Product, BrandCampaign, ProjectTask, Job, ActivityPost, CommunityChannel } from "./types";
+import {
+  initialProfile,
+  initialPosts,
+  initialCourses,
+  initialProducts,
+  initialCampaigns,
+  initialJobs,
+  initialChannels
+} from "./mockData";
+import { auth, getUserProfile, saveUserProfile, getCollectionData, saveCollectionItem, deleteCollectionItem } from "./lib/firebase";
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as firebaseSignOut, onAuthStateChanged } from "firebase/auth";
+
+// Components
+import ConnectSection from "./components/ConnectSection";
+import AcademySection from "./components/AcademySection";
+import PortfolioSection from "./components/PortfolioSection";
+import MarketplaceSection from "./components/MarketplaceSection";
+import ProjectsSection from "./components/ProjectsSection";
+import GigsSection from "./components/GigsSection";
+import PaymentsSection from "./components/PaymentsSection";
+import EventsSection from "./components/EventsSection";
+import AnalyticsSection from "./components/AnalyticsSection";
+import CommunitySection from "./components/CommunitySection";
+import CompanionAppDownload from "./components/CompanionAppDownload";
+import ChatDrawer from "./components/ChatDrawer";
+import { ServicesCarousel } from "./components/ServicesCarousel";
+import { HomeMarketing } from "./components/HomeMarketing";
+import { AboutSection } from "./components/AboutSection";
+import { TeamsSection } from "./components/TeamsSection";
+import { JobsSection } from "./components/JobsSection";
+import { HowItWorksSection } from "./components/HowItWorksSection";
+import { RewardsSection } from "./components/RewardsSection";
+import { NotificationsDrawer } from "./components/NotificationsDrawer";
+import { BackgroundDoodles } from "./components/BackgroundDoodles";
+import { AdminSection } from "./components/AdminSection";
+
+// Icons
+import {
+  Home,
+  Sparkles,
+  Bell,
+  Gift,
+  Users,
+  Award,
+  ShoppingCart,
+  Laptop,
+  Compass,
+  Layers,
+  Heart,
+  Smartphone,
+  ShieldCheck,
+  ShieldAlert,
+  User,
+  Settings,
+  Lock,
+  Mail,
+  Menu,
+  X,
+  FileText,
+  CheckSquare,
+  CreditCard,
+  Calendar,
+  LineChart,
+  Building,
+  ChevronDown,
+  ChevronUp,
+  ChevronRight,
+  Star,
+  Clock,
+  FastForward, Share2, CheckCircle2,
+  Briefcase,
+  Plus,
+  Linkedin,
+  Github,
+  LogOut} from "lucide-react";
+
+const initialTasks: ProjectTask[] = [
+  { id: "t1", title: "Instagram Reels Campaign Video", desc: "₦250,000 || Coca-Cola Nigeria || Shoot 1x aesthetic morning routine Reel featuring Coke Zero Sugar and tag @cocacolanigeria.", status: "inprogress", priority: "High", assignee: "Coca-Cola Nigeria", dueDate: "2026-07-12", category: "marketing" },
+  { id: "t2", title: "TikTok Meme Ad Integration", desc: "₦180,000 || PiggyVest Fintech || Produce 1x high-retention funny meme TikTok video showcasing the automated savings features of PiggyVest.", status: "todo", priority: "Medium", assignee: "PiggyVest Fintech", dueDate: "2026-07-15", category: "design" },
+  { id: "t3", title: "UGC Styling Video Reel", desc: "₦120,000 || Kala Bespoke Fashion || Deliver 1x aesthetic unboxing and styling walkthrough of the latest summer linen jackets.", status: "review", priority: "High", assignee: "Kala Bespoke Fashion", dueDate: "2026-07-09", category: "dev" }
+];
+
+export default function App() {
+  // Authentication State
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
+  const [authEmail, setAuthEmail] = useState("chinedu@estrr.com");
+  const [authPassword, setAuthPassword] = useState("password123");
+  const [authName, setAuthName] = useState("Chinedu Okafor");
+  const [authBirthdate, setAuthBirthdate] = useState("");
+  const [authAccountType, setAuthAccountType] = useState<"freelancer" | "jobOwner">("freelancer");
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(false);
+  const [isLinkCopied, setIsLinkCopied] = useState(false);
+
+  React.useEffect(() => {
+    setAuthError(null);
+  }, [showAuthModal, authMode]);
+
+  // Router State
+  const [activeTab, setActiveTab] = useState<
+    "home" | "connect" | "academy" | "marketplace" | "projects" | "gigs" | "community" | "mobile" | "teams" | "careers" | "about" | "how-it-works" | "payments" | "events" | "analytics" | "admin" | "portfolio"
+  >("home");
+
+  const [collapsedNavSections, setCollapsedNavSections] = useState<Record<string, boolean>>({
+    "Core Hub & Insights": false,
+    "Escrow & Professional Trade": false,
+    "Network & Social": false,
+    "Fintech & App Utilities": false,
+    "Admin Controls": false,
+  });
+
+  const [sidebarTheme, setSidebarTheme] = useState<"white" | "ivory" | "slate" | "indigo">("ivory");
+
+  const sidebarStyles = {
+    white: {
+      navClass: "bg-white border border-slate-200 text-slate-800",
+      borderClass: "border-slate-150",
+      sectionHeaderClass: "text-slate-500",
+      inactiveItemClass: "text-slate-700 hover:bg-slate-50 border-transparent hover:text-slate-900",
+      activeItemClass: "bg-purple-600 border-purple-600 text-white font-bold shadow-xs shadow-purple-500/20 translate-x-0.5",
+      descClass: "text-slate-500",
+      activeDescClass: "text-purple-100"
+    },
+    ivory: {
+      navClass: "bg-[#FAF9F5] border-2 border-[#E9E3D5] text-slate-900",
+      borderClass: "border-[#EFECE6]",
+      sectionHeaderClass: "text-slate-600",
+      inactiveItemClass: "text-slate-700 hover:bg-[#F2ECE0]/60 border-transparent hover:text-slate-950",
+      activeItemClass: "bg-purple-700 border-purple-700 text-white font-bold shadow-md shadow-purple-750/20 translate-x-0.5",
+      descClass: "text-slate-500",
+      activeDescClass: "text-purple-100"
+    },
+    slate: {
+      navClass: "bg-slate-950 border-2 border-slate-850 text-slate-100",
+      borderClass: "border-slate-850/80",
+      sectionHeaderClass: "text-slate-400",
+      inactiveItemClass: "text-slate-300 hover:bg-slate-900 border-transparent hover:text-white",
+      activeItemClass: "bg-purple-600 border-purple-600 text-white font-bold shadow-xs shadow-purple-500/30 translate-x-0.5",
+      descClass: "text-slate-500",
+      activeDescClass: "text-purple-100"
+    },
+    indigo: {
+      navClass: "bg-indigo-950 border-2 border-indigo-900 text-indigo-50",
+      borderClass: "border-indigo-900/80",
+      sectionHeaderClass: "text-indigo-300",
+      inactiveItemClass: "text-indigo-200 hover:bg-indigo-900 border-transparent hover:text-white",
+      activeItemClass: "bg-indigo-600 border-indigo-600 text-white font-bold shadow-xs shadow-indigo-500/30 translate-x-0.5",
+      descClass: "text-indigo-400",
+      activeDescClass: "text-indigo-200"
+    }
+  };
+
+  const toggleNavSection = (sectionName: string) => {
+    setCollapsedNavSections((prev) => ({
+      ...prev,
+      [sectionName]: !prev[sectionName]
+    }));
+  };
+
+  // Core App states
+  const [userProfile, setUserProfile] = useState<UserProfile>(initialProfile);
+  const [posts, setPosts] = useState<ActivityPost[]>(initialPosts);
+  const [courses, setCourses] = useState<Course[]>(initialCourses);
+  const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [campaigns, setCampaigns] = useState<BrandCampaign[]>(initialCampaigns);
+  const [tasks, setTasks] = useState<ProjectTask[]>(initialTasks);
+  const [jobs, setJobs] = useState<Job[]>(initialJobs);
+  const [channels, setChannels] = useState<CommunityChannel[]>(initialChannels);
+
+  // LinkedIn OAuth
+  const handleLinkedInLogin = async () => {
+    try {
+      setIsAuthLoading(true);
+      const response = await fetch("/api/auth/linkedin/url");
+      const { url } = await response.json();
+      
+      const width = 600;
+      const height = 700;
+      const left = window.screen.width / 2 - width / 2;
+      const top = window.screen.height / 2 - height / 2;
+      
+      const authWindow = window.open(
+        url,
+        "linkedin_auth",
+        `width=${width},height=${height},left=${left},top=${top}`
+      );
+
+      if (!authWindow) {
+        alert("Please allow popups for LinkedIn login.");
+        setIsAuthLoading(false);
+      }
+    } catch (err) {
+      console.error("LinkedIn login fetch error:", err);
+      setIsAuthLoading(false);
+    }
+  };
+
+  // GitHub OAuth
+  const handleGithubLogin = async () => {
+    try {
+      setIsAuthLoading(true);
+      const response = await fetch("/api/auth/github/url");
+      const { url } = await response.json();
+      
+      const width = 600;
+      const height = 700;
+      const left = window.screen.width / 2 - width / 2;
+      const top = window.screen.height / 2 - height / 2;
+      
+      const authWindow = window.open(
+        url,
+        "github_auth",
+        `width=${width},height=${height},left=${left},top=${top}`
+      );
+
+      if (!authWindow) {
+        alert("Please allow popups for GitHub login.");
+        setIsAuthLoading(false);
+      }
+    } catch (err) {
+      console.error("GitHub login fetch error:", err);
+      setIsAuthLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    const handleMessage = async (event: MessageEvent) => {
+      // Validate origin if possible, but '*' is used in server res.send
+      if (event.data?.type === "OAUTH_AUTH_SUCCESS") {
+        const { provider, user: oauthUser } = event.data;
+        
+        if (provider === "linkedin" || provider === "github") {
+          // For this environment, we simulate authentication by updating local state
+          // and optionally saving a placeholder profile if needed.
+          const email = oauthUser?.email || `${provider}_user@estrr.com`;
+          const name = oauthUser?.name || oauthUser?.login || "OAuth User";
+          
+          const updatedProfile = {
+            ...userProfile,
+            name: name,
+            email: email,
+            avatar: oauthUser?.picture || oauthUser?.avatar_url || userProfile.avatar,
+            profession: `${provider === "linkedin" ? "LinkedIn" : "GitHub"} Verified Professional`,
+            accountType: "freelancer" as const
+          };
+          
+          setUserProfile(updatedProfile);
+          setIsAuthenticated(true);
+          setShowAuthModal(false);
+          setIsAuthLoading(false);
+          
+          confetti({
+            particleCount: 150,
+            spread: 70,
+            origin: { y: 0.6 }
+          });
+        }
+      }
+    };
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, [userProfile]);
+
+  // Firestore Syncing Wrappers
+  const handleUpdateProfile = async (updatedProfile: UserProfile) => {
+    setUserProfile(updatedProfile);
+    if (auth.currentUser) {
+      await saveUserProfile(auth.currentUser.uid, updatedProfile);
+    }
+  };
+
+  const handleUpdatePosts = async (updatedPosts: ActivityPost[]) => {
+    setPosts(updatedPosts);
+    // Sync added/updated items
+    const currentMap = new Map(posts.map(item => [item.id, item]));
+    for (const newItem of updatedPosts) {
+      const existing = currentMap.get(newItem.id);
+      if (!existing || JSON.stringify(existing) !== JSON.stringify(newItem)) {
+        await saveCollectionItem("posts", newItem);
+      }
+    }
+    // Delete items removed from list
+    for (const oldItem of posts) {
+      if (!updatedPosts.some(item => item.id === oldItem.id)) {
+        await deleteCollectionItem("posts", oldItem.id);
+      }
+    }
+  };
+
+  const handleUpdateCourses = async (updatedCourses: Course[]) => {
+    setCourses(updatedCourses);
+    const currentMap = new Map(courses.map(item => [item.id, item]));
+    for (const newItem of updatedCourses) {
+      const existing = currentMap.get(newItem.id);
+      if (!existing || JSON.stringify(existing) !== JSON.stringify(newItem)) {
+        await saveCollectionItem("courses", newItem);
+      }
+    }
+    for (const oldItem of courses) {
+      if (!updatedCourses.some(item => item.id === oldItem.id)) {
+        await deleteCollectionItem("courses", oldItem.id);
+      }
+    }
+  };
+
+  const handleUpdateProducts = async (updatedProducts: Product[]) => {
+    setProducts(updatedProducts);
+    const currentMap = new Map(products.map(item => [item.id, item]));
+    for (const newItem of updatedProducts) {
+      const existing = currentMap.get(newItem.id);
+      if (!existing || JSON.stringify(existing) !== JSON.stringify(newItem)) {
+        await saveCollectionItem("products", newItem);
+      }
+    }
+    for (const oldItem of products) {
+      if (!updatedProducts.some(item => item.id === oldItem.id)) {
+        await deleteCollectionItem("products", oldItem.id);
+      }
+    }
+  };
+
+  const handleUpdateTasks = async (updatedTasks: ProjectTask[]) => {
+    setTasks(updatedTasks);
+    const currentMap = new Map(tasks.map(item => [item.id, item]));
+    for (const newItem of updatedTasks) {
+      const existing = currentMap.get(newItem.id);
+      if (!existing || JSON.stringify(existing) !== JSON.stringify(newItem)) {
+        await saveCollectionItem("tasks", newItem);
+      }
+    }
+    for (const oldItem of tasks) {
+      if (!updatedTasks.some(item => item.id === oldItem.id)) {
+        await deleteCollectionItem("tasks", oldItem.id);
+      }
+    }
+  };
+
+  const handleUpdateChannels = async (updatedChannels: CommunityChannel[]) => {
+    setChannels(updatedChannels);
+    const currentMap = new Map(channels.map(item => [item.id, item]));
+    for (const newItem of updatedChannels) {
+      const existing = currentMap.get(newItem.id);
+      if (!existing || JSON.stringify(existing) !== JSON.stringify(newItem)) {
+        await saveCollectionItem("channels", newItem);
+      }
+    }
+    for (const oldItem of channels) {
+      if (!updatedChannels.some(item => item.id === oldItem.id)) {
+        await deleteCollectionItem("channels", oldItem.id);
+      }
+    }
+  };
+
+  const handleUpdateJobs = async (updatedJobs: Job[]) => {
+    setJobs(updatedJobs);
+    const currentMap = new Map(jobs.map(item => [item.id, item]));
+    for (const newItem of updatedJobs) {
+      const existing = currentMap.get(newItem.id);
+      if (!existing || JSON.stringify(existing) !== JSON.stringify(newItem)) {
+        await saveCollectionItem("jobs", newItem);
+      }
+    }
+    for (const oldItem of jobs) {
+      if (!updatedJobs.some(item => item.id === oldItem.id)) {
+        await deleteCollectionItem("jobs", oldItem.id);
+      }
+    }
+  };
+
+  const cycleTaskStatus = (e: React.MouseEvent, taskId: string, currentStatus: string) => {
+    e.stopPropagation();
+    const statusFlow: Record<string, ProjectTask["status"]> = {
+      todo: "inprogress",
+      inprogress: "review",
+      review: "done",
+      done: "todo"
+    };
+    const newStatus = statusFlow[currentStatus] || "todo";
+    
+    if (newStatus === "done") {
+      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+      confetti({
+        particleCount: 60,
+        spread: 60,
+        origin: {
+          x: (rect.left + rect.width / 2) / window.innerWidth,
+          y: (rect.top + rect.height / 2) / window.innerHeight,
+        },
+        colors: ['#a855f7', '#10b981', '#3b82f6'],
+        disableForReducedMotion: true,
+      });
+    }
+
+    const updatedTasks = tasks.map((t) => (t.id === taskId ? { ...t, status: newStatus } : t));
+    handleUpdateTasks(updatedTasks);
+  };
+
+  // Profile Settings Sidebar Drawer state
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [editBio, setEditBio] = useState(userProfile.bio || "");
+  const [editProfession, setEditProfession] = useState(userProfile.profession || "");
+  const [editSkills, setEditSkills] = useState(userProfile.skills?.join(", ") || "");
+  const [editBirthdate, setEditBirthdate] = useState(userProfile.birthdate || "1998-07-06");
+  const [editAvatar, setEditAvatar] = useState(userProfile.avatar || "");
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Sync edit state with user profile whenever drawer opens or profile changes
+  React.useEffect(() => {
+    if (isProfileOpen) {
+      setEditBio(userProfile.bio || "");
+      setEditProfession(userProfile.profession || "");
+      setEditSkills(userProfile.skills?.join(", ") || "");
+      setEditBirthdate(userProfile.birthdate || "1998-07-06");
+      setEditAvatar(userProfile.avatar || "");
+    }
+  }, [isProfileOpen, userProfile]);
+
+  // Listen for Firebase auth state changes
+  React.useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // Fetch custom user profile from Firestore or load fallback profile
+        const profile = await getUserProfile(user.uid, user.email || undefined, user.displayName || undefined);
+        setUserProfile(profile);
+        setIsAuthenticated(true);
+        
+        // Auto-set admin privileges if email matches admin accounts
+        const userEmail = (user.email || profile.email || "").trim().toLowerCase();
+        if (userEmail === "rdgabmomoh@gmail.com" || userEmail === "raphdafemomoh@gmail.com") {
+          setIsAdmin(true);
+        } else {
+          setIsAdmin(false);
+        }
+
+        // Load collaborative lists from Firestore
+        try {
+          const fetchedPosts = await getCollectionData<ActivityPost>("posts", initialPosts);
+          setPosts(fetchedPosts);
+
+          const fetchedCourses = await getCollectionData<Course>("courses", initialCourses);
+          setCourses(fetchedCourses);
+
+          const fetchedProducts = await getCollectionData<Product>("products", initialProducts);
+          setProducts(fetchedProducts);
+
+          const fetchedCampaigns = await getCollectionData<BrandCampaign>("campaigns", initialCampaigns);
+          setCampaigns(fetchedCampaigns);
+
+          const fetchedTasks = await getCollectionData<ProjectTask>("tasks", initialTasks);
+          setTasks(fetchedTasks);
+
+          const fetchedJobs = await getCollectionData<Job>("jobs", initialJobs);
+          setJobs(fetchedJobs);
+
+          const fetchedChannels = await getCollectionData<CommunityChannel>("channels", initialChannels);
+          setChannels(fetchedChannels);
+        } catch (err) {
+          console.error("Error loading collaborative collections:", err);
+        }
+      } else {
+        setIsAuthenticated(false);
+        setUserProfile(initialProfile);
+        setPosts(initialPosts);
+        setCourses(initialCourses);
+        setProducts(initialProducts);
+        setCampaigns(initialCampaigns);
+        setTasks(initialTasks);
+        setJobs(initialJobs);
+        setChannels(initialChannels);
+        setIsAdmin(false);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // ESTARR AI Drawer State
+  const [isAiOpen, setIsAiOpen] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [aiContext, setAiContext] = useState("general");
+
+  const handleOpenAi = (prompt: string, context: string) => {
+    setAiPrompt(prompt);
+    setAiContext(context);
+    setIsAiOpen(true);
+  };
+
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const updatedProfile = {
+      ...userProfile,
+      bio: editBio,
+      profession: editProfession,
+      skills: editSkills.split(",").map(s => s.trim()).filter(Boolean),
+      birthdate: editBirthdate,
+      avatar: editAvatar
+    };
+    setUserProfile(updatedProfile);
+    
+    // If authenticated, also save it in Firestore!
+    if (auth.currentUser) {
+      await saveUserProfile(auth.currentUser.uid, updatedProfile);
+    }
+    
+    setIsProfileOpen(false);
+    alert("Profile configurations updated successfully!");
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!authEmail || !authPassword) return;
+
+    setIsAuthLoading(true);
+    setAuthError(null);
+    try {
+      if (authMode === "signin") {
+        try {
+          await signInWithEmailAndPassword(auth, authEmail, authPassword);
+        } catch (signInErr: any) {
+          // If the user doesn't exist (invalid-credential or user-not-found), automatically attempt registration as a seamless fallback
+          if (signInErr.code === "auth/invalid-credential" || signInErr.code === "auth/user-not-found") {
+            console.log("Account not found or invalid credentials on first sign in. Attempting seamless auto-registration fallback...");
+            try {
+              const userCredential = await createUserWithEmailAndPassword(auth, authEmail, authPassword);
+              const user = userCredential.user;
+              await saveUserProfile(user.uid, {
+                name: authName || authEmail.split("@")[0],
+                email: authEmail,
+                birthdate: authBirthdate || "1998-07-06",
+                accountType: authAccountType,
+                profession: authAccountType === "freelancer" ? "Professional Freelancer" : "Job Provider / Owner",
+              });
+              // Send signup welcome email
+              try {
+                fetch("/api/send-welcome", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    email: authEmail,
+                    name: authName || authEmail.split("@")[0],
+                    type: "signup"
+                  })
+                }).catch(err => console.error("Async welcome email dispatch failed:", err));
+              } catch (e) {}
+            } catch (signUpErr: any) {
+              // If registration fails because the email is already in use, it means the password they entered was wrong
+              if (signUpErr.code === "auth/email-already-in-use") {
+                throw signInErr;
+              } else {
+                throw signUpErr;
+              }
+            }
+          } else {
+            throw signInErr;
+          }
+        }
+      } else {
+        const userCredential = await createUserWithEmailAndPassword(auth, authEmail, authPassword);
+        const user = userCredential.user;
+        await saveUserProfile(user.uid, {
+          name: authName,
+          email: authEmail,
+          birthdate: authBirthdate || "1998-07-06",
+          accountType: authAccountType,
+          profession: authAccountType === "freelancer" ? "Professional Freelancer" : "Job Provider / Owner",
+        });
+        // Send signup welcome email
+        try {
+          fetch("/api/send-welcome", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: authEmail,
+              name: authName,
+              type: "signup"
+            })
+          }).catch(err => console.error("Async welcome email dispatch failed:", err));
+        } catch (e) {}
+      }
+      setShowAuthModal(false);
+    } catch (error: any) {
+      console.error("Auth error details:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
+      let friendlyMessage = error.message;
+      if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password" || error.code === "auth/invalid-credential") {
+        friendlyMessage = "Incorrect email or password. If you don't have an account, please click SIGN UP below to register first!";
+      } else if (error.code === "auth/email-already-in-use") {
+        friendlyMessage = "An account with this email already exists. Try signing in instead.";
+      } else if (error.code === "auth/weak-password") {
+        friendlyMessage = "Password is too weak. Please use at least 6 characters.";
+      } else if (error.code === "auth/invalid-email") {
+        friendlyMessage = "Please enter a valid email address.";
+      } else if (error.code === "auth/network-request-failed") {
+        friendlyMessage = "Network error: Unable to reach the authentication server. This often happens due to domain restrictions on the Firebase API key. Please ensure your domain is whitelisted in the Firebase Console.";
+      }
+      setAuthError(friendlyMessage);
+    } finally {
+      setIsAuthLoading(false);
+    }
+  };
+
+  const isSidebarHidden = false;
+
+  return (
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans antialiased selection:bg-purple-600 selection:text-white relative overflow-hidden">
+      
+      {/* Scrollable Background Doodles */}
+      <BackgroundDoodles />
+      
+      {/* Global Background Abstract Patterns */}
+      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        {/* Left Side Corners */}
+        <div className="absolute left-[3%] top-[12%] text-purple-500/5 rotate-12">
+          <svg width="140" height="140" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+            <circle cx="50" cy="50" r="40" strokeDasharray="8 8" />
+            <circle cx="50" cy="50" r="25" />
+            <circle cx="50" cy="50" r="12" strokeDasharray="4 4" />
+          </svg>
+        </div>
+        <div className="absolute left-[5%] top-[50%] text-emerald-500/5 -rotate-12">
+          <svg width="130" height="130" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="4">
+            <rect x="20" y="20" width="60" height="60" rx="10" />
+            <rect x="35" y="35" width="30" height="30" rx="5" strokeDasharray="4 4" />
+          </svg>
+        </div>
+        <div className="absolute left-[2%] bottom-[10%] text-blue-500/5 rotate-45">
+          <svg width="150" height="150" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+            <path d="M 10 35 Q 30 5 50 35 T 90 35" />
+            <path d="M 10 55 Q 30 25 50 55 T 90 55" />
+            <path d="M 10 75 Q 30 45 50 75 T 90 75" />
+          </svg>
+        </div>
+
+        {/* Right Side Corners */}
+        <div className="absolute right-[3%] top-[20%] text-blue-500/5 -rotate-12">
+          <svg width="150" height="150" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+            <path d="M 20 20 L 80 80 M 80 20 L 20 80" />
+            <circle cx="50" cy="50" r="30" strokeDasharray="6 6" />
+          </svg>
+        </div>
+        <div className="absolute right-[5%] top-[55%] text-purple-500/5 rotate-12">
+          <svg width="120" height="120" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round">
+            <line x1="20" y1="20" x2="80" y2="20" />
+            <line x1="20" y1="40" x2="80" y2="40" strokeDasharray="6 6" />
+            <line x1="20" y1="60" x2="80" y2="60" />
+            <line x1="20" y1="80" x2="80" y2="80" strokeDasharray="6 6" />
+          </svg>
+        </div>
+        <div className="absolute right-[2%] bottom-[12%] text-rose-500/5 -rotate-45">
+          <svg width="160" height="160" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+            <polygon points="50,15 85,85 15,85" />
+            <polygon points="50,30 72,80 28,80" strokeDasharray="4 4" />
+          </svg>
+        </div>
+      </div>
+
+      {showAuthModal && (
+        <div className="fixed inset-0 z-50 bg-slate-50/90 backdrop-blur-xs flex flex-col justify-center items-center p-4 selection:bg-purple-600 selection:text-white border-4 border-slate-200">
+          <div className="absolute inset-0 bg-[linear-gradient(to_right,#0a0a0a_1px,transparent_1px),linear-gradient(to_bottom,#0a0a0a_1px,transparent_1px)] bg-[size:5rem_5rem] opacity-5 pointer-events-none" />
+          <div className="w-full max-w-sm bg-white border-2 border-slate-200 p-5 md:p-6 shadow-lg shadow-slate-200/50 relative z-10 rounded-xl">
+            <button onClick={() => setShowAuthModal(false)} className="absolute top-3 right-3 text-slate-900 hover:text-purple-500 transition-colors"><X className="w-5 h-5" /></button>
+            <div className="text-center flex flex-col items-center gap-1 mb-4 mt-1">
+              <div className="group relative w-10 h-10 flex items-center justify-center transition-all duration-500 hover:-translate-y-0.5 cursor-pointer">
+                <svg width="40" height="40" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-10 h-10 drop-shadow-md">
+                  <defs>
+                    <linearGradient id="brand-grad-modal" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#9d50bb" />
+                      <stop offset="100%" stopColor="#6e48aa" />
+                    </linearGradient>
+                  </defs>
+                  <rect x="20" y="20" width="160" height="160" rx="40" fill="url(#brand-grad-modal)" />
+                  <path d="M100 45L112.5 83.5H153L120.25 107.5L132.75 146L100 122L67.25 146L79.75 107.5L47 83.5H87.5L100 45Z" fill="white" className="transition-transform duration-700 origin-center group-hover:scale-110 group-hover:rotate-[144deg]" />
+                </svg>
+              </div>
+              <h1 className="font-display font-bold text-xl tracking-tight mt-2 text-slate-900">ESTARR APP</h1>
+              <p className="text-[11px] text-purple-600 font-bold tracking-wide mt-0.5">Empowering Creators & Pros</p>
+              <p className="text-[10px] text-slate-400">Connect • Learn • Build • Work • Grow</p>
+            </div>
+            <form onSubmit={handleLogin} className="flex flex-col gap-3 text-xs">
+              {authMode === "signup" && (
+                <>
+                  <div className="flex flex-col gap-1">
+                    <label className="font-mono text-[9px] font-bold text-slate-900 tracking-wide">Full Name</label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-2.5 w-3.5 h-3.5 text-slate-800" />
+                      <input
+                        type="text"
+                        required
+                        disabled={isAuthLoading}
+                        placeholder="Chinedu Okafor"
+                        value={authName}
+                        onChange={(e) => setAuthName(e.target.value)}
+                        className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-3 py-2 focus:outline-none focus:bg-slate-50 text-slate-900 font-medium disabled:opacity-60"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="flex flex-col gap-1">
+                      <label className="font-mono text-[9px] font-bold text-slate-900 tracking-wide">Account Type *</label>
+                      <div className="flex gap-1.5">
+                        <button
+                          type="button"
+                          disabled={isAuthLoading}
+                          onClick={() => setAuthAccountType("freelancer")}
+                          className={`flex-1 py-1.5 px-2 rounded-xl border text-[10px] font-bold transition-all disabled:opacity-60 ${authAccountType === "freelancer" ? "bg-purple-100 border-purple-500 text-purple-700" : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"}`}
+                        >
+                          Freelancer
+                        </button>
+                        <button
+                          type="button"
+                          disabled={isAuthLoading}
+                          onClick={() => setAuthAccountType("jobOwner")}
+                          className={`flex-1 py-1.5 px-2 rounded-xl border text-[10px] font-bold transition-all disabled:opacity-60 ${authAccountType === "jobOwner" ? "bg-purple-100 border-purple-500 text-purple-700" : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"}`}
+                        >
+                          Owner
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <label className="font-mono text-[9px] font-bold text-slate-900 tracking-wide">Birthdate *</label>
+                      <div className="relative">
+                        <Calendar className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-slate-800" />
+                        <input
+                          type="date"
+                          required
+                          disabled={isAuthLoading}
+                          value={authBirthdate}
+                          onChange={(e) => setAuthBirthdate(e.target.value)}
+                          className="w-full bg-white border border-slate-200 rounded-xl pl-8 pr-2 py-2 focus:outline-none focus:bg-slate-50 text-slate-900 font-medium text-[10px] disabled:opacity-60"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              <div className="flex flex-col gap-1">
+                <label className="font-mono text-[9px] font-bold text-slate-900 tracking-wide">Email Address</label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-2.5 w-3.5 h-3.5 text-slate-800" />
+                  <input
+                    type="email"
+                    required
+                    disabled={isAuthLoading}
+                    placeholder="chinedu@estrr.com"
+                    value={authEmail}
+                    onChange={(e) => setAuthEmail(e.target.value)}
+                    className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-3 py-2 focus:outline-none focus:bg-slate-50 text-slate-900 font-medium disabled:opacity-60"
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="font-mono text-[9px] font-bold text-slate-900 tracking-wide">Security Password</label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-2.5 w-3.5 h-3.5 text-slate-800" />
+                  <input
+                    type="password"
+                    required
+                    disabled={isAuthLoading}
+                    placeholder="••••••••"
+                    value={authPassword}
+                    onChange={(e) => setAuthPassword(e.target.value)}
+                    className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-3 py-2 focus:outline-none focus:bg-slate-50 text-slate-900 font-medium disabled:opacity-60"
+                  />
+                </div>
+              </div>
+
+              {authMode === "signin" && (
+                <p className="text-[10px] text-slate-500 font-mono italic leading-relaxed bg-slate-50 p-2 rounded-lg border border-slate-100">
+                  💡 <strong>Tip:</strong> If you don't have an account in the database yet, click <strong>SIGN UP</strong> below to register one!
+                </p>
+              )}
+
+              {authError && (
+                <div className="p-2.5 bg-rose-50 border border-rose-100 text-rose-600 rounded-xl text-[10px] font-mono leading-relaxed">
+                  ⚠️ {authError}
+                </div>
+              )}
+
+              <button
+                id="btn-auth-submit"
+                type="submit"
+                disabled={isAuthLoading}
+                className={`w-full btn-primary text-[10px] uppercase mt-2 py-2.5 flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed`}
+              >
+                {isAuthLoading ? (
+                  <>
+                    <svg className="animate-spin h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    <span>Processing...</span>
+                  </>
+                ) : (
+                  authMode === "signin" ? "Sign In to ESTARR" : "Create Account"
+                )}
+               </button>
+            </form>
+
+            <div className="relative flex items-center gap-3 my-4">
+              <div className="flex-1 h-px bg-slate-200" />
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Or Continue With</span>
+              <div className="flex-1 h-px bg-slate-200" />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 mb-2">
+              <button
+                type="button"
+                onClick={handleLinkedInLogin}
+                className="flex items-center justify-center gap-2 py-2 px-4 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors text-xs font-bold text-slate-700 cursor-pointer"
+              >
+                <Linkedin className="w-4 h-4 text-[#0A66C2]" />
+                LinkedIn
+              </button>
+              <button
+                type="button"
+                onClick={handleGithubLogin}
+                className="flex items-center justify-center gap-2 py-2 px-4 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors text-xs font-bold text-slate-700 cursor-pointer"
+              >
+                <Github className="w-4 h-4 text-slate-900" />
+                GitHub
+              </button>
+            </div>
+
+            <div className="text-center mt-4 pt-3 border-t border-slate-200/25 text-[11px]">
+              {authMode === "signin" ? (
+                <p className="text-slate-500">
+                  Don't have an account yet?{" "}
+                  <button
+                    onClick={() => setAuthMode("signup")}
+                    className="text-purple-500 font-bold hover:underline uppercase tracking-tight cursor-pointer"
+                  >
+                    Sign Up
+                  </button>
+                </p>
+              ) : (
+                <p className="text-slate-500">
+                  Already registered?{" "}
+                  <button
+                    onClick={() => setAuthMode("signin")}
+                    className="text-purple-500 font-bold hover:underline uppercase tracking-tight cursor-pointer"
+                  >
+                    Sign In
+                  </button>
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Dynamic Header */}  {/* Dynamic Header */}
+      <header className="sticky top-0 bg-slate-50 border-b-2 border-slate-200 z-40 px-6 py-4 flex justify-between items-center shadow-none">
+        <button onClick={() => setActiveTab("home")} className="flex items-center gap-3 text-left cursor-pointer hover:opacity-90">
+          <div className="group relative w-11 h-11 flex items-center justify-center transition-all duration-500 hover:-translate-y-0.5">
+            <svg width="44" height="44" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-11 h-11 drop-shadow-md">
+              <defs>
+                <linearGradient id="brand-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#9d50bb" />
+                  <stop offset="100%" stopColor="#6e48aa" />
+                </linearGradient>
+              </defs>
+              <rect x="20" y="20" width="160" height="160" rx="40" fill="url(#brand-grad)" />
+              <path d="M100 45L112.5 83.5H153L120.25 107.5L132.75 146L100 122L67.25 146L79.75 107.5L47 83.5H87.5L100 45Z" fill="white" className="transition-transform duration-700 origin-center group-hover:scale-110 group-hover:rotate-[144deg]" />
+            </svg>
+          </div>
+          <div>
+            <h1 className="font-display font-bold text-sm md:text-base uppercase tracking-tight text-slate-900">ESTARR APP</h1>
+            <p className="text-[10px] text-slate-900 font-medium tracking-wide font-bold opacity-60">Empowering Creators & Pros</p>
+          </div>
+        </button>
+
+        {/* Global User Profile Indicator */}
+        <div className="flex items-center gap-3">
+          {isAuthenticated ? (
+            <>
+              <button
+                onClick={() => setIsNotificationsOpen(true)}
+                className="relative bg-white hover:bg-slate-100 text-slate-900 border border-slate-200 p-2 rounded-xl cursor-pointer transition-colors shadow-sm"
+              >
+                <Bell className="w-4 h-4" />
+                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+              </button>
+              <button
+                id="btn-edit-profile-main"
+                onClick={() => setIsProfileOpen(true)}
+                className="flex items-center gap-2 text-left bg-white hover:bg-slate-100 p-1 border border-slate-200 cursor-pointer transition-all pr-3 rounded-xl"
+              >
+                <img src={userProfile.avatar} alt="avatar" className="w-7 h-7 object-cover border border-slate-200 rounded-lg" />
+                <div className="hidden sm:block text-[10px]">
+                  <span className="font-bold text-slate-900 block leading-tight uppercase tracking-tight">{userProfile.name}</span>
+                  <span className="text-purple-500 font-bold block leading-tight text-[8px] uppercase tracking-wider">Configure Profile</span>
+                </div>
+              </button>
+              <button
+                onClick={async () => {
+                  try {
+                    await firebaseSignOut(auth);
+                    setActiveTab("home");
+                    alert("Successfully logged out from Firebase Auth.");
+                  } catch (error: any) {
+                    console.error("Logout error:", error);
+                  }
+                }}
+                className="flex items-center justify-center w-9 h-9 bg-white hover:bg-rose-50 text-slate-400 hover:text-rose-500 border border-slate-200 rounded-xl transition-colors shadow-sm"
+                title="Sign Out"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </>
+          ) : (
+            <div className="flex gap-2">
+              <button 
+                onClick={() => { setAuthMode("signin"); setShowAuthModal(true); }}
+                className="btn-secondary px-4 py-1.5 text-[10px]"
+              >
+                Sign In
+              </button>
+              <button 
+                onClick={() => { setAuthMode("signup"); setShowAuthModal(true); }}
+                className="btn-primary px-4 py-1.5 text-[10px]"
+              >
+                Sign Up
+              </button>
+            </div>
+          )}
+        </div>
+      </header>
+
+      {/* Main Container Layout */}
+      <div className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 relative z-10">
+        {/* Navigation Rail Sidebar */}
+        {!isSidebarHidden && (<nav className={`lg:col-span-3 flex flex-col gap-4 p-4 h-fit shadow-xs rounded-xl transition-all duration-300 ${sidebarStyles[sidebarTheme].navClass}`}>
+          <div className={`flex flex-col gap-2 border-b pb-3 mb-1 ${sidebarStyles[sidebarTheme].borderClass}`}>
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-mono font-bold uppercase tracking-widest">
+                ESTARR ECOSYSTEM
+              </span>
+              <span className="text-[9px] font-mono text-purple-600 bg-purple-50/80 border border-purple-100/30 px-2 py-0.5 rounded-full font-black">
+                13 MODULES
+              </span>
+            </div>
+            
+            {/* Theme Swatches Picker removed since it can be controlled from the admin panel */}
+          </div>
+
+          {[
+            {
+              title: "Core Hub & Insights",
+              items: [
+                { id: "home", label: "Home", desc: "Editorial ecosystem overview", icon: Home },
+                { id: "academy", label: "Academy", desc: "Practical classes & quizzes", icon: Award },
+                { id: "portfolio", label: "Professional Portfolio", desc: "Showcase skills & projects", icon: Briefcase },
+                { id: "analytics", label: "IT & Creator Analytics", desc: "Tech/Social metrics & Media Kit", icon: LineChart },
+              ]
+            },
+            {
+              title: "Escrow & Professional Trade",
+              items: [
+                { id: "projects", label: "Escrow Hub", desc: "Paid milestones & escrow", icon: CheckSquare },
+                { id: "careers", label: "Jobs Board", desc: "Full-time & freelance opportunities", icon: Compass },
+                { id: "gigs", label: "Gigs", desc: "Escrow micro-service market", icon: Laptop },
+                { id: "marketplace", label: "Marketplace", desc: "Escrow trade & storefronts", icon: ShoppingCart },
+              ]
+            },
+            {
+              title: "Network & Social",
+              items: [
+                { id: "connect", label: "Connect", desc: "Professional network & peers", icon: Users },
+                { id: "community", label: "Community", desc: "Cohorts & discussion boards", icon: Heart },
+                { id: "events", label: "Events", desc: "Live streams & ticketing", icon: Calendar },
+              ]
+            },
+            {
+              title: "Fintech & App Utilities",
+              items: [
+                { id: "payments", label: "Payments", desc: "Digital wallets & transfers", icon: CreditCard },
+                { id: "mobile", label: "Companion App", desc: "Download the ESTARR APP", icon: Smartphone },
+                { id: "rewards", label: "Ambassadors", desc: "Earn Points & Rewards", icon: Gift }
+              ]
+            },
+            {
+              title: "Admin Controls",
+              items: [
+                { id: "admin", label: "Admin Dashboard", desc: "System settings & metrics", icon: ShieldCheck }
+              ]
+            }
+          ].map((section) => {
+            const isCollapsed = collapsedNavSections[section.title];
+            const hasActiveItem = section.items.some(item => item.id === activeTab);
+            
+            return (
+              <div key={section.title} className="flex flex-col gap-1.5">
+                {/* Section Header Toggle */}
+                <div 
+                  onClick={() => toggleNavSection(section.title)}
+                  className={`flex items-center justify-between text-[10px] font-mono font-bold hover:opacity-80 tracking-wider cursor-pointer uppercase py-1 select-none transition-colors group ${sidebarStyles[sidebarTheme].sectionHeaderClass}`}
+                >
+                  <span className="flex items-center gap-1.5">
+                    {hasActiveItem && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
+                    )}
+                    {section.title}
+                  </span>
+                  <div className="flex items-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
+                    <span className="text-[8px] font-normal">({section.items.length})</span>
+                    {isCollapsed ? (
+                      <ChevronRight className="w-3 h-3" />
+                    ) : (
+                      <ChevronDown className="w-3 h-3" />
+                    )}
+                  </div>
+                </div>
+
+                {/* Section Items container */}
+                {!isCollapsed && (
+                  <div className={`flex flex-col gap-1 pl-1 border-l ${sidebarStyles[sidebarTheme].borderClass}`}>
+                    {section.items.map((item) => {
+                      const Icon = item.icon;
+                      const isActive = activeTab === item.id;
+                      return (
+                        <button
+                          key={item.id}
+                          id={`btn-nav-tab-${item.id}`}
+                          onClick={() => {
+                            if (!isAuthenticated) {
+                              setAuthMode("signup");
+                              setShowAuthModal(true);
+                            } else {
+                              setActiveTab(item.id as any);
+                            }
+                          }}
+                          className={`w-full text-left p-2 transition-all duration-200 cursor-pointer rounded-xl border ${
+                            isActive
+                              ? sidebarStyles[sidebarTheme].activeItemClass
+                              : sidebarStyles[sidebarTheme].inactiveItemClass
+                          }`}
+                        >
+                          <div className="flex items-start gap-3">
+                            <Icon className={`w-4 h-4 shrink-0 mt-0.5 transition-colors ${isActive ? "text-white" : "text-slate-500"}`} />
+                            <div>
+                              <span className="text-xs font-bold uppercase tracking-tight block leading-tight">{item.label}</span>
+                              <span className={`text-[9px] block leading-tight mt-0.5 font-medium transition-colors ${isActive ? sidebarStyles[sidebarTheme].activeDescClass : sidebarStyles[sidebarTheme].descClass}`}>
+                                {item.desc}
+                              </span>
+                            </div>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </nav>)}
+
+        {/* Dynamic Workspace Panel */}
+        <main className={`${isSidebarHidden ? "lg:col-span-12" : "lg:col-span-9"} flex flex-col gap-6 min-h-[500px]`}>
+          {activeTab === "home" && (
+            <div className="flex flex-col gap-6 animate-fade-in">
+              {/* Main Hero Area */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 border border-slate-200 bg-slate-50 shadow-sm hover:shadow-md transition-shadow rounded-xl">
+                {/* Hero Left: Typography Focus */}
+<div className="lg:col-span-7 p-6 md:p-10 flex flex-col border-b lg:border-b-0 lg:border-r-2 border-slate-200 bg-white rounded-xl relative overflow-hidden min-h-[420px]">
+                  {/* Decorative Abstract Shapes */}
+                  <div className="absolute right-8 top-8 text-purple-400/60 pointer-events-none rotate-12 z-0">
+                    <svg width="160" height="160" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="3">
+                      <circle cx="50" cy="50" r="40" strokeDasharray="8 8" />
+                    </svg>
+                  </div>
+                  <div className="absolute right-12 bottom-12 text-blue-400/10 pointer-events-none rotate-[25deg] z-0">
+                    <svg width="140" height="140" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round">
+                      <path d="M 50 10 V 90 M 10 50 H 90" />
+                    </svg>
+                  </div>
+                  <div className="absolute left-8 bottom-8 text-rose-400/10 pointer-events-none -rotate-[20deg] z-0">
+                    <svg width="120" height="120" viewBox="0 0 100 100" fill="currentColor">
+                      <polygon points="50,10 90,90 10,90" />
+                    </svg>
+                  </div>
+
+                  <div className="relative z-10 flex flex-col h-full">
+                    <div>
+                      <span className="px-3 py-1 bg-purple-500 text-white border border-transparent rounded-full text-[10px] font-bold tracking-wide mb-8 inline-block uppercase shadow-sm hover:shadow-md transition-all">
+                        Connect App
+                      </span>
+                      <h1 className="text-5xl md:text-6xl lg:text-7xl leading-none font-bold tracking-tight mb-4 text-slate-900">
+                        Connect &<br />
+                        <span className="text-purple-500 relative inline-block">
+                          Showcase
+                          <div className="absolute -left-4 -bottom-2 text-rose-300/10 pointer-events-none -rotate-[15deg] -z-10 mix-blend-multiply hidden md:block">
+                            <svg width="60" height="60" viewBox="0 0 100 100" fill="currentColor">
+                              <polygon points="50,10 90,90 10,90" />
+                            </svg>
+                          </div>
+                        </span>.
+                      </h1>
+                    </div>
+                    
+                    <div className="mt-4 max-w-md">
+                      <p className="text-lg md:text-xl leading-relaxed text-slate-600 font-medium">
+                        Build your professional portfolio, connect with peers, and verify your credentials on-chain.
+                      </p>
+                    </div>
+
+                    <div className="mt-8 flex items-center gap-4">
+                      <button
+                        onClick={() => {
+                          if (!isAuthenticated) {
+                            setAuthMode("signup");
+                            setShowAuthModal(true);
+                            return;
+                          }
+                          setActiveTab("portfolio");
+                        }}
+                        className="flex items-center gap-2 px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-xs uppercase tracking-wider transition-all shadow-sm hover:shadow-md border border-slate-800"
+                      >
+                        <Share2 className="w-4 h-4 text-purple-400" />
+                        <span>Share Portfolio</span>
+                      </button>
+                    </div>
+                    <div className="mt-auto pt-8">
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 border-t border-slate-100 pt-6">
+                        <div>
+                          <p className="text-2xl font-black text-slate-900 tracking-tighter">13+</p>
+                          <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mt-1">Ecosystem Modules</p>
+                        </div>
+                        <div>
+                          <p className="text-2xl font-black text-slate-900 tracking-tighter">100%</p>
+                          <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mt-1">On-Chain Secured</p>
+                        </div>
+                        <div className="hidden md:block">
+                          <p className="text-2xl font-black text-purple-500 tracking-tighter">24/7</p>
+                          <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mt-1">Escrow Pipeline</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Hero Right: Featured & AI */}
+                <div className="lg:col-span-5 flex flex-col rounded-xl">
+                  {/* Stream */}
+                  <div className="flex-1 p-6 md:p-8 bg-[#FAF9F6] border border-[#EBE8E0] text-slate-900 shadow-sm flex flex-col justify-between min-h-[220px] rounded-xl">
+                    <div>
+                      <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-[10px] uppercase tracking-[0.25em] font-bold text-purple-500">Active Escrow Pipeline</h2>
+                        <span className="text-[8px] font-mono bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-bold border border-purple-200">
+                          SECURE
+                        </span>
+                      </div>
+                      <div className="space-y-0">
+                        {tasks.slice(0, 3).map((task, index) => {
+                          // Parse budget and client
+                          let budget = "₦150,000";
+                          let client = task.assignee || "Client";
+                          if (task.desc.includes("||")) {
+                            const parts = task.desc.split("||");
+                            if (parts.length >= 2) {
+                              budget = parts[0].trim();
+                              client = parts[1].trim();
+                            }
+                          } else {
+                            if (task.id === "t1") budget = "₦250,000";
+                            else if (task.id === "t2") budget = "₦180,000";
+                            else if (task.id === "t3") budget = "₦120,000";
+                          }
+
+                          let percentage = 8;
+                          let statusText = "Locked";
+                          let statusColor = "text-purple-500";
+                          let borderColor = "via-amber-400";
+
+                          if (task.status === "inprogress") {
+                            percentage = 67;
+                            statusText = "In Progress";
+                            statusColor = "text-purple-500";
+                            borderColor = "via-purple-400";
+                          } else if (task.status === "review") {
+                            percentage = 92;
+                            statusText = "In Review";
+                            statusColor = "text-emerald-600";
+                            borderColor = "via-emerald-400";
+                          } else if (task.status === "done") {
+                            percentage = 100;
+                            statusText = "Released";
+                            statusColor = "text-blue-600";
+                            borderColor = "via-blue-400";
+                          }
+
+                          // SVG parameters for 36px circular indicator
+                          const size = 36;
+                          const strokeWidth = 3;
+                          const center = size / 2;
+                          const radius = center - strokeWidth;
+                          const circumference = 2 * Math.PI * radius;
+                          const strokeDashoffset = circumference - (percentage / 100) * circumference;
+
+                          const isDueSoon = task.dueDate && task.status !== "done" ? (new Date(task.dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60) <= 48 : false;
+                          const categoryColors: Record<string, string> = {
+                            marketing: "bg-pink-100 text-pink-700 border-pink-200",
+                            dev: "bg-cyan-100 text-cyan-700 border-cyan-200",
+                            design: "bg-fuchsia-100 text-fuchsia-700 border-fuchsia-200",
+                          };
+                          const defaultCatColor = "bg-slate-100 text-slate-500 border-slate-200";
+                          const categoryClass = task.category ? categoryColors[task.category] || defaultCatColor : "";
+
+
+                          return (
+                            <React.Fragment key={task.id}>
+                              <div 
+                                onClick={() => {
+                                  if (!isAuthenticated) {
+                                    setAuthMode("signup");
+                                    setShowAuthModal(true);
+                                  } else {
+                                    setActiveTab("projects");
+                                  }
+                                }} 
+                                className={`group cursor-pointer p-4 -mx-4 rounded-xl hover:bg-purple-50/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(168,85,247,0.08)] flex justify-between items-center gap-3`}
+                              >
+                                <div className="flex-1 min-w-0">
+                                  <h3 className="text-sm font-bold italic tracking-tight text-slate-900 group-hover:text-purple-600 transition-colors truncate">
+                                    {task.title}
+                                  </h3>
+                                  <p className="text-[10px] text-slate-500 truncate mt-0.5">
+                                    {client} • <span className="font-semibold text-slate-900">{budget}</span>
+                                  </p>
+                                  <div className="mt-1 flex items-center gap-2">
+                                    <span className={`text-[9px] font-mono font-bold uppercase tracking-wider shrink-0 ${statusColor}`}>
+                                      {statusText}
+                                    </span>
+                                    
+                                    {task.category && (
+                                      <span className={`text-[8px] font-mono font-bold uppercase px-1.5 py-0.5 rounded-full border ${categoryClass}`}>
+                                        {task.category}
+                                      </span>
+                                    )}
+
+                                    {isDueSoon && (
+                                      <span className="flex items-center gap-1 text-[9px] font-mono font-bold text-rose-500 bg-rose-500/10 px-1.5 py-0.5 rounded-full">
+                                        <Clock className="w-2.5 h-2.5" /> Due Soon
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+
+                                <div className="flex items-center gap-2 shrink-0">
+                                  {/* Quick Cycle Button */}
+                                  <button 
+                                    onClick={(e) => cycleTaskStatus(e, task.id, task.status)}
+                                    className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-purple-100 text-slate-400 hover:text-purple-600 transition-colors border border-transparent hover:border-purple-200"
+                                    title="Cycle Status"
+                                  >
+                                    <FastForward className="w-3.5 h-3.5" />
+                                  </button>
+                                  
+                                  {/* Circular Progress Indicator */}
+                                  <div className="relative flex items-center justify-center shrink-0" style={{ width: size, height: size }}>
+                                    <svg width={size} height={size} className="transform -rotate-90">
+                                      {/* Background Track */}
+                                      <circle
+                                        cx={center}
+                                        cy={center}
+                                        r={radius}
+                                        className="stroke-[#EBE8E0] fill-none"
+                                        strokeWidth={strokeWidth}
+                                      />
+                                      {/* Animated Progress Circle */}
+                                      <circle
+                                        cx={center}
+                                        cy={center}
+                                        r={radius}
+                                        className={`fill-none transition-all duration-500 ${
+                                          task.status === "inprogress"
+                                            ? "stroke-purple-500"
+                                            : task.status === "review"
+                                            ? "stroke-emerald-500"
+                                            : task.status === "done"
+                                            ? "stroke-blue-500"
+                                            : "stroke-amber-500"
+                                        }`}
+                                        strokeWidth={strokeWidth}
+                                        strokeDasharray={circumference}
+                                        strokeDashoffset={strokeDashoffset}
+                                        strokeLinecap="round"
+                                      />
+                                    </svg>
+                                    <span className="absolute text-[8px] font-mono font-bold text-white tracking-tighter">
+                                      {percentage}%
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                              {index < 2 && (
+                                <div className={`h-[2px] w-full bg-gradient-to-r from-transparent ${borderColor} to-transparent opacity-80`} />
+                              )}
+                            </React.Fragment>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* AI Quick Copilot card */}
+                  <div className="bg-purple-600 p-6 text-white border-t border-slate-800 relative flex flex-col justify-between rounded-xl">
+                    <div>
+                      <div className="text-[9px] font-semibold tracking-wide text-purple-200 mb-1">ESTARR Intelligence</div>
+                      <p className="font-bold text-xs leading-tight mb-4 text-white">
+                        "I've analyzed your portfolio. You are 12% away from qualifying for 'Senior Content Creator' roles in the Jobs Board."
+                      </p>
+                    </div>
+                    <button 
+                      onClick={() => handleOpenAi("Help me close the 12% gap to qualify as a Senior Content Creator in the Jobs Board.", "general")}
+                      className="flex justify-between items-center w-full bg-slate-950 hover:bg-slate-800 text-white p-2.5 border border-slate-800 transition-all cursor-pointer font-bold text-[10px] uppercase tracking-wider rounded-xl"
+                    >
+                      <span>Ask AI Co-pilot</span>
+                      <span className="w-5 h-5 rounded-full bg-white text-purple-600 flex items-center justify-center font-bold">?</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Interactive Grid */}
+              <ServicesCarousel
+                onSelect={(tabId) => {
+                  if (!isAuthenticated) {
+                    setAuthMode("signup");
+                    setShowAuthModal(true);
+                  } else {
+                    setActiveTab(tabId);
+                  }
+                }}
+              />
+              
+                            <HomeMarketing 
+                onStartEarning={() => {
+                  setActiveTab("home");
+                  if (!isAuthenticated) {
+                    setAuthMode("signup");
+                    setShowAuthModal(true);
+                  }
+                }} 
+                onStartCollabing={() => {
+                  setActiveTab("projects");
+                  if (!isAuthenticated) {
+                    setAuthMode("signup");
+                    setShowAuthModal(true);
+                  }
+                }}
+              />
+            </div>
+          )}
+
+          {activeTab === "connect" && (
+            <ConnectSection
+              userProfile={userProfile}
+              posts={posts}
+              onUpdatePosts={handleUpdatePosts}
+              onUpdateProfile={handleUpdateProfile}
+            />
+          )}
+
+          {activeTab === "academy" && (
+            <AcademySection
+              userProfile={userProfile}
+              courses={courses}
+              onUpdateCourses={handleUpdateCourses}
+              onUpdateProfile={handleUpdateProfile}
+              onOpenAiChat={handleOpenAi}
+            />
+          )}
+
+          {activeTab === "marketplace" && (
+            <MarketplaceSection
+              userProfile={userProfile}
+              products={products}
+              onUpdateProducts={handleUpdateProducts}
+              onOpenAiChat={handleOpenAi}
+            />
+          )}
+
+          {activeTab === "projects" && (
+            <ProjectsSection
+              userProfile={userProfile}
+              tasks={tasks}
+              onUpdateTasks={handleUpdateTasks}
+              onOpenAiChat={handleOpenAi}
+              onNavigate={setActiveTab}
+            />
+          )}
+
+          {activeTab === "gigs" && (
+            <GigsSection
+              userProfile={userProfile}
+              onOpenAiChat={handleOpenAi}
+            />
+          )}
+
+          {activeTab === "payments" && (
+            <PaymentsSection />
+          )}
+
+          {activeTab === "events" && (
+            <EventsSection />
+          )}
+
+          {activeTab === "analytics" && (
+            <AnalyticsSection userProfile={userProfile} onUpdateProfile={handleUpdateProfile} />
+          )}
+
+          {activeTab === "portfolio" && (
+            <PortfolioSection userProfile={userProfile} />
+          )}
+
+          {activeTab === "community" && (
+            <CommunitySection
+              userProfile={userProfile}
+              channels={channels}
+              onUpdateChannels={handleUpdateChannels}
+            />
+          )}
+
+          {activeTab === "mobile" && (
+            <CompanionAppDownload />
+          )}
+          {activeTab === "rewards" && (
+            <RewardsSection />
+          )}
+
+          {activeTab === "admin" && (
+            <AdminSection
+              isAdmin={isAdmin}
+              setIsAdmin={setIsAdmin}
+              sidebarTheme={sidebarTheme}
+              setSidebarTheme={setSidebarTheme}
+              userProfile={userProfile}
+            />
+          )}
+
+          {activeTab === "about" && <AboutSection />}
+          {activeTab === "teams" && <TeamsSection />}
+          {activeTab === "careers" && <JobsSection userProfile={userProfile} jobs={jobs} onUpdateJobs={handleUpdateJobs} onUpdateProfile={handleUpdateProfile} />}
+          {activeTab === "how-it-works" && <HowItWorksSection />}
+        </main>
+      </div>
+
+      {/* Notifications Drawer */}
+      <NotificationsDrawer isOpen={isNotificationsOpen} onClose={() => setIsNotificationsOpen(false)} />
+      
+      {/* Profile Config Settings Drawer */}
+      {isProfileOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex justify-end z-50">
+          <form
+            onSubmit={handleSaveProfile}
+            className="bg-slate-50 max-w-md w-full h-full p-6 md:p-8 flex flex-col justify-between shadow-2xl overflow-y-auto border-l-4 border-slate-200 rounded-xl"
+          >
+            <div>
+              <div className="flex justify-between items-center mb-6 pb-4 border-b-2 border-slate-200">
+                <h3 className="font-display font-bold text-lg text-slate-900 flex items-center gap-2 uppercase tracking-tight">
+                  <Settings className="w-5 h-5 text-purple-500" /> Configure ESTARR Profile
+                </h3>
+                <button
+                  type="button"
+                  onClick={() => setIsProfileOpen(false)}
+                  className="bg-white hover:bg-slate-100 text-slate-900 p-2 border border-slate-200 cursor-pointer rounded-xl"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="flex flex-col gap-4 text-xs">
+                {/* Photo Uploader */}
+                <div className="flex flex-col gap-2.5 items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                  <label className="font-bold uppercase tracking-wider text-slate-900 text-[10px] w-full text-left">Profile Photo</label>
+                  
+                  {/* Clickable Avatar Preview Frame */}
+                  <div 
+                    onClick={() => fileInputRef.current?.click()}
+                    className="relative group cursor-pointer transition-all hover:scale-105 active:scale-95"
+                    title="Click to upload profile photo"
+                  >
+                    <img 
+                      src={editAvatar || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150"} 
+                      alt="avatar preview" 
+                      className="w-24 h-24 rounded-full object-cover border-4 border-slate-100 shadow-md group-hover:border-purple-300 transition-colors"
+                    />
+                    <div className="absolute inset-0 bg-black/40 rounded-full flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200">
+                      <span className="text-[10px] text-white font-bold uppercase tracking-wider">Change</span>
+                      <span className="text-[8px] text-purple-200 font-medium">Click to select</span>
+                    </div>
+                  </div>
+
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                          setEditAvatar(reader.result as string);
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                    className="text-[10px] text-slate-500 file:mr-3 file:py-1 file:px-2.5 file:rounded-full file:border-0 file:text-[10px] file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 cursor-pointer w-full mt-1"
+                  />
+                  <span className="text-[9px] text-slate-400 text-center leading-normal">
+                    Supported formats: JPG, PNG, WEBP. Your new photo will be instantly visible across all sections, including Connect.
+                  </span>
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="font-bold uppercase tracking-wider text-slate-900 text-[10px]">Profession / Title</label>
+                  <input
+                    type="text"
+                    required
+                    value={editProfession}
+                    onChange={(e) => setEditProfession(e.target.value)}
+                    className="bg-white border border-slate-200 px-3 py-2.5 text-slate-900 focus:outline-none focus:bg-slate-100 rounded-xl font-medium"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="font-bold uppercase tracking-wider text-slate-900 text-[10px]">Bio Summary</label>
+                  <textarea
+                    required
+                    value={editBio}
+                    onChange={(e) => setEditBio(e.target.value)}
+                    className="bg-white border border-slate-200 px-3 py-2 text-slate-900 focus:outline-none focus:bg-slate-100 rounded-xl font-medium min-h-[80px]"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="font-bold uppercase tracking-wider text-slate-900 text-[10px]">My Skills Showcase (Comma separated)</label>
+                  <input
+                    type="text"
+                    value={editSkills}
+                    onChange={(e) => setEditSkills(e.target.value)}
+                    className="bg-white border border-slate-200 px-3 py-2.5 text-slate-900 focus:outline-none focus:bg-slate-100 rounded-xl font-medium"
+                  />
+                  <span className="text-[9px] text-slate-500">Add skills like: Canva, Video Editing, Poultry Farming to optimize gig matching results.</span>
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="font-bold uppercase tracking-wider text-slate-900 text-[10px]">My Birthdate *</label>
+                  <input
+                    type="date"
+                    required
+                    value={editBirthdate}
+                    onChange={(e) => setEditBirthdate(e.target.value)}
+                    className="bg-white border border-slate-200 px-3 py-2.5 text-slate-900 focus:outline-none focus:bg-slate-100 rounded-xl font-medium"
+                  />
+                  <span className="text-[9px] text-slate-500">Important for birthday celebrations on Connect!</span>
+                </div>
+              </div>
+            </div>
+
+            <button
+              id="btn-profile-save-submit"
+              type="submit"
+              className="w-full bg-slate-950 hover:bg-gradient-to-r hover:from-violet-600 hover:via-indigo-500 hover:to-emerald-500 text-white py-3.5 rounded-xl font-semibold tracking-wide cursor-pointer transition-all shadow-sm"
+            >
+              Save Configurations
+            </button>
+          </form>
+        </div>
+      )}
+
+      {/* Floating Persistant AI trigger button (mobile layout helper) */}
+      <button
+        id="btn-ai-float"
+        onClick={() => handleOpenAi("", "general")}
+        className="fixed bottom-12 right-12 bg-gradient-to-r from-violet-600 via-indigo-500 to-emerald-500 text-white p-4 rounded-full shadow-sm hover:shadow-md transition-shadow border border-slate-200 hover:opacity-95 transition-all cursor-pointer z-40 flex items-center justify-center animate-bounce"
+      >
+        <Sparkles className="w-5 h-5" />
+      </button>
+
+      {/* AI Drawer assistant */}
+      <ChatDrawer
+        isOpen={isAiOpen}
+        onClose={() => setIsAiOpen(false)}
+        initialPrompt={aiPrompt}
+        initialContext={aiContext}
+      />
+
+      {/* Tiny clean footer */}
+      <footer className="bg-slate-950 text-white py-12 px-6 mt-auto">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex flex-wrap justify-center md:justify-start gap-4 md:gap-8 text-[10px] font-mono tracking-widest uppercase">
+            <button onClick={() => setActiveTab("about")} className="hover:text-indigo-400 transition-colors uppercase cursor-pointer">About Us</button>
+            <button onClick={() => setActiveTab("how-it-works")} className="hover:text-indigo-400 transition-colors uppercase cursor-pointer">How It Works</button>
+            <button onClick={() => setActiveTab("teams")} className="hover:text-indigo-400 transition-colors uppercase cursor-pointer">Teams</button>
+            <button onClick={() => setActiveTab("careers")} className="hover:text-indigo-400 transition-colors uppercase cursor-pointer">Jobs</button>
+          </div>
+          <div className="text-[10px] text-center md:text-right font-mono tracking-widest uppercase opacity-50">
+            ESTARR APP • SSLABS 2026 ALL RIGHTS RESERVED • 100% OFF-CHAIN SECURED ECOSYSTEM
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}

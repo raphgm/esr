@@ -1,0 +1,1 @@
+sed -i 's/const \[isAuthenticated, setIsAuthenticated\] = useState(true);/const [isAuthenticated, setIsAuthenticated] = useState(false);\n  const [showAuthModal, setShowAuthModal] = useState(false);/' src/App.tsx

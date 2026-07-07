@@ -1,0 +1,99 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "User profile collection containing customized user stats and info",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Full name of the user" },
+        "email": { "type": "string", "description": "Email address" },
+        "profession": { "type": "string", "description": "Profession or title" },
+        "bio": { "type": "string", "description": "Short bio" },
+        "location": { "type": "string", "description": "User location" },
+        "avatar": { "type": "string", "description": "Avatar URL" },
+        "formalSkills": { "type": "array", "description": "Formal/professional skills list" },
+        "creatorSkills": { "type": "array", "description": "Creator-focused skills list" },
+        "skills": { "type": "array", "description": "Unified skills list" },
+        "interests": { "type": "array", "description": "Interests and fields of expertise" },
+        "goals": { "type": "array", "description": "Career and growth goals" },
+        "certifications": { "type": "array", "description": "Earned credentials and certifications" },
+        "recommends": { "type": "number", "description": "Number of recommendations received" },
+        "birthdate": { "type": "string", "description": "User birthdate in YYYY-MM-DD" },
+        "walletBalance": { "type": "number", "description": "User's current escrow wallet balance" },
+        "instructorEarnings": { "type": "number", "description": "Total instructor earnings" },
+        "unlockedCourseIds": { "type": "array", "description": "IDs of unlocked courses" },
+        "role": { "type": "string", "description": "User platform role tier" },
+        "level": { "type": "string", "description": "User performance level" },
+        "points": { "type": "number", "description": "Platform points earned" },
+        "history": { "type": "array", "description": "User transaction and academy history" }
+      },
+      "required": ["name", "email"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "#/entities/User",
+      "description": "User specific data"
+    },
+    "/posts/{postId}": {
+      "schema": "object",
+      "description": "Social media activity feeds and posts"
+    },
+    "/courses/{courseId}": {
+      "schema": "object",
+      "description": "Ecosystem and educational academy courses"
+    },
+    "/products/{productId}": {
+      "schema": "object",
+      "description": "Physical and digital products in the marketplace"
+    },
+    "/campaigns/{campaignId}": {
+      "schema": "object",
+      "description": "Brand marketing and advertising campaigns"
+    },
+    "/tasks/{taskId}": {
+      "schema": "object",
+      "description": "Project tasks, boards, and milestones"
+    },
+    "/jobs/{jobId}": {
+      "schema": "object",
+      "description": "Available jobs, apprenticeships, and gigs"
+    },
+    "/channels/{channelId}": {
+      "schema": "object",
+      "description": "Interactive community discussion channels"
+    },
+    "/peers/{peerId}": {
+      "schema": "#/entities/User",
+      "description": "Public peer profiles for networking"
+    },
+    "/connections/{connectionId}": {
+      "schema": "object",
+      "description": "Peer-to-peer connection statuses"
+    },
+    "/peer_messages/{messageId}": {
+      "schema": "object",
+      "description": "Private messages between peers"
+    },
+    "/mentorship_registry/{mentorId}": {
+      "schema": "object",
+      "description": "Registered mentors list"
+    },
+    "/mentorship_requests/{requestId}": {
+      "schema": "object",
+      "description": "Mentorship connection requests"
+    },
+    "/sync_queue/{syncId}": {
+      "schema": "object",
+      "description": "Offline-first sync ledger queue"
+    },
+    "/sync_conflicts/{conflictId}": {
+      "schema": "object",
+      "description": "Peer-to-cloud synchronization conflicts"
+    },
+    "/creator_content/{contentId}": {
+      "schema": "object",
+      "description": "Creator uploaded media: videos, slides, photos"
+    }
+  }
+}

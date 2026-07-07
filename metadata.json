@@ -1,0 +1,8 @@
+{
+  "name": "ESTARR APP",
+  "description": "An all-in-one digital ecosystem to learn practical skills, discover opportunities, build businesses, collaborate on projects, and create sustainable income.",
+  "requestFramePermissions": ["camera", "microphone"],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
