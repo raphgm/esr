@@ -48,6 +48,7 @@ interface ConnectSectionProps {
   posts: ActivityPost[];
   onUpdatePosts: (posts: ActivityPost[]) => void;
   onUpdateProfile: (profile: UserProfile) => void;
+  initialSubTab?: "feed" | "directory" | "mentorship" | "companion";
 }
 
 const mockPeers: (UserProfile & { id: string })[] = [
@@ -72,7 +73,7 @@ const mockPeers: (UserProfile & { id: string })[] = [
     interests: ["Catering", "Small Business"],
     goals: ["Open a physical restaurant in Lagos", "Learn pastry techniques"],
     certifications: ["Academy: Professional Catering 101"],
-    recommends: 15,
+    recommends: 16,
     birthdate: "1995-07-06",
   },
   {
@@ -142,10 +143,17 @@ export default function ConnectSection({
   posts,
   onUpdatePosts,
   onUpdateProfile,
+  initialSubTab,
 }: ConnectSectionProps) {
   const [activeTab, setActiveTab] = useState<
     "feed" | "directory" | "mentorship" | "companion"
-  >("feed");
+  >(initialSubTab || "feed");
+
+  useEffect(() => {
+    if (initialSubTab) {
+      setActiveTab(initialSubTab);
+    }
+  }, [initialSubTab]);
   const [newPostContent, setNewPostContent] = useState("");
   const [newPostImage, setNewPostImage] = useState<string | null>(null);
   const [newPostVideo, setNewPostVideo] = useState<string | null>(null);

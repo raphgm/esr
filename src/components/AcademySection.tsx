@@ -61,37 +61,37 @@ interface AcademySectionProps {
 const courseGigMapping: Record<string, { title: string; budget: string; description: string; type: string }> = {
   "Zero to YouTuber": {
     title: "Dedicated YouTube Vlog Integration",
-    budget: "₦350,000 - ₦650,000",
+    budget: "$350,000 - $650,000",
     description: "Produce high-converting 45-90s mid-roll brand integrations for leading fintech and lifestyle apps.",
     type: "UGC Video"
   },
   "Selling on WhatsApp & Instagram": {
     title: "Social Commerce Storefront Catalog Setup",
-    budget: "₦120,000 - ₦220,000",
+    budget: "$120,000 - $220,000",
     description: "Help local Gbagada fashion brands establish automated WhatsApp Business catalogues and payment links.",
     type: "E-commerce"
   },
   "Poultry Farming Masterclass": {
     title: "Agricultural Creator Series / Feed Advisor",
-    budget: "₦200,000 - ₦400,000",
+    budget: "$200,000 - $400,000",
     description: "Publish educational unboxing of starter feeds and record daily bird vaccination progress.",
     type: "Agriculture"
   },
   "Modern Tailoring & Fashion Design": {
     title: "Bespoke Apparel Pattern Drafting",
-    budget: "₦150,000 - ₦350,000",
+    budget: "$150,000 - $350,000",
     description: "Draft traditional and contemporary African patterns and coordinate corporate tailoring deals.",
     type: "Trades"
   },
   "Virtual Assistant Mastery": {
     title: "Remote Executive Assistant / Calendar Management",
-    budget: "₦250,000 - ₦500,000",
+    budget: "$250,000 - $500,000",
     description: "Manage schedules, draft correspondence, and handle customer support tickets for global startups.",
     type: "Remote Work"
   },
   "Vibe Coding: The Future of Software": {
     title: "AI-Assisted Web App Prototyping",
-    budget: "₦400,000 - ₦850,000",
+    budget: "$400,000 - $850,000",
     description: "Build functional prototypes and MVPs for local businesses using natural language AI tools.",
     type: "Tech / AI"
   }
@@ -415,7 +415,7 @@ export default function AcademySection({
   const handleTipCreator = (instructorName: string) => {
     setIsTipping(true);
     setTimeout(() => {
-      alert(`Sent a ₦500 tip to ${instructorName}! Thank you for supporting artisans.`);
+      alert(`Sent a $500 tip to ${instructorName}! Thank you for supporting artisans.`);
       setIsTipping(false);
     }, 1500);
   };
@@ -501,7 +501,7 @@ export default function AcademySection({
       ...userProfile,
       walletBalance: newBalance
     });
-    alert(`💳 Wallet Refilled!\n₦5,000 has been added to your Learner Wallet.\nNew Balance: ₦${newBalance.toLocaleString()}`);
+    alert(`💳 Wallet Refilled!\n$5,000 has been added to your Learner Wallet.\nNew Balance: $${newBalance.toLocaleString()}`);
   };
 
   const handlePurchaseCourse = (course: Course) => {
@@ -509,7 +509,7 @@ export default function AcademySection({
     const currentBalance = userProfile.walletBalance ?? 0;
     
     if (currentBalance < cost) {
-      alert(`⚠️ Insufficient Funds in your Learner Wallet!\n\nCourse Fee: ₦${cost.toLocaleString()}\nAvailable Wallet: ₦${currentBalance.toLocaleString()}\n\nPlease click "Top Up Wallet" above to add ₦5,000 to your spendable balance.`);
+      alert(`⚠️ Insufficient Funds in your Learner Wallet!\n\nCourse Fee: $${cost.toLocaleString()}\nAvailable Wallet: $${currentBalance.toLocaleString()}\n\nPlease click "Top Up Wallet" above to add $5,000 to your spendable balance.`);
       return;
     }
 
@@ -523,7 +523,7 @@ export default function AcademySection({
     });
 
     if (course.instructorName !== userProfile.name) {
-      alert(`🎉 Course Unlocked!\n\nSuccessfully unlocked "${course.title}".\n₦${cost.toLocaleString()} has been securely transferred to the Artisan Instructor: ${course.instructorName}.`);
+      alert(`🎉 Course Unlocked!\n\nSuccessfully unlocked "${course.title}".\n$${cost.toLocaleString()} has been securely transferred to the Artisan Instructor: ${course.instructorName}.`);
     } else {
       alert(`🎉 Successfully unlocked your own course!`);
     }
@@ -578,7 +578,7 @@ export default function AcademySection({
       instructorEarnings: (userProfile.instructorEarnings ?? 0) + 5000 // Bonus for launching a course!
     });
 
-    alert(`🎉 monetized Course Created successfully!\n\nYour course "${newCourseTitle}" has been added to the public catalog for ₦${priceNum.toLocaleString()}.\n\nYou received a ₦5,000 launch booster incentive!`);
+    alert(`🎉 monetized Course Created successfully!\n\nYour course "${newCourseTitle}" has been added to the public catalog for $${priceNum.toLocaleString()}.\n\nYou received a $5,000 launch booster incentive!`);
     setActiveTab("catalog");
   };
 
@@ -613,7 +613,7 @@ export default function AcademySection({
                 </div>
                 <div>
                   <span className="text-[10px] text-slate-9000 font-mono block uppercase">Learner Wallet Balance</span>
-                  <span className="text-lg font-bold text-slate-800">₦{(userProfile.walletBalance ?? 0).toLocaleString()}</span>
+                  <span className="text-lg font-bold text-slate-800">${(userProfile.walletBalance ?? 0).toLocaleString()}</span>
                 </div>
               </div>
               <button
@@ -621,7 +621,7 @@ export default function AcademySection({
                 onClick={handleTopUpWallet}
                 className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] uppercase px-3 py-2 rounded-xl cursor-pointer transition-all flex items-center gap-1 shadow-xs"
               >
-                + Top Up ₦5,000
+                + Top Up $5,000
               </button>
             </div>
 
@@ -633,7 +633,7 @@ export default function AcademySection({
                 </div>
                 <div>
                   <span className="text-[10px] text-slate-9000 font-mono block uppercase">Artisan Teaching Earnings</span>
-                  <span className="text-lg font-bold text-slate-800">₦{(userProfile.instructorEarnings ?? 0).toLocaleString()}</span>
+                  <span className="text-lg font-bold text-slate-800">${(userProfile.instructorEarnings ?? 0).toLocaleString()}</span>
                 </div>
               </div>
               <button
@@ -763,7 +763,7 @@ export default function AcademySection({
                           </span>
                         ) : (
                           <span className="absolute top-3 right-3 bg-purple-500 text-slate-900 text-[10px] font-mono font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-md">
-                            <Lock className="w-2.5 h-2.5" /> ₦{course.price?.toLocaleString()}
+                            <Lock className="w-2.5 h-2.5" /> ${course.price?.toLocaleString()}
                           </span>
                         )}
 
@@ -836,7 +836,7 @@ export default function AcademySection({
                               onClick={() => setPurchasingCourse(course)}
                               className="w-full mt-4 bg-purple-500 hover:bg-purple-600 text-slate-900 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-all flex items-center justify-center gap-1.5 shadow-sm"
                             >
-                              <Lock className="w-3.5 h-3.5" /> Unlock for ₦{course.price?.toLocaleString()}
+                              <Lock className="w-3.5 h-3.5" /> Unlock for ${course.price?.toLocaleString()}
                             </button>
                           )}
                         </div>
@@ -1188,7 +1188,7 @@ export default function AcademySection({
                 <div className="bg-slate-900 text-white rounded-xl p-4 flex flex-col justify-between border border-slate-800 shadow-sm">
                   <span className="text-[10px] text-slate-9000 font-mono block uppercase">Total Cash Earned</span>
                   <div className="mt-2 flex items-baseline gap-1">
-                    <span className="text-2xl font-bold text-amber-400">₦{(userProfile.instructorEarnings ?? 0).toLocaleString()}</span>
+                    <span className="text-2xl font-bold text-amber-400">${(userProfile.instructorEarnings ?? 0).toLocaleString()}</span>
                   </div>
                   <span className="text-[9px] text-emerald-400 mt-2 block font-medium">✓ Settled & withdrawable</span>
                 </div>
@@ -1208,13 +1208,13 @@ export default function AcademySection({
                     <span className="text-2xl font-bold text-slate-800">1,840</span>
                     <span className="text-xs text-slate-500 font-medium ml-1">minutes</span>
                   </div>
-                  <span className="text-[9px] text-emerald-600 mt-2 block font-medium">₦1.50 earned per view-min</span>
+                  <span className="text-[9px] text-emerald-600 mt-2 block font-medium">$1.50 earned per view-min</span>
                 </div>
 
                 <div className="bg-white border border-slate-200 rounded-xl p-4 flex flex-col justify-between shadow-xs">
                   <span className="text-[10px] text-slate-9000 font-mono block uppercase">Tip Payouts</span>
                   <div className="mt-2">
-                    <span className="text-2xl font-bold text-slate-800">₦18,400</span>
+                    <span className="text-2xl font-bold text-slate-800">$18,400</span>
                     <span className="text-xs text-slate-500 font-medium ml-1">received</span>
                   </div>
                   <span className="text-[9px] text-purple-700 mt-2 block font-medium">28 peer recommendations</span>
@@ -1365,7 +1365,7 @@ export default function AcademySection({
                   ) : (
                     <Coffee className="w-3 h-3 text-amber-600" />
                   )}
-                  {isTipping ? "Sending..." : "Tip Artisan ₦500"}
+                  {isTipping ? "Sending..." : "Tip Artisan $500"}
                 </button>
               </div>
             </div>
@@ -1729,14 +1729,14 @@ export default function AcademySection({
             {/* Price detail */}
             <div className="flex justify-between items-baseline border-b border-dashed border-slate-100 pb-4">
               <span className="text-xs text-slate-500 font-medium">Class Unlock Cost:</span>
-              <span className="text-xl font-black text-slate-900 font-mono">₦{purchasingCourse.price?.toLocaleString()}</span>
+              <span className="text-xl font-black text-slate-900 font-mono">${purchasingCourse.price?.toLocaleString()}</span>
             </div>
 
             {/* Wallet summary */}
             <div className="flex justify-between items-center text-xs">
               <span className="text-slate-500 font-medium">Your Wallet Balance:</span>
               <span className={`font-mono font-bold ${(userProfile.walletBalance ?? 0) >= (purchasingCourse.price ?? 0) ? "text-emerald-600" : "text-rose-600"}`}>
-                ₦{(userProfile.walletBalance ?? 0).toLocaleString()}
+                ${(userProfile.walletBalance ?? 0).toLocaleString()}
               </span>
             </div>
 

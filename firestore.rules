@@ -43,7 +43,8 @@ service cloud.firestore {
 
     // --- Creator Content ---
     match /creator_content/{contentId} {
-      allow read, write: if isSignedIn();
+      allow read: if true;
+      allow write: if isSignedIn();
     }
 
     // --- Posts ---
@@ -90,20 +91,17 @@ service cloud.firestore {
 
     // --- Peers ---
     match /peers/{peerId} {
-      allow read: if true;
-      allow write: if isSignedIn();
+      allow read, write: if true;
     }
 
     // --- Connections ---
     match /connections/{connectionId} {
-      allow read: if true;
-      allow write: if isSignedIn();
+      allow read, write: if true;
     }
 
     // --- Peer Messages ---
     match /peer_messages/{messageId} {
-      allow read: if true;
-      allow write: if isSignedIn();
+      allow read, write: if true;
     }
 
     // --- Mentorship ---
@@ -122,6 +120,21 @@ service cloud.firestore {
     }
     match /sync_conflicts/{conflictId} {
       allow read, write: if isSignedIn();
+    }
+
+    // --- Expert Quotes ---
+    match /expert_quotes/{quoteId} {
+      allow read, write: if true;
+    }
+
+    // --- Djinni Anonymous Candidates ---
+    match /djinni_candidates/{candidateId} {
+      allow read, write: if true;
+    }
+
+    // --- Djinni Pitches & Offers ---
+    match /djinni_pitches/{pitchId} {
+      allow read, write: if true;
     }
   }
 }

@@ -3,6 +3,7 @@ import { PageBanner } from "./PageBanner";
 import { UserProfile, Job } from "../types";
 import { Briefcase, MapPin, Plus, DollarSign, X, Sparkles, CheckCircle, Code, ShieldCheck, PenTool, Copy, Check, MessageSquare, RefreshCw, ShieldAlert } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import { DjinniAnonymousSection } from "./DjinniAnonymousSection";
 
 interface JobsSectionProps {
   userProfile: UserProfile;
@@ -13,7 +14,7 @@ interface JobsSectionProps {
 
 export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile }: JobsSectionProps) {
   const [showPostJob, setShowPostJob] = useState(false);
-  const [viewMode, setViewMode] = useState<"listings" | "proof-of-skills">("listings");
+  const [viewMode, setViewMode] = useState<"listings" | "proof-of-skills" | "djinni-anonymous">("listings");
   const [activeCategory, setActiveCategory] = useState<"All" | "Apprenticeship" | "Freelance" | "Full-time">("All");
 
   // Dynamic Matcher Skill selector tags
@@ -235,6 +236,13 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile }
           >
             <Sparkles className="w-3.5 h-3.5" />
             {userProfile.accountType === "jobOwner" ? "Hire by Proof-of-Skill" : "My Skill Match Score"}
+          </button>
+          <button
+            onClick={() => setViewMode("djinni-anonymous")}
+            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${viewMode === "djinni-anonymous" ? "bg-white shadow-sm text-purple-600" : "text-slate-500 hover:text-slate-700"}`}
+          >
+            <ShieldCheck className="w-3.5 h-3.5 text-blue-500" />
+            Djinni Anonymous Market
           </button>
         </div>
 
@@ -567,7 +575,7 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile }
               </div>
               <div className="flex-1 flex flex-col gap-1.5">
                 <label className="text-[10px] font-bold text-slate-900 uppercase tracking-wide">Salary / Budget</label>
-                <input type="text" value={newSalary} onChange={e => setNewSalary(e.target.value)} placeholder="e.g. ₦300k - ₦500k/mo" className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-sm focus:outline-none focus:border-purple-500" />
+                <input type="text" value={newSalary} onChange={e => setNewSalary(e.target.value)} placeholder="e.g. $3k - $5k/mo" className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-sm focus:outline-none focus:border-purple-500" />
               </div>
             </div>
             
@@ -693,6 +701,12 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile }
             </div>
           ))}
         </div>
+      ) : viewMode === "djinni-anonymous" ? (
+        <DjinniAnonymousSection 
+          userProfile={userProfile}
+          jobs={jobs}
+          onUpdateProfile={onUpdateProfile}
+        />
       ) : null}
 
       {/* AI Pitch Generator Modal */}

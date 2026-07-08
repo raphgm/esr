@@ -113,6 +113,7 @@ export interface ProjectTask {
   priority: "High" | "Medium" | "Low";
   assignee: string;
   dueDate: string;
+  userId?: string;
   comments?: { id: string; author: string; text: string; audioUrl?: string; audioDuration?: number; time: string }[];
 }
 
@@ -158,3 +159,31 @@ export interface CommunityChannel {
   desc: string;
   posts: { id: string; author: string; content: string; time: string; likes: number }[];
 }
+
+export interface DjinniCandidate {
+  id: string;
+  userId: string;
+  anonymousTitle: string;
+  skills: string[];
+  desiredSalary: number;
+  experienceYears: number;
+  remotePreference: "Fully Remote" | "Hybrid" | "Onsite" | string;
+  anonymousSummary: string;
+  isActive: boolean;
+  unlockedUserIds: string[];
+}
+
+export interface DjinniPitch {
+  id: string;
+  candidateId: string;
+  candidateUserId: string;
+  employerUserId: string;
+  employerName: string;
+  employerEmail: string;
+  jobTitle: string;
+  proposedSalary: string;
+  message: string;
+  status: "pending" | "accepted" | "declined";
+  createdAt: string;
+}
+

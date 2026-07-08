@@ -63,7 +63,7 @@ export function TeamsSection() {
               Our Team
             </h2>
             <p className="text-slate-9000 max-w-xl text-sm md:text-base">
-              The visionaries driving ESTARR APP forward.
+              The visionaries driving ESTARR forward.
             </p>
           </div>
         </div>

@@ -53,7 +53,7 @@ export function AdminSection({
   // Custom system log messages
   const [logs, setLogs] = useState([
     { id: "l1", time: "08:51:12", type: "info", text: "Database auto-replicated to server node lagos-01" },
-    { id: "l2", time: "08:49:05", type: "success", text: "Secure Escrow payment of ₦250,000 released successfully" },
+    { id: "l2", time: "08:49:05", type: "success", text: "Secure Escrow payment of $250,000 released successfully" },
     { id: "l3", time: "08:44:18", type: "warning", text: "Verification challenge sent to user Tunde Bakare" },
     { id: "l4", time: "08:30:00", type: "info", text: "Platform nodes synchronized with SEC-compliant ledger" }
   ]);
@@ -61,7 +61,7 @@ export function AdminSection({
   // System Statistics
   const [stats, setStats] = useState({
     activeEscrows: 1240,
-    escrowVolume: "₦34,150,000",
+    escrowVolume: "$34,150,000",
     systemNodeStatus: "Healthy (Lagos-01)",
     apiLatency: "14ms"
   });

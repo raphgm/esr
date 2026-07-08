@@ -171,7 +171,7 @@ export const CreatorStudio: React.FC<CreatorStudioProps> = ({
             <span className="text-[10px] font-mono uppercase text-slate-400 block mb-2">Total Earnings</span>
             <div className="flex items-center gap-2">
               <DollarSign className="w-6 h-6 text-emerald-400" />
-              <span className="text-3xl font-black">₦{stats.totalEarnings.toLocaleString()}</span>
+              <span className="text-3xl font-black">${stats.totalEarnings.toLocaleString()}</span>
             </div>
             <p className="text-[10px] text-emerald-400 mt-2">✓ Based on views and tips</p>
           </div>

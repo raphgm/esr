@@ -108,7 +108,7 @@ export default function MarketplaceSection({
         newProdImg ||
         "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=300",
       description:
-        newProdDesc || "Premium quality item listed on ESTARR APP.",
+        newProdDesc || "Premium quality item listed on ESTARR.",
       reviews: [],
     };
 
@@ -193,7 +193,7 @@ export default function MarketplaceSection({
                 </span>
               )}
               <span className="absolute bottom-3 right-3 bg-emerald-50 text-emerald-800 text-[9px] font-bold px-2.5 py-1 rounded-xl">
-                ₦{prod.price.toLocaleString()}
+                ${prod.price.toLocaleString()}
               </span>
             </div>
 
@@ -329,7 +329,7 @@ export default function MarketplaceSection({
 
                     <div className="mt-4 md:mt-0">
                       <span className="text-xl font-mono font-bold text-slate-800">
-                        ₦{selectedProduct.price.toLocaleString()}
+                        ${selectedProduct.price.toLocaleString()}
                       </span>
                       <p className="text-[10px] text-emerald-600 font-medium">
                         🛡️ Escrow Locked Payout Protection
@@ -469,7 +469,7 @@ export default function MarketplaceSection({
 
                   <div className="flex flex-col gap-1">
                     <label className="text-[10px] font-mono uppercase tracking-wider font-bold text-slate-500">
-                      Price (₦) *
+                      Price ($) *
                     </label>
                     <input
                       type="number"
@@ -574,7 +574,7 @@ export default function MarketplaceSection({
                                     Qty: {item.qty}
                                   </span>
                                   <span className="font-bold">
-                                    ₦
+                                    $
                                     {(
                                       item.product.price * item.qty
                                     ).toLocaleString()}
@@ -595,7 +595,7 @@ export default function MarketplaceSection({
                         <div className="border-t border-slate-100 pt-4 mt-2">
                           <div className="flex justify-between font-mono text-sm font-bold text-slate-800">
                             <span>Subtotal</span>
-                            <span>₦{calculateSubtotal().toLocaleString()}</span>
+                            <span>${calculateSubtotal().toLocaleString()}</span>
                           </div>
                           <p className="text-[10px] text-slate-9000 mt-1">
                             Escrow commission: 0% • Delivery arranged separately
@@ -629,7 +629,7 @@ export default function MarketplaceSection({
                     <div className="border border-emerald-100 bg-emerald-50/50 rounded-xl p-4">
                       <div className="flex justify-between font-mono font-bold text-slate-800 mb-1">
                         <span>Total Payable</span>
-                        <span>₦{calculateSubtotal().toLocaleString()}</span>
+                        <span>${calculateSubtotal().toLocaleString()}</span>
                       </div>
                       <p className="text-[10px] text-emerald-800">
                         Funded in Escrow Vault. Safe and guarded.

@@ -275,7 +275,7 @@ export default function RealEstateSection({
                     </td>
                     <td className="px-6 py-4 text-xs font-medium text-slate-500">Acquisition</td>
                     <td className="px-6 py-4 text-xs font-medium text-slate-500">Initial Deposit</td>
-                    <td className="px-6 py-4 text-xs font-black text-slate-900">₦25,000,000</td>
+                    <td className="px-6 py-4 text-xs font-black text-slate-900">$25,000,000</td>
                     <td className="px-6 py-4">
                       <span className="text-[9px] font-black uppercase text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Released</span>
                     </td>
@@ -291,7 +291,7 @@ export default function RealEstateSection({
                     </td>
                     <td className="px-6 py-4 text-xs font-medium text-slate-500">Procurement</td>
                     <td className="px-6 py-4 text-xs font-medium text-slate-500">Title Verification</td>
-                    <td className="px-6 py-4 text-xs font-black text-slate-900">₦5,000,000</td>
+                    <td className="px-6 py-4 text-xs font-black text-slate-900">$5,000,000</td>
                     <td className="px-6 py-4">
                       <span className="text-[9px] font-black uppercase text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">In Verification</span>
                     </td>
@@ -353,7 +353,7 @@ export default function RealEstateSection({
                     <label className="block text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-2">Escrow Budget</label>
                     <div className="relative">
                       <Wallet className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                      <input type="text" placeholder="e.g. ₦15,000,000" className="w-full border-2 border-slate-100 bg-slate-50/50 rounded-2xl pl-10 pr-4 py-3 text-sm font-bold text-slate-800 focus:outline-none focus:border-purple-500 transition-all placeholder:text-slate-300" />
+                      <input type="text" placeholder="e.g. $15,000,000" className="w-full border-2 border-slate-100 bg-slate-50/50 rounded-2xl pl-10 pr-4 py-3 text-sm font-bold text-slate-800 focus:outline-none focus:border-purple-500 transition-all placeholder:text-slate-300" />
                     </div>
                   </div>
                   <div className="col-span-2 sm:col-span-1">

@@ -415,7 +415,7 @@ export default function GigsSection({ userProfile, onOpenAiChat }: GigsSectionPr
               </div>
               <div className="flex justify-between">
                 <span>Funded Value:</span>
-                <span className="text-white font-bold">₦4.2M NGN</span>
+                <span className="text-white font-bold">$4.2M USD</span>
               </div>
             </div>
           </div>
@@ -532,7 +532,7 @@ export default function GigsSection({ userProfile, onOpenAiChat }: GigsSectionPr
                       <div className="text-right">
                         <span className="text-[9px] font-mono text-slate-9000 uppercase block">Starting at</span>
                         <span className="text-base font-black font-mono text-slate-900">
-                          ₦{gig.price.toLocaleString()}
+                          ${gig.price.toLocaleString()}
                         </span>
                       </div>
                     </div>
@@ -620,7 +620,7 @@ export default function GigsSection({ userProfile, onOpenAiChat }: GigsSectionPr
                   {/* Price */}
                   <div className="flex flex-col gap-1">
                     <label className="font-mono text-[9px] font-bold text-slate-9000 uppercase">
-                      Gig Price (₦ NGN)
+                      Gig Price ($ USD)
                     </label>
                     <input
                       type="number"
@@ -732,7 +732,7 @@ export default function GigsSection({ userProfile, onOpenAiChat }: GigsSectionPr
                       <span className="text-[10px] font-mono text-slate-9000 uppercase">Gig Selected</span>
                       <h4 className="font-bold text-xs text-slate-800">{activeGig.title}</h4>
                       <div className="flex justify-between items-center text-[10px] text-slate-500 mt-1 border-t border-slate-200/50 pt-2 font-mono">
-                        <span>Price: ₦{activeGig.price.toLocaleString()}</span>
+                        <span>Price: ${activeGig.price.toLocaleString()}</span>
                         <span>Delivery: {activeGig.deliveryDays} days</span>
                       </div>
                     </div>
@@ -786,7 +786,7 @@ export default function GigsSection({ userProfile, onOpenAiChat }: GigsSectionPr
                       <div className="border-t border-slate-900 pt-2.5 mt-1 flex justify-between items-baseline font-mono">
                         <span className="text-slate-9000">Escrow Total:</span>
                         <span className="text-base font-black text-emerald-400">
-                          ₦{activeGig.price.toLocaleString()} NGN
+                          ${activeGig.price.toLocaleString()} USD
                         </span>
                       </div>
                     </div>
@@ -807,7 +807,7 @@ export default function GigsSection({ userProfile, onOpenAiChat }: GigsSectionPr
                         >
                           <span className="font-bold text-slate-800 block">ESTARR Wallet</span>
                           <span className="text-[10px] font-mono font-bold text-purple-500 mt-1 block">
-                            Bal: ₦180,000
+                            Bal: $180,000
                           </span>
                         </button>
 
@@ -839,7 +839,7 @@ export default function GigsSection({ userProfile, onOpenAiChat }: GigsSectionPr
                       onClick={handleConfirmPayment}
                       className="w-full bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold uppercase py-3 rounded-xl transition-colors shadow-sm"
                     >
-                      🔒 Lock ₦{activeGig.price.toLocaleString()} in Escrow
+                      🔒 Lock ${activeGig.price.toLocaleString()} in Escrow
                     </button>
                   </div>
                 </div>
@@ -857,7 +857,7 @@ export default function GigsSection({ userProfile, onOpenAiChat }: GigsSectionPr
                       Escrow Contract Funded!
                     </h3>
                     <p className="text-xs text-slate-500 mt-1.5 leading-relaxed max-w-xs mx-auto">
-                      ₦{activeGig.price.toLocaleString()} NGN has been secured under contract <strong>#ESG-{Math.floor(Math.random() * 90000) + 10000}</strong>.
+                      ${activeGig.price.toLocaleString()} USD has been secured under contract <strong>#ESG-{Math.floor(Math.random() * 90000) + 10000}</strong>.
                     </p>
                   </div>
 

@@ -64,7 +64,7 @@ export default function AnalyticsSection({ userProfile, onUpdateProfile }: Analy
   const [engagementRate, setEngagementRate] = useState(7.4); // typical high Gen-Z rate
   const [copiedLink, setCopiedLink] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
-  const [currency, setCurrency] = useState<"NGN" | "USD" | "GHS">("NGN");
+  const [currency, setCurrency] = useState<"NGN" | "USD" | "GHS">("USD");
   const [cpmRate, setCpmRate] = useState(120); // Naira per 1000 views
 
   // Currency Helpers
@@ -400,7 +400,7 @@ export default function AnalyticsSection({ userProfile, onUpdateProfile }: Analy
       `"${task}"`, "General", "Completed"
     ]) || [
       ["Completed the 'Cloud DevOps Simulator'", "Academy", "Completed"],
-      ["Secured ₦150k Escrow Contract", "Gigs", "Completed"],
+      ["Secured $150k Escrow Contract", "Gigs", "Completed"],
       ["Drafted Content Strategy for PiggyVest", "Gigs", "Completed"]
     ];
 
@@ -1144,7 +1144,7 @@ export default function AnalyticsSection({ userProfile, onUpdateProfile }: Analy
               {/* Base Campaign Rate */}
               <div className="flex flex-col gap-1">
                 <label className="text-[9px] font-mono font-bold text-slate-9000 uppercase">
-                  Minimum Base Project Rate (₦)
+                  Minimum Base Project Rate ($)
                 </label>
                 <input
                   type="number"
@@ -1306,7 +1306,7 @@ export default function AnalyticsSection({ userProfile, onUpdateProfile }: Analy
               <div className="bg-slate-900/50 border border-slate-800 p-3 rounded-xl">
                 <span className="block text-[8px] font-mono text-slate-9000 uppercase">Base Project Rate</span>
                 <span className="font-mono font-bold text-emerald-400 block mt-1">
-                  ₦{(baseRate).toLocaleString()}
+                  ${(baseRate).toLocaleString()}
                 </span>
               </div>
             </div>

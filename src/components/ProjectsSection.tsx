@@ -37,15 +37,15 @@ interface ProjectsSectionProps {
 
 // Transaction Feed to show realistic escrow updates
 const initialEscrowFeed = [
-  { id: "f1", text: "Coca-Cola Nigeria deposited ₦250,000 into Escrow for 'Instagram Reels Campaign Video'", time: "10 mins ago", type: "deposit" },
-  { id: "f2", text: "PiggyVest Fintech released ₦180,000 to Chinedu Okafor's bank account", time: "1 hour ago", type: "release" },
-  { id: "f3", text: "Amo Feed Mills verified poultry vlog deliverables and released ₦200,000", time: "3 hours ago", type: "verify" },
+  { id: "f1", text: "Coca-Cola Nigeria deposited $250,000 into Escrow for 'Instagram Reels Campaign Video'", time: "10 mins ago", type: "deposit" },
+  { id: "f2", text: "PiggyVest Fintech released $180,000 to Chinedu Okafor's bank account", time: "1 hour ago", type: "release" },
+  { id: "f3", text: "Amo Feed Mills verified poultry vlog deliverables and released $200,000", time: "3 hours ago", type: "verify" },
   { id: "f4", text: "Secured Escrow smart contract verified by ESTARR Node", time: "5 hours ago", type: "secure" }
 ];
 
 // Helper to extract rich contract details from a task object
 function parseTaskDetails(task: ProjectTask) {
-  let budget = 150000; // default 150k Naira
+  let budget = 150000; // default 150k Dollars
   let client = task.assignee || "External Client";
   let cleanDesc = task.desc;
 
@@ -118,7 +118,7 @@ export default function ProjectsSection({
 
     const formattedBudget = parseFloat(newBudget) || 100000;
     // Serialize budget and client into description to maintain type safety with Parent
-    const serializedDesc = `₦${formattedBudget.toLocaleString()} || ${newClient} || ${newDesc || "Milestone deliverable details."}`;
+    const serializedDesc = `$${formattedBudget.toLocaleString()} || ${newClient} || ${newDesc || "Milestone deliverable details."}`;
 
     const newTask: ProjectTask = {
       id: `task-${Date.now()}`,
@@ -213,7 +213,7 @@ export default function ProjectsSection({
 
     setTimeout(() => {
       // Default fallback is standard Instagram / TikTok UGC Campaign
-      let recommendedPrice = "₦180,000 - ₦350,000";
+      let recommendedPrice = "$180,000 - $350,000";
       let suggestedMilestones = [
         "Milestone 1: Script outline, campaign brief, and concept sign-off (30% Escrow)",
         "Milestone 2: High-resolution video draft submission with subtitling (50% Escrow)",
@@ -225,7 +225,7 @@ export default function ProjectsSection({
 
       const query = serviceType.toLowerCase();
       if (query.includes("youtube") || query.includes("long") || query.includes("podcast") || query.includes("vlog")) {
-        recommendedPrice = "₦350,000 - ₦650,000";
+        recommendedPrice = "$350,000 - $650,000";
         suggestedMilestones = [
           "Milestone 1: Video talking points and sponsor script approval (25% Escrow)",
           "Milestone 2: Complete vlog rough-cut with organic 90s mid-roll placement (50% Escrow)",
@@ -235,7 +235,7 @@ export default function ProjectsSection({
         title = "Dedicated YouTube Vlog Integration";
         suggestedClient = "Chipper Cash Ltd";
       } else if (query.includes("agric") || query.includes("poultry") || query.includes("farm") || query.includes("vocational")) {
-        recommendedPrice = "₦200,000 - ₦400,000";
+        recommendedPrice = "$200,000 - $400,000";
         suggestedMilestones = [
           "Milestone 1: Educational talking points outlining modern poultry benefits (20% Escrow)",
           "Milestone 2: Deliver 2x interactive feed unboxing and chick growth vlogs (50% Escrow)",
@@ -245,7 +245,7 @@ export default function ProjectsSection({
         title = "Agricultural Creator Influence Series";
         suggestedClient = "Amo Feed Mills";
       } else if (query.includes("instagram") || query.includes("carousel") || query.includes("photo") || query.includes("styling")) {
-        recommendedPrice = "₦120,000 - ₦220,000";
+        recommendedPrice = "$120,000 - $220,000";
         suggestedMilestones = [
           "Milestone 1: Moodboard & brand-aligned aesthetic styling layout approval (30% Escrow)",
           "Milestone 2: Captions, visual photo assets draft, and swipe-up link review (50% Escrow)",
@@ -272,7 +272,7 @@ export default function ProjectsSection({
     setNewTitle(estimatedDeal.title);
     setNewClient(estimatedDeal.suggestedClient);
     
-    // Extract numeric estimation from string e.g. "₦450,000 - ₦800,000" -> 450000
+    // Extract numeric estimation from string e.g. "$450,000 - $800,000" -> 450000
     const numbersOnly = estimatedDeal.pricing.split("-")[0].replace(/[^0-9]/g, "");
     setNewBudget(numbersOnly);
     setNewDesc(estimatedDeal.milestones.join("\n"));
@@ -319,7 +319,7 @@ export default function ProjectsSection({
                 🎉 Escrow Funds Released!
               </span>
               <h4 className="font-display font-black text-2xl tracking-tight text-white mb-1">
-                ₦{payoutNotification.amount.toLocaleString()} Cleared
+                ${payoutNotification.amount.toLocaleString()} Cleared
               </h4>
               <p className="text-xs text-slate-300">
                 Milestone approved for <span className="font-bold text-white">"{payoutNotification.title}"</span>. Funds are instantly withdrawn to your linked Bank Account!
@@ -337,7 +337,7 @@ export default function ProjectsSection({
 
       <PageBanner
         title="Escrow Hub & Paid Milestones"
-        subtitle="EARNINGS & RESULTS-DRIVEN CONTRACTS"
+        subtitle="WARNINGS & RESULTS-DRIVEN CONTRACTS"
         description={
           <div className="flex flex-col gap-3">
             <p>
@@ -363,28 +363,28 @@ export default function ProjectsSection({
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-slate-900 text-white rounded-3xl p-6 border-2 border-slate-800 shadow-sm">
         <div className="flex flex-col gap-1">
           <span className="text-[9px] font-mono tracking-wider uppercase text-slate-9000">Total Contract Value</span>
-          <span className="text-xl md:text-2xl font-display font-black text-white">₦{stats.total.toLocaleString()}</span>
+          <span className="text-xl md:text-2xl font-display font-black text-white">${stats.total.toLocaleString()}</span>
           <span className="text-[10px] text-slate-500 font-medium">Bids + Active Work</span>
         </div>
         <div className="flex flex-col gap-1 border-l border-slate-800 pl-4">
           <span className="text-[9px] font-mono tracking-wider uppercase text-emerald-400 flex items-center gap-1">
             <Lock className="w-2.5 h-2.5 text-emerald-400" /> Locked In Escrow
           </span>
-          <span className="text-xl md:text-2xl font-display font-black text-emerald-400">₦{stats.escrowed.toLocaleString()}</span>
+          <span className="text-xl md:text-2xl font-display font-black text-emerald-400">${stats.escrowed.toLocaleString()}</span>
           <span className="text-[10px] text-slate-500 font-medium">Client Deposited</span>
         </div>
         <div className="flex flex-col gap-1 border-l border-slate-800 pl-4">
           <span className="text-[9px] font-mono tracking-wider uppercase text-purple-500 flex items-center gap-1">
             <ShieldCheck className="w-2.5 h-2.5 text-purple-500" /> Under Review
           </span>
-          <span className="text-xl md:text-2xl font-display font-black text-purple-500">₦{stats.pendingRelease.toLocaleString()}</span>
+          <span className="text-xl md:text-2xl font-display font-black text-purple-500">${stats.pendingRelease.toLocaleString()}</span>
           <span className="text-[10px] text-slate-500 font-medium">Milestones Submitted</span>
         </div>
         <div className="flex flex-col gap-1 border-l border-slate-800 pl-4">
           <span className="text-[9px] font-mono tracking-wider uppercase text-sky-400 flex items-center gap-1">
             <Wallet className="w-2.5 h-2.5 text-sky-400" /> Disbursed & Earned
           </span>
-          <span className="text-xl md:text-2xl font-display font-black text-sky-400">₦{stats.disbursed.toLocaleString()}</span>
+          <span className="text-xl md:text-2xl font-display font-black text-sky-400">${stats.disbursed.toLocaleString()}</span>
           <span className="text-[10px] text-slate-500 font-medium">Paid to Bank Account</span>
         </div>
       </div>
@@ -559,7 +559,7 @@ export default function ProjectsSection({
                 <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 flex flex-col gap-2 hover:border-purple-600 transition-colors">
                   <div className="flex justify-between items-start">
                     <span className="text-[10px] font-bold text-purple-500 uppercase">Zikoko Media</span>
-                    <span className="text-xs font-mono font-black text-slate-900">₦150,000</span>
+                    <span className="text-xs font-mono font-black text-slate-900">$150,000</span>
                   </div>
                   <h5 className="font-bold text-xs text-slate-800">Short-form TikTok Video Campaign</h5>
                   <button
@@ -577,7 +577,7 @@ export default function ProjectsSection({
                 <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 flex flex-col gap-2 hover:border-purple-600 transition-colors">
                   <div className="flex justify-between items-start">
                     <span className="text-[10px] font-bold text-purple-500 uppercase">PiggyVest (Fintech)</span>
-                    <span className="text-xs font-mono font-black text-slate-900">₦250,000</span>
+                    <span className="text-xs font-mono font-black text-slate-900">$250,000</span>
                   </div>
                   <h5 className="font-bold text-xs text-slate-800">Finance Micro-influencer Promo series</h5>
                   <button
@@ -603,7 +603,7 @@ export default function ProjectsSection({
             <div>
               <h5 className="text-xs font-bold text-slate-900 uppercase tracking-tight">100% Secure Escrow</h5>
               <p className="text-[11px] text-slate-500 mt-0.5 leading-tight">
-                Contracts are back-secured by Nigerian Partner Banks. Disbursed instantly.
+                Contracts are back-secured by Partner Banks. Disbursed instantly.
               </p>
             </div>
           </div>
@@ -675,7 +675,7 @@ export default function ProjectsSection({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1 text-xs">
                     <label className="font-bold text-slate-500">
-                      Contract Budget Value (₦ Naira) *
+                      Contract Budget Value ($ USD) *
                     </label>
                     <input
                       type="number"
@@ -819,7 +819,7 @@ export default function ProjectsSection({
                     <div className="flex justify-between items-center mt-1">
                       <span className="text-[9px] text-slate-9000 leading-none">{colors[status].hint}</span>
                       <span className="text-[10px] font-mono font-black text-slate-700">
-                        ₦{totalColumnValue.toLocaleString()}
+                        ${totalColumnValue.toLocaleString()}
                       </span>
                     </div>
                   </div>
@@ -846,7 +846,7 @@ export default function ProjectsSection({
                           <div className="flex justify-between items-start">
                             <div className="flex gap-2 items-center">
                               <span className="text-[10px] font-mono font-black text-slate-900 bg-slate-50 px-2.5 py-1 rounded-xl border border-slate-100">
-                                ₦{budget.toLocaleString()}
+                                ${budget.toLocaleString()}
                               </span>
                               
                               {task.category && (

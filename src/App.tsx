@@ -76,12 +76,13 @@ import {
   Plus,
   Linkedin,
   Github,
+  HelpCircle,
   LogOut} from "lucide-react";
 
 const initialTasks: ProjectTask[] = [
-  { id: "t1", title: "Instagram Reels Campaign Video", desc: "₦250,000 || Coca-Cola Nigeria || Shoot 1x aesthetic morning routine Reel featuring Coke Zero Sugar and tag @cocacolanigeria.", status: "inprogress", priority: "High", assignee: "Coca-Cola Nigeria", dueDate: "2026-07-12", category: "marketing" },
-  { id: "t2", title: "TikTok Meme Ad Integration", desc: "₦180,000 || PiggyVest Fintech || Produce 1x high-retention funny meme TikTok video showcasing the automated savings features of PiggyVest.", status: "todo", priority: "Medium", assignee: "PiggyVest Fintech", dueDate: "2026-07-15", category: "design" },
-  { id: "t3", title: "UGC Styling Video Reel", desc: "₦120,000 || Kala Bespoke Fashion || Deliver 1x aesthetic unboxing and styling walkthrough of the latest summer linen jackets.", status: "review", priority: "High", assignee: "Kala Bespoke Fashion", dueDate: "2026-07-09", category: "dev" }
+  { id: "t1", title: "Instagram Reels Campaign Video", desc: "$250,000 || Coca-Cola Nigeria || Shoot 1x aesthetic morning routine Reel featuring Coke Zero Sugar and tag @cocacolanigeria.", status: "inprogress", priority: "High", assignee: "Coca-Cola Nigeria", dueDate: "2026-07-12", category: "marketing" },
+  { id: "t2", title: "TikTok Meme Ad Integration", desc: "$180,000 || PiggyVest Fintech || Produce 1x high-retention funny meme TikTok video showcasing the automated savings features of PiggyVest.", status: "todo", priority: "Medium", assignee: "PiggyVest Fintech", dueDate: "2026-07-15", category: "design" },
+  { id: "t3", title: "UGC Styling Video Reel", desc: "$120,000 || Kala Bespoke Fashion || Deliver 1x aesthetic unboxing and styling walkthrough of the latest summer linen jackets.", status: "review", priority: "High", assignee: "Kala Bespoke Fashion", dueDate: "2026-07-09", category: "dev" }
 ];
 
 export default function App() {
@@ -95,18 +96,31 @@ export default function App() {
   const [authName, setAuthName] = useState("Chinedu Okafor");
   const [authBirthdate, setAuthBirthdate] = useState("");
   const [authAccountType, setAuthAccountType] = useState<"freelancer" | "jobOwner">("freelancer");
+  const [authConfirmPassword, setAuthConfirmPassword] = useState("");
+  const [applyingAs, setApplyingAs] = useState("Developer");
   const [authError, setAuthError] = useState<string | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState(false);
   const [isLinkCopied, setIsLinkCopied] = useState(false);
 
+  // Hiring Wizard State (Toptal style onboarding for Owners/jobOwners)
+  const [hireWizardStep, setHireWizardStep] = useState<number>(1);
+  const [selectedRoleType, setSelectedRoleType] = useState<string>("");
+  const [showHireTooltip, setShowHireTooltip] = useState(false);
+
   React.useEffect(() => {
     setAuthError(null);
+    // Reset wizard on modal open or auth mode change
+    if (showAuthModal) {
+      setHireWizardStep(1);
+      setSelectedRoleType("");
+    }
   }, [showAuthModal, authMode]);
 
   // Router State
   const [activeTab, setActiveTab] = useState<
     "home" | "connect" | "academy" | "marketplace" | "projects" | "gigs" | "community" | "mobile" | "teams" | "careers" | "about" | "how-it-works" | "payments" | "events" | "analytics" | "admin" | "portfolio"
   >("home");
+  const [connectSubTab, setConnectSubTab] = useState<"feed" | "directory" | "mentorship" | "companion">("feed");
 
   const [collapsedNavSections, setCollapsedNavSections] = useState<Record<string, boolean>>({
     "Core Hub & Insights": false,
@@ -116,7 +130,7 @@ export default function App() {
     "Admin Controls": false,
   });
 
-  const [sidebarTheme, setSidebarTheme] = useState<"white" | "ivory" | "slate" | "indigo">("indigo");
+  const [sidebarTheme, setSidebarTheme] = useState<"white" | "ivory" | "slate" | "indigo">("ivory");
 
   const sidebarStyles = {
     white: {
@@ -327,16 +341,27 @@ export default function App() {
   };
 
   const handleUpdateTasks = async (updatedTasks: ProjectTask[]) => {
-    setTasks(updatedTasks);
+    const currentUser = auth.currentUser;
+    const userEmail = currentUser?.email?.toLowerCase().trim();
+    const isNewUser = currentUser && userEmail !== "chinedu@estarrapp.com";
+    
+    const tasksToSave = updatedTasks.map(t => {
+      if (isNewUser && !t.userId) {
+        return { ...t, userId: currentUser.uid };
+      }
+      return t;
+    });
+
+    setTasks(tasksToSave);
     const currentMap = new Map(tasks.map(item => [item.id, item]));
-    for (const newItem of updatedTasks) {
+    for (const newItem of tasksToSave) {
       const existing = currentMap.get(newItem.id);
       if (!existing || JSON.stringify(existing) !== JSON.stringify(newItem)) {
         await saveCollectionItem("tasks", newItem);
       }
     }
     for (const oldItem of tasks) {
-      if (!updatedTasks.some(item => item.id === oldItem.id)) {
+      if (!tasksToSave.some(item => item.id === oldItem.id)) {
         await deleteCollectionItem("tasks", oldItem.id);
       }
     }
@@ -455,7 +480,12 @@ export default function App() {
           setCampaigns(fetchedCampaigns);
 
           const fetchedTasks = await getCollectionData<ProjectTask>("tasks", initialTasks);
-          setTasks(fetchedTasks);
+          if (userEmail === "chinedu@estarrapp.com") {
+            setTasks(fetchedTasks);
+          } else {
+            const userSpecificTasks = fetchedTasks.filter(t => t.userId === user.uid);
+            setTasks(userSpecificTasks);
+          }
 
           const fetchedJobs = await getCollectionData<Job>("jobs", initialJobs);
           setJobs(fetchedJobs);
@@ -517,6 +547,11 @@ export default function App() {
     e.preventDefault();
     if (!authEmail || !authPassword) return;
 
+    if (authMode === "signup" && authAccountType === "freelancer" && authPassword !== authConfirmPassword) {
+      setAuthError("Passwords do not match.");
+      return;
+    }
+
     setIsAuthLoading(true);
     setAuthError(null);
     try {
@@ -535,7 +570,7 @@ export default function App() {
                 email: authEmail,
                 birthdate: authBirthdate || "1998-07-06",
                 accountType: authAccountType,
-                profession: authAccountType === "freelancer" ? "Professional Freelancer" : "Job Provider / Owner",
+                profession: authAccountType === "freelancer" ? (applyingAs ? `${applyingAs} Specialist` : "Professional Freelancer") : (selectedRoleType ? `Hiring: ${selectedRoleType}` : "Job Provider / Owner"),
               });
               // Send signup welcome email
               try {
@@ -569,7 +604,7 @@ export default function App() {
           email: authEmail,
           birthdate: authBirthdate || "1998-07-06",
           accountType: authAccountType,
-          profession: authAccountType === "freelancer" ? "Professional Freelancer" : "Job Provider / Owner",
+          profession: authAccountType === "freelancer" ? (applyingAs ? `${applyingAs} Specialist` : "Professional Freelancer") : (selectedRoleType ? `Hiring: ${selectedRoleType}` : "Job Provider / Owner"),
         });
         // Send signup welcome email
         try {
@@ -663,203 +698,624 @@ export default function App() {
       {showAuthModal && (
         <div className="fixed inset-0 z-50 bg-slate-50/90 backdrop-blur-xs flex flex-col justify-center items-center p-4 selection:bg-purple-600 selection:text-white border-4 border-slate-200">
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#0a0a0a_1px,transparent_1px),linear-gradient(to_bottom,#0a0a0a_1px,transparent_1px)] bg-[size:5rem_5rem] opacity-5 pointer-events-none" />
-          <div className="w-full max-w-sm bg-white border-2 border-slate-200 p-5 md:p-6 shadow-lg shadow-slate-200/50 relative z-10 rounded-xl">
-            <button onClick={() => setShowAuthModal(false)} className="absolute top-3 right-3 text-slate-900 hover:text-purple-500 transition-colors"><X className="w-5 h-5" /></button>
-            <div className="text-center flex flex-col items-center gap-1 mb-4 mt-1">
-              <div className="group relative w-10 h-10 flex items-center justify-center transition-all duration-500 hover:-translate-y-0.5 cursor-pointer">
-                <svg width="40" height="40" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-10 h-10 drop-shadow-md">
-                  <defs>
-                    <linearGradient id="brand-grad-modal" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#9d50bb" />
-                      <stop offset="100%" stopColor="#6e48aa" />
-                    </linearGradient>
-                  </defs>
-                  <rect x="20" y="20" width="160" height="160" rx="40" fill="url(#brand-grad-modal)" />
-                  <path d="M100 45L112.5 83.5H153L120.25 107.5L132.75 146L100 122L67.25 146L79.75 107.5L47 83.5H87.5L100 45Z" fill="white" className="transition-transform duration-700 origin-center group-hover:scale-110 group-hover:rotate-[144deg]" />
-                </svg>
+          
+          <div className={`w-full ${
+            (authAccountType === "jobOwner" && authMode === "signup" && hireWizardStep === 1) 
+              ? "max-w-xl md:max-w-2xl" 
+              : (authAccountType === "freelancer" && authMode === "signup") 
+              ? "max-w-xl md:max-w-4xl" 
+              : "max-w-sm"
+          } bg-white border-2 border-slate-200 p-5 md:p-6 shadow-lg shadow-slate-200/50 relative z-10 rounded-xl transition-all duration-300`}>
+            <button onClick={() => setShowAuthModal(false)} className="absolute top-4 right-4 text-slate-950 hover:text-purple-600 transition-colors cursor-pointer"><X className="w-5 h-5" /></button>
+            
+            {/* Conditional Render: Step 1 of the Hiring Wizard for Job Owners */}
+            {authAccountType === "jobOwner" && authMode === "signup" && hireWizardStep === 1 ? (
+              <div className="flex flex-col">
+                {/* Modal Logo / Header Area */}
+                <div className="flex items-center gap-3 mb-4">
+                  <svg width="32" height="32" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 drop-shadow-sm">
+                    <defs>
+                      <linearGradient id="brand-grad-modal-wizard" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#9d50bb" />
+                        <stop offset="100%" stopColor="#6e48aa" />
+                      </linearGradient>
+                    </defs>
+                    <rect x="20" y="20" width="160" height="160" rx="40" fill="url(#brand-grad-modal-wizard)" />
+                    <path d="M100 45L112.5 83.5H153L120.25 107.5L132.75 146L100 122L67.25 146L79.75 107.5L47 83.5H87.5L100 45Z" fill="white" />
+                  </svg>
+                  <div>
+                    <h1 className="font-display font-black text-lg tracking-tight text-slate-900 leading-none">ESTARR</h1>
+                    <p className="text-[10px] text-purple-600 font-bold tracking-wide mt-0.5">Hiring Portal</p>
+                  </div>
+                </div>
+
+                {/* Account Type Selector - Screenshot 1 Style */}
+                <div className="mb-6 max-w-xs">
+                  <span className="font-display font-extrabold text-[11px] uppercase tracking-wider text-slate-900 block mb-1.5">
+                    Account Type *
+                  </span>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setAuthAccountType("freelancer")}
+                      className={`flex-1 py-1.5 px-4 rounded-full border text-xs font-bold tracking-tight transition-all cursor-pointer ${
+                        authAccountType === "freelancer"
+                          ? "bg-purple-50 border-purple-500 text-purple-600 shadow-xs"
+                          : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"
+                      }`}
+                    >
+                      Freelancer
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAuthAccountType("jobOwner")}
+                      className={`flex-1 py-1.5 px-4 rounded-full border text-xs font-bold tracking-tight transition-all cursor-pointer ${
+                        authAccountType === "jobOwner"
+                          ? "bg-purple-50 border-purple-500 text-purple-600 shadow-xs"
+                          : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"
+                      }`}
+                    >
+                      Owner
+                    </button>
+                  </div>
+                </div>
+
+                {/* Blue Banner Notice - Screenshot 2 Style */}
+                <div className="bg-[#EBF3FC] border-l-4 border-[#0066FF] text-[#001A4E] p-4 rounded-r-xl text-[11px] md:text-xs leading-relaxed mb-6 font-medium">
+                  Thanks for your interest in hiring through ESTARR! Before we get started, we'd like to ask a few questions to better understand your business needs.
+                </div>
+
+                {/* Wizard Title */}
+                <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 block mb-1">
+                  STEP 1
+                </span>
+                <h2 className="font-display font-extrabold text-2xl md:text-3xl text-slate-900 tracking-tight mb-5">
+                  Who would you like to hire?
+                </h2>
+
+                {/* Option Cards Row */}
+                <div className="flex flex-col gap-3">
+                  {[
+                    {
+                      id: "Developer",
+                      title: "Developer",
+                      desc: "Software Developer, Data Scientist, DevOps, QA...",
+                      icon: <Laptop className="w-5 h-5 text-blue-500" />
+                    },
+                    {
+                      id: "Designer",
+                      title: "Designer",
+                      desc: "Web, Mobile, UI/UX, Branding, and Visual Designer...",
+                      icon: <Layers className="w-5 h-5 text-purple-500" />
+                    },
+                    {
+                      id: "Marketing Expert",
+                      title: "Marketing Expert",
+                      desc: "Growth Marketing Expert, Content Marketing Strategist, Digital Marketer, SEO Specialist...",
+                      icon: <LineChart className="w-5 h-5 text-emerald-500" />
+                    },
+                    {
+                      id: "Project Manager",
+                      title: "Project Manager",
+                      desc: "Digital Project Manager, IT Project Manager, Scrum Master, Agile Coach...",
+                      icon: <Briefcase className="w-5 h-5 text-amber-500" />
+                    }
+                  ].map((option) => (
+                    <div
+                      key={option.id}
+                      onClick={() => {
+                        setSelectedRoleType(option.id);
+                        setHireWizardStep(2);
+                      }}
+                      className="border border-slate-200 hover:border-blue-400 hover:bg-slate-50/50 p-3.5 rounded-xl flex items-center justify-between transition-all duration-200 cursor-pointer group shadow-2xs hover:shadow-xs"
+                    >
+                      <div className="flex items-center gap-3.5">
+                        <div className="w-10 h-10 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center group-hover:bg-white group-hover:border-blue-200 transition-colors">
+                          {option.icon}
+                        </div>
+                        <div className="flex flex-col pr-4">
+                          <span className="font-display font-bold text-sm text-slate-900 group-hover:text-blue-600 transition-colors">
+                            {option.title}
+                          </span>
+                          <span className="text-slate-500 text-[11px] leading-snug mt-0.5">
+                            {option.desc}
+                          </span>
+                        </div>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-blue-500 group-hover:translate-x-0.5 transition-all" />
+                    </div>
+                  ))}
+                </div>
+
+                <div className="text-center mt-6 pt-4 border-t border-slate-100 text-[11px]">
+                  <p className="text-slate-500">
+                    Already registered?{" "}
+                    <button
+                      onClick={() => setAuthMode("signin")}
+                      className="text-purple-600 font-bold hover:underline uppercase tracking-tight cursor-pointer"
+                    >
+                      Sign In
+                    </button>
+                  </p>
+                </div>
               </div>
-              <h1 className="font-display font-bold text-xl tracking-tight mt-2 text-slate-900">ESTARR APP</h1>
-              <p className="text-[11px] text-purple-600 font-bold tracking-wide mt-0.5">Empowering Creators & Pros</p>
-              <p className="text-[10px] text-slate-400">Connect • Learn • Build • Work • Grow</p>
-            </div>
-            <form onSubmit={handleLogin} className="flex flex-col gap-3 text-xs">
-              {authMode === "signup" && (
-                <>
+            ) : authAccountType === "freelancer" && authMode === "signup" ? (
+              // Toptal-style Freelancer Sign-up Layout
+              <div className="flex flex-col md:flex-row gap-8">
+                {/* Left Side: Form */}
+                <div className="flex-1">
+                  {/* Header/Logo */}
+                  <div className="flex items-center gap-3 mb-4">
+                    <svg width="32" height="32" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 drop-shadow-sm">
+                      <defs>
+                        <linearGradient id="brand-grad-modal-wizard" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stopColor="#9d50bb" />
+                          <stop offset="100%" stopColor="#6e48aa" />
+                        </linearGradient>
+                      </defs>
+                      <rect x="20" y="20" width="160" height="160" rx="40" fill="url(#brand-grad-modal-wizard)" />
+                      <path d="M100 45L112.5 83.5H153L120.25 107.5L132.75 146L100 122L67.25 146L79.75 107.5L47 83.5H87.5L100 45Z" fill="white" />
+                    </svg>
+                    <div>
+                      <h1 className="font-display font-black text-lg tracking-tight text-slate-900 leading-none">ESTARR</h1>
+                      <p className="text-[10px] text-purple-600 font-bold tracking-wide mt-0.5">Talent Network</p>
+                    </div>
+                  </div>
+
+                  {/* Toptal Style Onboarding Header */}
+                  <h2 className="font-display font-black text-xl md:text-2xl text-[#1E293B] tracking-tight leading-tight mb-2">
+                    Apply to Join the World's Top Talent Network
+                  </h2>
+                  <p className="text-slate-500 text-[11px] leading-relaxed mb-6">
+                    ESTARR is an exclusive network of the world's top talent in business, design, marketing, and technology. We provide access to top companies, a community of experts, and resources that can help accelerate your career.
+                  </p>
+
+                  {/* Sign Up with LinkedIn */}
+                  <button
+                    type="button"
+                    onClick={handleLinkedInLogin}
+                    className="w-full bg-[#0A66C2] hover:bg-[#08529c] text-white py-2.5 px-4 rounded-md flex items-center justify-center gap-2 text-xs font-bold font-display cursor-pointer transition-colors shadow-sm"
+                  >
+                    <Linkedin className="w-4 h-4 text-white" />
+                    Sign Up with LinkedIn
+                  </button>
+
+                  <div className="text-[10px] text-slate-400 text-center mt-2 mb-4 italic">
+                    By clicking <span className="font-semibold">Sign up with LinkedIn</span>, you agree to let ESTARR store your LinkedIn profile
+                  </div>
+
+                  {/* Divider */}
+                  <div className="relative flex items-center gap-3 my-5">
+                    <div className="flex-1 h-px bg-slate-200" />
+                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest bg-white px-2">OR</span>
+                    <div className="flex-1 h-px bg-slate-200" />
+                  </div>
+
+                  {/* The Form */}
+                  <form onSubmit={handleLogin} className="flex flex-col gap-3 text-xs">
+                    {/* Account Type (Freelancer vs Owner) - so they can toggle back if they want */}
+                    <div className="grid grid-cols-2 gap-3 mb-1">
+                      <div className="flex flex-col gap-1">
+                        <span className="font-display font-extrabold text-[9px] uppercase tracking-wider text-slate-900">
+                          Account Type *
+                        </span>
+                        <div className="flex gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => setAuthAccountType("freelancer")}
+                            className="flex-1 py-1.5 px-2 rounded-full border text-[10px] font-bold tracking-tight transition-all bg-purple-50 border-purple-500 text-purple-600 cursor-pointer"
+                          >
+                            Freelancer
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setAuthAccountType("jobOwner");
+                              setHireWizardStep(1);
+                            }}
+                            className="flex-1 py-1.5 px-2 rounded-full border text-[10px] font-bold tracking-tight transition-all bg-white border-slate-200 text-slate-500 hover:border-slate-300 cursor-pointer"
+                          >
+                            Owner
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Dropdown: I'm applying as... */}
+                      <div className="flex flex-col gap-1">
+                        <span className="font-display font-extrabold text-[9px] uppercase tracking-wider text-slate-900">
+                          I'm applying as...
+                        </span>
+                        <select
+                          value={applyingAs}
+                          onChange={(e) => setApplyingAs(e.target.value)}
+                          className="w-full bg-white border border-slate-200 rounded-md px-2 py-1.5 focus:outline-none focus:border-purple-500 text-slate-900 font-medium text-xs h-[34px]"
+                        >
+                          <option value="Developer">Developer</option>
+                          <option value="Designer">Designer</option>
+                          <option value="Marketing Expert">Marketing Expert</option>
+                          <option value="Project Manager">Project Manager</option>
+                          <option value="Product Manager">Product Manager</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Inputs */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div className="flex flex-col gap-1">
+                        <label className="font-display font-extrabold text-[9px] uppercase tracking-wider text-slate-900">Full Name</label>
+                        <input
+                          type="text"
+                          required
+                          disabled={isAuthLoading}
+                          placeholder="Your full name"
+                          value={authName}
+                          onChange={(e) => setAuthName(e.target.value)}
+                          className="w-full bg-white border border-slate-200 rounded-md px-3 py-1.5 focus:outline-none focus:border-purple-500 text-slate-900 font-medium disabled:opacity-60"
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-1">
+                        <label className="font-display font-extrabold text-[9px] uppercase tracking-wider text-slate-900">E-mail</label>
+                        <input
+                          type="email"
+                          required
+                          disabled={isAuthLoading}
+                          placeholder="your.email@domain.com"
+                          value={authEmail}
+                          onChange={(e) => setAuthEmail(e.target.value)}
+                          className="w-full bg-white border border-slate-200 rounded-md px-3 py-1.5 focus:outline-none focus:border-purple-500 text-slate-900 font-medium disabled:opacity-60"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div className="flex flex-col gap-1">
+                        <label className="font-display font-extrabold text-[9px] uppercase tracking-wider text-slate-900">Password</label>
+                        <input
+                          type="password"
+                          required
+                          disabled={isAuthLoading}
+                          placeholder="Create password"
+                          value={authPassword}
+                          onChange={(e) => setAuthPassword(e.target.value)}
+                          className="w-full bg-white border border-slate-200 rounded-md px-3 py-1.5 focus:outline-none focus:border-purple-500 text-slate-900 font-medium disabled:opacity-60"
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-1">
+                        <label className="font-display font-extrabold text-[9px] uppercase tracking-wider text-slate-900">Confirm password</label>
+                        <input
+                          type="password"
+                          required
+                          disabled={isAuthLoading}
+                          placeholder="Confirm password"
+                          value={authConfirmPassword}
+                          onChange={(e) => setAuthConfirmPassword(e.target.value)}
+                          className="w-full bg-white border border-slate-200 rounded-md px-3 py-1.5 focus:outline-none focus:border-purple-500 text-slate-900 font-medium disabled:opacity-60"
+                        />
+                      </div>
+                    </div>
+
+                    {authError && (
+                      <div className="p-2.5 bg-rose-50 border border-rose-100 text-rose-600 rounded-md text-[10px] font-mono leading-relaxed mt-1">
+                        ⚠️ {authError}
+                      </div>
+                    )}
+
+                    <div className="text-[10px] text-slate-500 leading-relaxed mt-2">
+                      By submitting, you acknowledge and agree to ESTARR's <span className="text-purple-600 hover:underline cursor-pointer">Terms and Conditions</span> and <span className="text-purple-600 hover:underline cursor-pointer">Privacy Policy</span>.
+                    </div>
+
+                    <button
+                      id="btn-auth-submit-talent"
+                      type="submit"
+                      disabled={isAuthLoading}
+                      className="w-full bg-[#00D285] hover:bg-[#00be76] text-white py-3 px-4 rounded-md flex items-center justify-center gap-1.5 text-xs font-bold font-display uppercase tracking-wider transition-colors cursor-pointer disabled:opacity-75"
+                    >
+                      {isAuthLoading ? (
+                        <>
+                          <svg className="animate-spin h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                          </svg>
+                          <span>Applying...</span>
+                        </>
+                      ) : (
+                        "Apply to Join ESTARR"
+                      )}
+                    </button>
+                  </form>
+
+                  <div className="text-center mt-4 pt-3 border-t border-slate-100 text-[11px]">
+                    <p className="text-slate-500">
+                      Already registered?{" "}
+                      <button
+                        onClick={() => setAuthMode("signin")}
+                        className="text-purple-600 font-bold hover:underline uppercase tracking-tight cursor-pointer"
+                      >
+                        Sign In
+                      </button>
+                    </p>
+                  </div>
+                </div>
+
+                {/* Right Side: Logos / Social Proof */}
+                <div className="hidden md:flex md:w-[240px] bg-slate-50 border-l border-slate-200 p-6 flex-col justify-center rounded-r-xl">
+                  <h4 className="font-display font-extrabold text-[10px] uppercase tracking-widest text-slate-400 mb-6 text-center md:text-left">
+                    Work with top companies
+                  </h4>
+                  
+                  <div className="flex flex-col gap-6 items-center md:items-start opacity-65">
+                    {/* Microsoft Logo */}
+                    <div className="flex items-center gap-2 text-slate-800">
+                      <div className="grid grid-cols-2 gap-0.5 w-4 h-4">
+                        <div className="bg-[#F25022] w-1.5 h-1.5"></div>
+                        <div className="bg-[#7FBA00] w-1.5 h-1.5"></div>
+                        <div className="bg-[#00A4EF] w-1.5 h-1.5"></div>
+                        <div className="bg-[#FFB900] w-1.5 h-1.5"></div>
+                      </div>
+                      <span className="font-sans font-semibold tracking-tight text-sm text-slate-700">Microsoft</span>
+                    </div>
+
+                    {/* Salesforce Logo */}
+                    <div className="text-[#00A1E0] font-sans font-black tracking-tighter text-sm">
+                      salesforce
+                    </div>
+
+                    {/* Airbnb Logo */}
+                    <div className="flex items-center gap-1.5 text-slate-800">
+                      <span className="font-display font-extrabold text-sm text-[#FF5A5F] tracking-tight">airbnb</span>
+                    </div>
+
+                    {/* Shopify Logo */}
+                    <div className="flex items-center gap-1 text-[#96BF48] font-sans font-bold text-sm">
+                      <span>shopify</span>
+                    </div>
+
+                    {/* Netflix Logo */}
+                    <div className="font-display font-black tracking-widest text-[#E50914] text-sm italic">
+                      NETFLIX
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              // Standard Auth form (SignIn, or step 2 of Owner signup)
+              <>
+                <div className="text-center flex flex-col items-center gap-1 mb-4 mt-1">
+                  <div className="group relative w-10 h-10 flex items-center justify-center transition-all duration-500 hover:-translate-y-0.5 cursor-pointer">
+                    <svg width="40" height="40" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-10 h-10 drop-shadow-md">
+                      <defs>
+                        <linearGradient id="brand-grad-modal" x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stopColor="#9d50bb" />
+                          <stop offset="100%" stopColor="#6e48aa" />
+                        </linearGradient>
+                      </defs>
+                      <rect x="20" y="20" width="160" height="160" rx="40" fill="url(#brand-grad-modal)" />
+                      <path d="M100 45L112.5 83.5H153L120.25 107.5L132.75 146L100 122L67.25 146L79.75 107.5L47 83.5H87.5L100 45Z" fill="white" className="transition-transform duration-700 origin-center group-hover:scale-110 group-hover:rotate-[144deg]" />
+                    </svg>
+                  </div>
+                  <h1 className="font-display font-bold text-xl tracking-tight mt-2 text-slate-900">ESTARR</h1>
+                  <p className="text-[11px] text-purple-600 font-bold tracking-wide mt-0.5">Empowering Creators & Pros</p>
+                  <p className="text-[10px] text-slate-400">Connect • Learn • Build • Work • Grow</p>
+                </div>
+
+                {authAccountType === "jobOwner" && authMode === "signup" && hireWizardStep === 2 && (
+                  <div className="mb-4">
+                    <button
+                      type="button"
+                      onClick={() => setHireWizardStep(1)}
+                      className="flex items-center gap-1 text-blue-600 hover:text-blue-800 text-[10px] font-bold uppercase tracking-tight mb-2 transition-all cursor-pointer"
+                    >
+                      ← Back to Hire Selection
+                    </button>
+                    <div className="bg-blue-50 border border-blue-100 rounded-xl p-2.5 text-[11px] font-semibold text-blue-900 flex justify-between items-center">
+                      <span>Role selected: <strong className="text-blue-600">{selectedRoleType}</strong></span>
+                      <span className="text-[9px] font-mono uppercase tracking-widest bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded-sm">Step 2 of 2</span>
+                    </div>
+                  </div>
+                )}
+
+                <form onSubmit={handleLogin} className="flex flex-col gap-3 text-xs">
+                  {authMode === "signup" && (
+                    <>
+                      <div className="flex flex-col gap-1">
+                        <label className="font-mono text-[9px] font-bold text-slate-900 tracking-wide">Full Name</label>
+                        <div className="relative">
+                          <User className="absolute left-3 top-2.5 w-3.5 h-3.5 text-slate-800" />
+                          <input
+                            type="text"
+                            required
+                            disabled={isAuthLoading}
+                            placeholder="Chinedu Okafor"
+                            value={authName}
+                            onChange={(e) => setAuthName(e.target.value)}
+                            className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-3 py-2 focus:outline-none focus:bg-slate-50 text-slate-900 font-medium disabled:opacity-60"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="flex flex-col gap-1">
+                          <span className="font-display font-extrabold text-[9px] uppercase tracking-wider text-slate-900">
+                            Account Type *
+                          </span>
+                          <div className="flex gap-1.5">
+                            <button
+                              type="button"
+                              disabled={isAuthLoading}
+                              onClick={() => setAuthAccountType("freelancer")}
+                              className={`flex-1 py-1.5 px-2 rounded-full border text-[10px] font-bold tracking-tight transition-all disabled:opacity-60 cursor-pointer ${
+                                authAccountType === "freelancer"
+                                  ? "bg-purple-50 border-purple-500 text-purple-600"
+                                  : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"
+                              }`}
+                            >
+                              Freelancer
+                            </button>
+                            <button
+                              type="button"
+                              disabled={isAuthLoading}
+                              onClick={() => {
+                                setAuthAccountType("jobOwner");
+                                setHireWizardStep(1); // Return to wizard step 1
+                              }}
+                              className={`flex-1 py-1.5 px-2 rounded-full border text-[10px] font-bold tracking-tight transition-all disabled:opacity-60 cursor-pointer ${
+                                authAccountType === "jobOwner"
+                                  ? "bg-purple-50 border-purple-500 text-purple-600"
+                                  : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"
+                              }`}
+                            >
+                              Owner
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col gap-1">
+                          <label className="font-mono text-[9px] font-bold text-slate-900 tracking-wide">Birthdate *</label>
+                          <div className="relative">
+                            <Calendar className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-slate-800" />
+                            <input
+                              type="date"
+                              required
+                              disabled={isAuthLoading}
+                              value={authBirthdate}
+                              onChange={(e) => setAuthBirthdate(e.target.value)}
+                              className="w-full bg-white border border-slate-200 rounded-xl pl-8 pr-2 py-2 focus:outline-none focus:bg-slate-50 text-slate-900 font-medium text-[10px] disabled:opacity-60"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
+
                   <div className="flex flex-col gap-1">
-                    <label className="font-mono text-[9px] font-bold text-slate-900 tracking-wide">Full Name</label>
+                    <label className="font-mono text-[9px] font-bold text-slate-900 tracking-wide">Email Address</label>
                     <div className="relative">
-                      <User className="absolute left-3 top-2.5 w-3.5 h-3.5 text-slate-800" />
+                      <Mail className="absolute left-3 top-2.5 w-3.5 h-3.5 text-slate-800" />
                       <input
-                        type="text"
+                        type="email"
                         required
                         disabled={isAuthLoading}
-                        placeholder="Chinedu Okafor"
-                        value={authName}
-                        onChange={(e) => setAuthName(e.target.value)}
+                        placeholder="chinedu@estarrapp.com"
+                        value={authEmail}
+                        onChange={(e) => setAuthEmail(e.target.value)}
                         className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-3 py-2 focus:outline-none focus:bg-slate-50 text-slate-900 font-medium disabled:opacity-60"
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="flex flex-col gap-1">
-                      <label className="font-mono text-[9px] font-bold text-slate-900 tracking-wide">Account Type *</label>
-                      <div className="flex gap-1.5">
-                        <button
-                          type="button"
-                          disabled={isAuthLoading}
-                          onClick={() => setAuthAccountType("freelancer")}
-                          className={`flex-1 py-1.5 px-2 rounded-xl border text-[10px] font-bold transition-all disabled:opacity-60 ${authAccountType === "freelancer" ? "bg-purple-100 border-purple-500 text-purple-700" : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"}`}
-                        >
-                          Freelancer
-                        </button>
-                        <button
-                          type="button"
-                          disabled={isAuthLoading}
-                          onClick={() => setAuthAccountType("jobOwner")}
-                          className={`flex-1 py-1.5 px-2 rounded-xl border text-[10px] font-bold transition-all disabled:opacity-60 ${authAccountType === "jobOwner" ? "bg-purple-100 border-purple-500 text-purple-700" : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"}`}
-                        >
-                          Owner
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col gap-1">
-                      <label className="font-mono text-[9px] font-bold text-slate-900 tracking-wide">Birthdate *</label>
-                      <div className="relative">
-                        <Calendar className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-slate-800" />
-                        <input
-                          type="date"
-                          required
-                          disabled={isAuthLoading}
-                          value={authBirthdate}
-                          onChange={(e) => setAuthBirthdate(e.target.value)}
-                          className="w-full bg-white border border-slate-200 rounded-xl pl-8 pr-2 py-2 focus:outline-none focus:bg-slate-50 text-slate-900 font-medium text-[10px] disabled:opacity-60"
-                        />
-                      </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="font-mono text-[9px] font-bold text-slate-900 tracking-wide">Security Password</label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-2.5 w-3.5 h-3.5 text-slate-800" />
+                      <input
+                        type="password"
+                        required
+                        disabled={isAuthLoading}
+                        placeholder="••••••••"
+                        value={authPassword}
+                        onChange={(e) => setAuthPassword(e.target.value)}
+                        className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-3 py-2 focus:outline-none focus:bg-slate-50 text-slate-900 font-medium disabled:opacity-60"
+                      />
                     </div>
                   </div>
-                </>
-              )}
 
-              <div className="flex flex-col gap-1">
-                <label className="font-mono text-[9px] font-bold text-slate-900 tracking-wide">Email Address</label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-2.5 w-3.5 h-3.5 text-slate-800" />
-                  <input
-                    type="email"
-                    required
-                    disabled={isAuthLoading}
-                    placeholder="chinedu@estarrapp.com"
-                    value={authEmail}
-                    onChange={(e) => setAuthEmail(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-3 py-2 focus:outline-none focus:bg-slate-50 text-slate-900 font-medium disabled:opacity-60"
-                  />
-                </div>
-              </div>
+                  {authMode === "signin" && (
+                    <p className="text-[10px] text-slate-500 font-mono italic leading-relaxed bg-slate-50 p-2 rounded-lg border border-slate-100">
+                      💡 <strong>Tip:</strong> If you don't have an account in the database yet, click <strong>SIGN UP</strong> below to register one!
+                    </p>
+                  )}
 
-              <div className="flex flex-col gap-1">
-                <label className="font-mono text-[9px] font-bold text-slate-900 tracking-wide">Security Password</label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-2.5 w-3.5 h-3.5 text-slate-800" />
-                  <input
-                    type="password"
-                    required
-                    disabled={isAuthLoading}
-                    placeholder="••••••••"
-                    value={authPassword}
-                    onChange={(e) => setAuthPassword(e.target.value)}
-                    className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-3 py-2 focus:outline-none focus:bg-slate-50 text-slate-900 font-medium disabled:opacity-60"
-                  />
-                </div>
-              </div>
+                  {authError && (
+                    <div className="p-2.5 bg-rose-50 border border-rose-100 text-rose-600 rounded-xl text-[10px] font-mono leading-relaxed">
+                      ⚠️ {authError}
+                    </div>
+                  )}
 
-              {authMode === "signin" && (
-                <p className="text-[10px] text-slate-500 font-mono italic leading-relaxed bg-slate-50 p-2 rounded-lg border border-slate-100">
-                  💡 <strong>Tip:</strong> If you don't have an account in the database yet, click <strong>SIGN UP</strong> below to register one!
-                </p>
-              )}
-
-              {authError && (
-                <div className="p-2.5 bg-rose-50 border border-rose-100 text-rose-600 rounded-xl text-[10px] font-mono leading-relaxed">
-                  ⚠️ {authError}
-                </div>
-              )}
-
-              <button
-                id="btn-auth-submit"
-                type="submit"
-                disabled={isAuthLoading}
-                className={`w-full btn-primary text-[10px] uppercase mt-2 py-2.5 flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed`}
-              >
-                {isAuthLoading ? (
-                  <>
-                    <svg className="animate-spin h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                    </svg>
-                    <span>Processing...</span>
-                  </>
-                ) : (
-                  authMode === "signin" ? "Sign In to ESTARR" : "Create Account"
-                )}
-               </button>
-            </form>
-
-            <div className="relative flex items-center gap-3 my-4">
-              <div className="flex-1 h-px bg-slate-200" />
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Or Continue With</span>
-              <div className="flex-1 h-px bg-slate-200" />
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 mb-2">
-              <button
-                type="button"
-                onClick={handleLinkedInLogin}
-                className="flex items-center justify-center gap-2 py-2 px-4 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors text-xs font-bold text-slate-700 cursor-pointer"
-              >
-                <Linkedin className="w-4 h-4 text-[#0A66C2]" />
-                LinkedIn
-              </button>
-              <button
-                type="button"
-                onClick={handleGithubLogin}
-                className="flex items-center justify-center gap-2 py-2 px-4 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors text-xs font-bold text-slate-700 cursor-pointer"
-              >
-                <Github className="w-4 h-4 text-slate-900" />
-                GitHub
-              </button>
-            </div>
-
-            <div className="text-center mt-4 pt-3 border-t border-slate-200/25 text-[11px]">
-              {authMode === "signin" ? (
-                <p className="text-slate-500">
-                  Don't have an account yet?{" "}
                   <button
-                    onClick={() => setAuthMode("signup")}
-                    className="text-purple-500 font-bold hover:underline uppercase tracking-tight cursor-pointer"
+                    id="btn-auth-submit"
+                    type="submit"
+                    disabled={isAuthLoading}
+                    className={`w-full btn-primary text-[10px] uppercase mt-2 py-2.5 flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed`}
                   >
-                    Sign Up
+                    {isAuthLoading ? (
+                      <>
+                        <svg className="animate-spin h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                        <span>Processing...</span>
+                      </>
+                    ) : (
+                      authMode === "signin" 
+                        ? "Sign In to ESTARR" 
+                        : (authAccountType === "jobOwner" ? "Complete & Match Talent" : "Create Account")
+                    )}
                   </button>
-                </p>
-              ) : (
-                <p className="text-slate-500">
-                  Already registered?{" "}
+                </form>
+
+                <div className="relative flex items-center gap-3 my-4">
+                  <div className="flex-1 h-px bg-slate-200" />
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Or Continue With</span>
+                  <div className="flex-1 h-px bg-slate-200" />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 mb-2">
                   <button
-                    onClick={() => setAuthMode("signin")}
-                    className="text-purple-500 font-bold hover:underline uppercase tracking-tight cursor-pointer"
+                    type="button"
+                    onClick={handleLinkedInLogin}
+                    className="flex items-center justify-center gap-2 py-2 px-4 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors text-xs font-bold text-slate-700 cursor-pointer"
                   >
-                    Sign In
+                    <Linkedin className="w-4 h-4 text-[#0A66C2]" />
+                    LinkedIn
                   </button>
-                </p>
-              )}
-            </div>
+                  <button
+                    type="button"
+                    onClick={handleGithubLogin}
+                    className="flex items-center justify-center gap-2 py-2 px-4 border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors text-xs font-bold text-slate-700 cursor-pointer"
+                  >
+                    <Github className="w-4 h-4 text-slate-900" />
+                    GitHub
+                  </button>
+                </div>
+
+                <div className="text-center mt-4 pt-3 border-t border-slate-200/25 text-[11px]">
+                  {authMode === "signin" ? (
+                    <p className="text-slate-500">
+                      Don't have an account yet?{" "}
+                      <button
+                        onClick={() => {
+                          setAuthMode("signup");
+                          if (authAccountType === "jobOwner") {
+                            setHireWizardStep(1);
+                          }
+                        }}
+                        className="text-purple-500 font-bold hover:underline uppercase tracking-tight cursor-pointer"
+                      >
+                        Sign Up
+                      </button>
+                    </p>
+                  ) : (
+                    <p className="text-slate-500">
+                      Already registered?{" "}
+                      <button
+                        onClick={() => setAuthMode("signin")}
+                        className="text-purple-500 font-bold hover:underline uppercase tracking-tight cursor-pointer"
+                      >
+                        Sign In
+                      </button>
+                    </p>
+                  )}
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
 
       {/* Dynamic Header */}
-      <header className="sticky top-0 bg-indigo-900 border-b border-indigo-800 z-40 px-6 py-4 flex justify-between items-center shadow-lg">
+      <header className="sticky top-0 bg-black border-b border-slate-800 z-40 px-6 py-4 flex justify-between items-center shadow-lg">
         <button onClick={() => setActiveTab("home")} className="flex items-center gap-3 text-left cursor-pointer hover:opacity-90">
           <div className="group relative w-11 h-11 flex items-center justify-center transition-all duration-500 hover:-translate-y-0.5">
             <svg width="44" height="44" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-11 h-11 drop-shadow-md">
@@ -874,10 +1330,73 @@ export default function App() {
             </svg>
           </div>
           <div>
-            <h1 className="font-display font-bold text-sm md:text-base uppercase tracking-tight text-white">ESTARR APP</h1>
+            <h1 className="font-display font-bold text-sm md:text-base uppercase tracking-tight text-white">ESTARR</h1>
             <p className="text-[10px] text-slate-400 font-medium tracking-wide font-bold">Empowering Creators & Pros</p>
           </div>
         </button>
+
+        {/* Global Navigation Buttons in the Middle of Header */}
+        <nav className="hidden md:flex items-center gap-1 bg-slate-950 border border-slate-800/80 px-2.5 py-1.5 rounded-full shadow-inner">
+          <button
+            onClick={() => setActiveTab("home")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold transition-all uppercase tracking-wider cursor-pointer ${
+              activeTab === "home"
+                ? "bg-purple-600 text-white shadow-md shadow-purple-500/20"
+                : "text-slate-400 hover:text-white hover:bg-slate-900/40"
+            }`}
+          >
+            <Home className="w-3 h-3" />
+            <span>Home</span>
+          </button>
+          
+          <button
+            onClick={() => setActiveTab("projects")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold transition-all uppercase tracking-wider cursor-pointer ${
+              activeTab === "projects"
+                ? "bg-purple-600 text-white shadow-md shadow-purple-500/20"
+                : "text-slate-400 hover:text-white hover:bg-slate-900/40"
+            }`}
+          >
+            <Layers className="w-3 h-3" />
+            <span>Projects</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("connect")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold transition-all uppercase tracking-wider cursor-pointer ${
+              activeTab === "connect"
+                ? "bg-purple-600 text-white shadow-md shadow-purple-500/20"
+                : "text-slate-400 hover:text-white hover:bg-slate-900/40"
+            }`}
+          >
+            <Users className="w-3 h-3" />
+            <span>Connect</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("academy")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold transition-all uppercase tracking-wider cursor-pointer ${
+              activeTab === "academy"
+                ? "bg-purple-600 text-white shadow-md shadow-purple-500/20"
+                : "text-slate-400 hover:text-white hover:bg-slate-900/40"
+            }`}
+          >
+            <Award className="w-3 h-3" />
+            <span>Academy</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab("marketplace")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold transition-all uppercase tracking-wider cursor-pointer ${
+              activeTab === "marketplace"
+                ? "bg-purple-600 text-white shadow-md shadow-purple-500/20"
+                : "text-slate-400 hover:text-white hover:bg-slate-900/40"
+            }`}
+          >
+            <ShoppingCart className="w-3 h-3" />
+            <span>Marketplace</span>
+          </button>
+        </nav>
 
         {/* Global User Profile Indicator */}
         <div className="flex items-center gap-3">
@@ -918,19 +1437,111 @@ export default function App() {
               </button>
             </>
           ) : (
-            <div className="flex gap-2">
+            <div className="flex items-center gap-4">
               <button 
                 onClick={() => { setAuthMode("signin"); setShowAuthModal(true); }}
-                className="bg-slate-900 hover:bg-slate-800 text-white border border-slate-800 px-4 py-1.5 rounded-xl text-[10px] font-bold transition-all cursor-pointer"
+                className="text-slate-400 hover:text-white text-xs font-semibold cursor-pointer transition-colors"
               >
                 Sign In
               </button>
               <button 
                 onClick={() => { setAuthMode("signup"); setShowAuthModal(true); }}
-                className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-1.5 rounded-xl text-[10px] font-bold transition-all cursor-pointer shadow-lg shadow-purple-500/20"
+                className="text-white hover:text-[#00D285] font-display font-bold text-xs md:text-sm tracking-tight transition-all cursor-pointer hover:underline underline-offset-4"
               >
-                Sign Up
+                Apply as a Talent
               </button>
+              <div className="relative flex items-center gap-1.5">
+                <button 
+                  onClick={() => { setAuthMode("signup"); setShowAuthModal(true); }}
+                  className="bg-gradient-to-r from-[#9d50bb] to-[#6e48aa] hover:from-[#a85ec5] hover:to-[#7b55be] text-white font-display font-bold text-xs md:text-sm px-5 py-2.5 rounded-lg transition-all cursor-pointer shadow-sm active:scale-95 flex items-center justify-center min-h-[44px]"
+                >
+                  Hire Top Talent
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowHireTooltip(!showHireTooltip);
+                  }}
+                  className="group relative w-11 h-11 flex items-center justify-center transition-all duration-500 hover:-translate-y-0.5 cursor-pointer bg-slate-900 border border-slate-800 rounded-lg text-slate-400 hover:text-white min-w-[44px] min-h-[44px]"
+                  title="Learn more"
+                >
+                  <HelpCircle className="w-4 h-4" />
+                  
+                  {/* Hover-only desktop tooltip */}
+                  <div className="hidden sm:block absolute right-0 top-full mt-2.5 w-60 p-3 rounded-lg shadow-xl border border-slate-800 bg-slate-950 text-white text-[11px] text-left transition-all duration-200 z-50 scale-95 opacity-0 pointer-events-none group-hover:scale-100 group-hover:opacity-100 group-hover:pointer-events-auto">
+                    <div className="absolute top-0 right-3.5 -mt-1.5 w-3 h-3 bg-slate-950 rotate-45 border-l border-t border-slate-800" />
+                    <p className="font-bold text-purple-400 mb-1">For Job Owners</p>
+                    <p className="text-slate-300 leading-relaxed">
+                      This feature allows clients and creators to browse, filter, and recruit top professionals from our verified expert network.
+                    </p>
+                  </div>
+
+                  {/* Click/Active tooltip state (adaptive: centered modal on mobile, dropdown on desktop) */}
+                  {showHireTooltip && (
+                    <>
+                      {/* Mobile Centered Modal Overlay */}
+                      <div 
+                        className="fixed inset-0 bg-slate-950/80 backdrop-blur-xs z-50 flex items-center justify-center p-4 sm:hidden cursor-default"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowHireTooltip(false);
+                        }}
+                      >
+                        <div 
+                          className="w-full max-w-xs bg-slate-900 border border-slate-800 rounded-xl p-5 text-left text-white shadow-2xl relative"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <button 
+                            type="button"
+                            onClick={() => setShowHireTooltip(false)}
+                            className="absolute top-3 right-3 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                          <p className="font-display font-extrabold text-[10px] text-purple-400 uppercase tracking-wider mb-2">For Job Owners</p>
+                          <h3 className="font-display font-black text-sm text-white mb-2">Browse & Hire Experts</h3>
+                          <p className="text-slate-300 text-xs leading-relaxed mb-4">
+                            This feature is designed for clients, brands, and creators to browse, filter, and recruit top professionals from our verified expert network.
+                          </p>
+                          <button 
+                            type="button"
+                            onClick={() => {
+                              setShowHireTooltip(false);
+                              setAuthMode("signup");
+                              setShowAuthModal(true);
+                            }}
+                            className="w-full py-2.5 bg-gradient-to-r from-[#9d50bb] to-[#6e48aa] hover:from-[#a85ec5] hover:to-[#7b55be] text-white font-display font-bold text-xs rounded-lg transition-all cursor-pointer shadow-md active:scale-95"
+                          >
+                            Sign Up to Browse
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Desktop Click Dropdown */}
+                      <div 
+                        className="hidden sm:block absolute right-0 top-full mt-2.5 w-60 p-3 rounded-lg shadow-xl border border-slate-800 bg-slate-950 text-white text-[11px] text-left z-50 scale-100 opacity-100 pointer-events-auto cursor-default"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <div className="absolute top-0 right-3.5 -mt-1.5 w-3 h-3 bg-slate-950 rotate-45 border-l border-t border-slate-800" />
+                        <div className="flex items-center justify-between mb-1.5">
+                          <p className="font-bold text-purple-400">For Job Owners</p>
+                          <button 
+                            type="button"
+                            onClick={() => setShowHireTooltip(false)}
+                            className="text-slate-400 hover:text-white cursor-pointer"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                        <p className="text-slate-300 leading-relaxed">
+                          This feature allows clients and creators to browse, filter, and recruit top professionals from our verified expert network.
+                        </p>
+                      </div>
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           )}
         </div>
@@ -984,16 +1595,15 @@ export default function App() {
               title: "Fintech & App Utilities",
               items: [
                 { id: "payments", label: "Payments", desc: "Digital wallets & transfers", icon: CreditCard },
-                { id: "mobile", label: "Companion App", desc: "Download the ESTARR APP", icon: Smartphone },
                 { id: "rewards", label: "Ambassadors", desc: "Earn Points & Rewards", icon: Gift }
               ]
             },
-            ...(isAdmin ? [{
+            {
               title: "Admin Controls",
               items: [
                 { id: "admin", label: "Admin Dashboard", desc: "System settings & metrics", icon: ShieldCheck }
               ]
-            }] : [])
+            }
           ].map((section) => {
             const isCollapsed = collapsedNavSections[section.title];
             const hasActiveItem = section.items.some(item => item.id === activeTab);
@@ -1072,6 +1682,28 @@ export default function App() {
               <div className="grid grid-cols-1 lg:grid-cols-12 border border-slate-200 bg-slate-50 shadow-sm hover:shadow-md transition-shadow rounded-xl">
                 {/* Hero Left: Typography Focus */}
 <div className="lg:col-span-7 p-6 md:p-10 flex flex-col border-b lg:border-b-0 lg:border-r-2 border-slate-200 bg-white rounded-xl relative overflow-hidden min-h-[420px]">
+                  {/* Background Video Loop with Tech Grid & Glow Fallbacks */}
+                  <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none z-0" />
+                  <video
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    preload="auto"
+                    className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none opacity-45 mix-blend-multiply transition-opacity duration-1000"
+                  >
+                    <source
+                      src="https://vjs.zencdn.net/v/oceans.mp4"
+                      type="video/mp4"
+                    />
+                    <source
+                      src="https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-nodes-connecting-in-space-32599-large.mp4"
+                      type="video/mp4"
+                    />
+                  </video>
+                  {/* Gradient Overlay for Premium Contrast */}
+                  <div className="absolute inset-0 bg-gradient-to-tr from-white/80 via-white/50 to-transparent z-0 pointer-events-none" />
+
                   {/* Decorative Abstract Shapes */}
                   <div className="absolute right-8 top-8 text-purple-400/60 pointer-events-none rotate-12 z-0">
                     <svg width="160" height="160" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="3">
@@ -1091,13 +1723,13 @@ export default function App() {
 
                   <div className="relative z-10 flex flex-col h-full">
                     <div>
-                      <span className="px-3 py-1 bg-purple-500 text-white border border-transparent rounded-full text-[10px] font-bold tracking-wide mb-8 inline-block uppercase shadow-sm hover:shadow-md transition-all">
-                        Connect App
+                      <span className="px-3 py-1 bg-purple-600 text-white border border-transparent rounded-full text-[10px] font-bold tracking-wide mb-8 inline-block uppercase shadow-sm hover:shadow-md transition-all">
+                        Elite Talent Network
                       </span>
                       <h1 className="text-5xl md:text-6xl lg:text-7xl leading-none font-bold tracking-tight mb-4 text-slate-900">
-                        Connect &<br />
+                        Top 3%<br />
                         <span className="text-purple-500 relative inline-block">
-                          Showcase
+                          Talent Pool
                           <div className="absolute -left-4 -bottom-2 text-rose-300/10 pointer-events-none -rotate-[15deg] -z-10 mix-blend-multiply hidden md:block">
                             <svg width="60" height="60" viewBox="0 0 100 100" fill="currentColor">
                               <polygon points="50,10 90,90 10,90" />
@@ -1107,41 +1739,25 @@ export default function App() {
                       </h1>
                     </div>
                     
-                    <div className="mt-4 max-w-md">
+                    <div className="mt-4 max-w-md font-sans">
                       <p className="text-lg md:text-xl leading-relaxed text-slate-600 font-medium">
-                        Build your professional portfolio, connect with peers, and verify your credentials on-chain.
+                        Build your verified remote portfolio, match with premium global contracts, and coordinate under strict milestone escrows.
                       </p>
                     </div>
 
-                    <div className="mt-8 flex items-center gap-4">
-                      <button
-                        onClick={() => {
-                          if (!isAuthenticated) {
-                            setAuthMode("signup");
-                            setShowAuthModal(true);
-                            return;
-                          }
-                          setActiveTab("portfolio");
-                        }}
-                        className="flex items-center gap-2 px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-xs uppercase tracking-wider transition-all shadow-sm hover:shadow-md border border-slate-800"
-                      >
-                        <Share2 className="w-4 h-4 text-purple-400" />
-                        <span>Share Portfolio</span>
-                      </button>
-                    </div>
                     <div className="mt-auto pt-8">
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4 border-t border-slate-100 pt-6">
                         <div>
-                          <p className="text-2xl font-black text-slate-900 tracking-tighter">13+</p>
-                          <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mt-1">Ecosystem Modules</p>
+                          <p className="text-2xl font-black text-slate-900 tracking-tighter">Elite 3%</p>
+                          <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mt-1 font-mono">Global Vetting</p>
                         </div>
                         <div>
                           <p className="text-2xl font-black text-slate-900 tracking-tighter">100%</p>
-                          <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mt-1">On-Chain Secured</p>
+                          <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mt-1 font-mono">Escrow Secured</p>
                         </div>
                         <div className="hidden md:block">
-                          <p className="text-2xl font-black text-purple-500 tracking-tighter">24/7</p>
-                          <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mt-1">Escrow Pipeline</p>
+                          <p className="text-2xl font-black text-purple-500 tracking-tighter">Zero-Risk</p>
+                          <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mt-1 font-mono">Contracting</p>
                         </div>
                       </div>
                     </div>
@@ -1162,7 +1778,7 @@ export default function App() {
                       <div className="space-y-0">
                         {tasks.slice(0, 3).map((task, index) => {
                           // Parse budget and client
-                          let budget = "₦150,000";
+                          let budget = "$150,000";
                           let client = task.assignee || "Client";
                           if (task.desc.includes("||")) {
                             const parts = task.desc.split("||");
@@ -1171,9 +1787,9 @@ export default function App() {
                               client = parts[1].trim();
                             }
                           } else {
-                            if (task.id === "t1") budget = "₦250,000";
-                            else if (task.id === "t2") budget = "₦180,000";
-                            else if (task.id === "t3") budget = "₦120,000";
+                            if (task.id === "t1") budget = "$250,000";
+                            else if (task.id === "t2") budget = "$180,000";
+                            else if (task.id === "t3") budget = "$120,000";
                           }
 
                           let percentage = 8;
@@ -1368,6 +1984,7 @@ export default function App() {
               posts={posts}
               onUpdatePosts={handleUpdatePosts}
               onUpdateProfile={handleUpdateProfile}
+              initialSubTab={connectSubTab}
             />
           )}
 
@@ -1408,7 +2025,7 @@ export default function App() {
           )}
 
           {activeTab === "payments" && (
-            <PaymentsSection />
+            <PaymentsSection isNewAccount={isAuthenticated && userProfile.email?.toLowerCase().trim() !== "chinedu@estarrapp.com"} />
           )}
 
           {activeTab === "events" && (
@@ -1431,14 +2048,12 @@ export default function App() {
             />
           )}
 
-          {activeTab === "mobile" && (
-            <CompanionAppDownload />
-          )}
+
           {activeTab === "rewards" && (
             <RewardsSection />
           )}
 
-          {activeTab === "admin" && isAdmin && (
+          {activeTab === "admin" && (
             <AdminSection
               isAdmin={isAdmin}
               setIsAdmin={setIsAdmin}
@@ -1597,7 +2212,7 @@ export default function App() {
       />
 
       {/* Tiny clean footer */}
-      <footer className="bg-indigo-900 text-white py-12 px-6 mt-auto">
+      <footer className="bg-slate-950 text-white py-12 px-6 mt-auto">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex flex-wrap justify-center md:justify-start gap-4 md:gap-8 text-[10px] font-mono tracking-widest uppercase">
             <button onClick={() => setActiveTab("about")} className="hover:text-indigo-400 transition-colors uppercase cursor-pointer">About Us</button>
@@ -1606,7 +2221,7 @@ export default function App() {
             <button onClick={() => setActiveTab("careers")} className="hover:text-indigo-400 transition-colors uppercase cursor-pointer">Jobs</button>
           </div>
           <div className="text-[10px] text-center md:text-right font-mono tracking-widest uppercase opacity-50">
-            ESTARR APP • SSLABS 2026 ALL RIGHTS RESERVED • 100% OFF-CHAIN SECURED ECOSYSTEM
+            ESTARR • SSLABS 2026 ALL RIGHTS RESERVED • 100% OFF-CHAIN SECURED ECOSYSTEM
           </div>
         </div>
       </footer>

@@ -11,9 +11,13 @@ import {
   RefreshCcw,
 } from "lucide-react";
 
-export default function PaymentsSection() {
-  const [balance, setBalance] = useState(1250000); // in kobo or local equivalent, let's display NGN format
-  const [transactions, setTransactions] = useState([
+interface PaymentsSectionProps {
+  isNewAccount?: boolean;
+}
+
+export default function PaymentsSection({ isNewAccount }: PaymentsSectionProps) {
+  const [balance, setBalance] = useState(isNewAccount ? 0 : 1250000); // in local equivalent, let's display USD format
+  const [transactions, setTransactions] = useState(isNewAccount ? [] : [
     {
       id: 1,
       type: "receive",
@@ -93,7 +97,7 @@ export default function PaymentsSection() {
               <Wallet className="w-5 h-5 text-purple-500" />
             </div>
             <h3 className="text-4xl font-bold font-mono tracking-tighter">
-              ₦{balance.toLocaleString()}
+              ${balance.toLocaleString()}
             </h3>
             <p className="text-[10px] text-slate-9000 font-mono mt-2 flex items-center gap-1.5">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> Insured
@@ -147,7 +151,7 @@ export default function PaymentsSection() {
 
                 <div className="flex flex-col gap-1.5">
                   <label className="font-mono text-[10px] font-bold text-slate-900 font-medium tracking-wide">
-                    Amount (₦)
+                    Amount ($)
                   </label>
                   <input
                     type="number"
@@ -207,7 +211,7 @@ export default function PaymentsSection() {
                       <p
                         className={`font-mono font-bold text-sm ${tx.type === "receive" ? "text-emerald-600" : "text-slate-900"}`}
                       >
-                        {tx.type === "receive" ? "+" : "-"}₦
+                        {tx.type === "receive" ? "+" : "-"}$
                         {tx.amount.toLocaleString()}
                       </p>
                       <span

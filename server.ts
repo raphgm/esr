@@ -450,6 +450,17 @@ app.get("/api/sync/devto/:username", async (req, res) => {
   }
 });
 
+// Helper to get base URL dynamically if APP_URL is not configured
+function getBaseUrl(req: express.Request): string {
+  if (process.env.APP_URL) {
+    return process.env.APP_URL.replace(/\/$/, "");
+  }
+  const host = req.headers["x-forwarded-host"] || req.get("host") || `localhost:${PORT}`;
+  const protocol = req.headers["x-forwarded-proto"] || req.protocol || "http";
+  const isSecure = protocol === "https" || (typeof host === "string" && host.includes(".run.app"));
+  return `${isSecure ? "https" : "http"}://${host}`;
+}
+
 // OAuth: GitHub
 app.get("/api/auth/github/url", (req, res) => {
   const clientId = process.env.GITHUB_CLIENT_ID;
@@ -457,7 +468,7 @@ app.get("/api/auth/github/url", (req, res) => {
     return res.status(500).json({ error: "GITHUB_CLIENT_ID is not set." });
   }
   
-  const redirectUri = `${process.env.APP_URL || `http://localhost:${PORT}`}/auth/github/callback`;
+  const redirectUri = `${getBaseUrl(req)}/auth/github/callback`;
   const url = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=user,repo`;
   res.json({ url });
 });
@@ -515,7 +526,7 @@ app.get("/api/auth/linkedin/url", (req, res) => {
     return res.status(500).json({ error: "LINKEDIN_CLIENT_ID is not set." });
   }
   
-  const redirectUri = `${process.env.APP_URL || `http://localhost:${PORT}`}/auth/linkedin/callback`;
+  const redirectUri = `${getBaseUrl(req)}/auth/linkedin/callback`;
   // Using modern OIDC scopes
   const url = `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=openid%20profile%20email`;
   res.json({ url });
@@ -530,7 +541,7 @@ app.get("/auth/linkedin/callback", async (req, res) => {
         code: code as string,
         client_id: process.env.LINKEDIN_CLIENT_ID!,
         client_secret: process.env.LINKEDIN_CLIENT_SECRET!,
-        redirect_uri: `${process.env.APP_URL || `http://localhost:${PORT}`}/auth/linkedin/callback`
+        redirect_uri: `${getBaseUrl(req)}/auth/linkedin/callback`
       }), {
       headers: { "Content-Type": "application/x-www-form-urlencoded" }
     });
