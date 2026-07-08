@@ -116,7 +116,7 @@ export default function App() {
     "Admin Controls": false,
   });
 
-  const [sidebarTheme, setSidebarTheme] = useState<"white" | "ivory" | "slate" | "indigo">("ivory");
+  const [sidebarTheme, setSidebarTheme] = useState<"white" | "ivory" | "slate" | "indigo">("indigo");
 
   const sidebarStyles = {
     white: {
@@ -859,7 +859,7 @@ export default function App() {
       )}
 
       {/* Dynamic Header */}
-      <header className="sticky top-0 bg-black border-b border-slate-800 z-40 px-6 py-4 flex justify-between items-center shadow-lg">
+      <header className="sticky top-0 bg-indigo-900 border-b border-indigo-800 z-40 px-6 py-4 flex justify-between items-center shadow-lg">
         <button onClick={() => setActiveTab("home")} className="flex items-center gap-3 text-left cursor-pointer hover:opacity-90">
           <div className="group relative w-11 h-11 flex items-center justify-center transition-all duration-500 hover:-translate-y-0.5">
             <svg width="44" height="44" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-11 h-11 drop-shadow-md">
@@ -988,12 +988,12 @@ export default function App() {
                 { id: "rewards", label: "Ambassadors", desc: "Earn Points & Rewards", icon: Gift }
               ]
             },
-            {
+            ...(isAdmin ? [{
               title: "Admin Controls",
               items: [
                 { id: "admin", label: "Admin Dashboard", desc: "System settings & metrics", icon: ShieldCheck }
               ]
-            }
+            }] : [])
           ].map((section) => {
             const isCollapsed = collapsedNavSections[section.title];
             const hasActiveItem = section.items.some(item => item.id === activeTab);
@@ -1438,7 +1438,7 @@ export default function App() {
             <RewardsSection />
           )}
 
-          {activeTab === "admin" && (
+          {activeTab === "admin" && isAdmin && (
             <AdminSection
               isAdmin={isAdmin}
               setIsAdmin={setIsAdmin}
@@ -1597,7 +1597,7 @@ export default function App() {
       />
 
       {/* Tiny clean footer */}
-      <footer className="bg-slate-950 text-white py-12 px-6 mt-auto">
+      <footer className="bg-indigo-900 text-white py-12 px-6 mt-auto">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex flex-wrap justify-center md:justify-start gap-4 md:gap-8 text-[10px] font-mono tracking-widest uppercase">
             <button onClick={() => setActiveTab("about")} className="hover:text-indigo-400 transition-colors uppercase cursor-pointer">About Us</button>
