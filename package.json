@@ -11,6 +11,8 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1081.0",
+    "@aws-sdk/s3-request-presigner": "^3.1081.0",
     "@firebase/eslint-plugin-security-rules": "^0.0.2",
     "@google-cloud/talent": "^7.2.0",
     "@google/genai": "^2.4.0",

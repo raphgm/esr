@@ -7,6 +7,8 @@ import { GoogleGenAI } from "@google/genai";
 import { createServer as createViteServer } from "vite";
 import axios from "axios";
 import cookieParser from "cookie-parser";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 dotenv.config();
 
@@ -34,6 +36,29 @@ function getGenAI(): GoogleGenAI {
     });
   }
   return aiClient;
+}
+
+// Initialize AWS S3 Client lazily
+let s3Client: S3Client | null = null;
+function getS3Client(): S3Client {
+  if (!s3Client) {
+    const accessKeyId = process.env.AWS_ACCESS_KEY_ID;
+    const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
+    const region = process.env.AWS_REGION;
+
+    if (!accessKeyId || !secretAccessKey || !region) {
+      throw new Error("AWS credentials (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION) are not set.");
+    }
+
+    s3Client = new S3Client({
+      region,
+      credentials: {
+        accessKeyId,
+        secretAccessKey,
+      },
+    });
+  }
+  return s3Client;
 }
 
 // API: ESTARR AI Chat Assistant
@@ -558,6 +583,41 @@ app.get("/api/sync/github/repos", async (req, res) => {
   } catch (error: any) {
     console.error("GitHub repo sync error:", error);
     res.status(500).json({ error: "Failed to sync GitHub repos" });
+  }
+});
+
+// API: Generate Pre-signed S3 URL for video uploads
+app.post("/api/upload/url", async (req, res) => {
+  try {
+    const { fileName, fileType } = req.body;
+    if (!fileName || !fileType) {
+      return res.status(400).json({ error: "fileName and fileType are required" });
+    }
+
+    const bucketName = process.env.AWS_S3_BUCKET;
+    if (!bucketName) {
+      return res.status(500).json({ error: "AWS_S3_BUCKET environment variable is not set." });
+    }
+
+    const client = getS3Client();
+    const key = `videos/${Date.now()}-${fileName}`;
+    
+    const command = new PutObjectCommand({
+      Bucket: bucketName,
+      Key: key,
+      ContentType: fileType,
+    });
+
+    const uploadUrl = await getSignedUrl(client, command, { expiresIn: 3600 }); // URL expires in 1 hour
+
+    res.json({
+      uploadUrl,
+      fileUrl: `https://${bucketName}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`,
+      key
+    });
+  } catch (error: any) {
+    console.error("S3 Presigned URL Error:", error.message);
+    res.status(500).json({ error: "Failed to generate upload URL" });
   }
 });
 

@@ -51,3 +51,28 @@ Add the following to your environment variables in AI Studio:
 - `AWS_SECRET_ACCESS_KEY`
 - `AWS_REGION` (e.g., `us-east-1`)
 - `AWS_S3_BUCKET` (your bucket name)
+
+### 5. How to connect in Code
+The backend is already configured to handle secure uploads. You can use the `/api/upload/url` endpoint to generate a pre-signed URL.
+
+**Example Client Usage (React):**
+```typescript
+const uploadVideo = async (file: File) => {
+  // 1. Get pre-signed URL from your backend
+  const response = await fetch('/api/upload/url', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ fileName: file.name, fileType: file.type })
+  });
+  const { uploadUrl, fileUrl } = await response.json();
+
+  // 2. Upload file directly to S3 using the pre-signed URL
+  await fetch(uploadUrl, {
+    method: 'PUT',
+    body: file,
+    headers: { 'Content-Type': file.type }
+  });
+
+  return fileUrl; // This is the public URL of your video
+};
+```

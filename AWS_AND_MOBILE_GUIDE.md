@@ -32,6 +32,13 @@ Add these to your AI Studio Settings:
 - `AWS_REGION` (e.g., `us-east-1`)
 - `AWS_S3_BUCKET`
 
+### 4. Connection & Usage
+The Express backend in `server.ts` is already equipped with an S3 client and a pre-signed URL generator. 
+
+**Endpoint**: `POST /api/upload/url`
+- **Request Body**: `{ "fileName": "video.mp4", "fileType": "video/mp4" }`
+- **Returns**: `uploadUrl` (for PUT request), `fileUrl` (permanent link).
+
 ---
 
 ## PART 1: High-Performance AWS Hosting & Video Playback Optimization
