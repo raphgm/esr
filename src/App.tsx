@@ -858,8 +858,8 @@ export default function App() {
         </div>
       )}
 
-      {/* Dynamic Header */}  {/* Dynamic Header */}
-      <header className="sticky top-0 bg-slate-50 border-b-2 border-slate-200 z-40 px-6 py-4 flex justify-between items-center shadow-none">
+      {/* Dynamic Header */}
+      <header className="sticky top-0 bg-black border-b border-slate-800 z-40 px-6 py-4 flex justify-between items-center shadow-lg">
         <button onClick={() => setActiveTab("home")} className="flex items-center gap-3 text-left cursor-pointer hover:opacity-90">
           <div className="group relative w-11 h-11 flex items-center justify-center transition-all duration-500 hover:-translate-y-0.5">
             <svg width="44" height="44" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-11 h-11 drop-shadow-md">
@@ -874,8 +874,8 @@ export default function App() {
             </svg>
           </div>
           <div>
-            <h1 className="font-display font-bold text-sm md:text-base uppercase tracking-tight text-slate-900">ESTARR APP</h1>
-            <p className="text-[10px] text-slate-900 font-medium tracking-wide font-bold opacity-60">Empowering Creators & Pros</p>
+            <h1 className="font-display font-bold text-sm md:text-base uppercase tracking-tight text-white">ESTARR APP</h1>
+            <p className="text-[10px] text-slate-400 font-medium tracking-wide font-bold">Empowering Creators & Pros</p>
           </div>
         </button>
 
@@ -885,20 +885,20 @@ export default function App() {
             <>
               <button
                 onClick={() => setIsNotificationsOpen(true)}
-                className="relative bg-white hover:bg-slate-100 text-slate-900 border border-slate-200 p-2 rounded-xl cursor-pointer transition-colors shadow-sm"
+                className="relative bg-slate-900 hover:bg-slate-800 text-white border border-slate-800 p-2 rounded-xl cursor-pointer transition-colors shadow-sm"
               >
                 <Bell className="w-4 h-4" />
-                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-black"></span>
               </button>
               <button
                 id="btn-edit-profile-main"
                 onClick={() => setIsProfileOpen(true)}
-                className="flex items-center gap-2 text-left bg-white hover:bg-slate-100 p-1 border border-slate-200 cursor-pointer transition-all pr-3 rounded-xl"
+                className="flex items-center gap-2 text-left bg-slate-900 hover:bg-slate-800 p-1 border border-slate-800 cursor-pointer transition-all pr-3 rounded-xl"
               >
-                <img src={userProfile.avatar} alt="avatar" className="w-7 h-7 object-cover border border-slate-200 rounded-lg" />
+                <img src={userProfile.avatar} alt="avatar" className="w-7 h-7 object-cover border border-slate-700 rounded-lg" />
                 <div className="hidden sm:block text-[10px]">
-                  <span className="font-bold text-slate-900 block leading-tight uppercase tracking-tight">{userProfile.name}</span>
-                  <span className="text-purple-500 font-bold block leading-tight text-[8px] uppercase tracking-wider">Configure Profile</span>
+                  <span className="font-bold text-white block leading-tight uppercase tracking-tight">{userProfile.name}</span>
+                  <span className="text-purple-400 font-bold block leading-tight text-[8px] uppercase tracking-wider">Configure Profile</span>
                 </div>
               </button>
               <button
@@ -911,7 +911,7 @@ export default function App() {
                     console.error("Logout error:", error);
                   }
                 }}
-                className="flex items-center justify-center w-9 h-9 bg-white hover:bg-rose-50 text-slate-400 hover:text-rose-500 border border-slate-200 rounded-xl transition-colors shadow-sm"
+                className="flex items-center justify-center w-9 h-9 bg-slate-900 hover:bg-rose-950/30 text-slate-400 hover:text-rose-500 border border-slate-800 rounded-xl transition-colors shadow-sm"
                 title="Sign Out"
               >
                 <LogOut className="w-4 h-4" />
@@ -921,13 +921,13 @@ export default function App() {
             <div className="flex gap-2">
               <button 
                 onClick={() => { setAuthMode("signin"); setShowAuthModal(true); }}
-                className="btn-secondary px-4 py-1.5 text-[10px]"
+                className="bg-slate-900 hover:bg-slate-800 text-white border border-slate-800 px-4 py-1.5 rounded-xl text-[10px] font-bold transition-all cursor-pointer"
               >
                 Sign In
               </button>
               <button 
                 onClick={() => { setAuthMode("signup"); setShowAuthModal(true); }}
-                className="btn-primary px-4 py-1.5 text-[10px]"
+                className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-1.5 rounded-xl text-[10px] font-bold transition-all cursor-pointer shadow-lg shadow-purple-500/20"
               >
                 Sign Up
               </button>
