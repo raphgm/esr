@@ -11,7 +11,7 @@ import cookieParser from "cookie-parser";
 dotenv.config();
 
 const app = express();
-const PORT = Number(process.env.PORT) || 3000;
+const PORT = 3000;
 
 app.use(express.json());
 app.use(cookieParser());
@@ -239,7 +239,7 @@ app.post("/api/send-welcome", async (req, res) => {
             </p>
 
             <div style="text-align: center; margin: 32px 0;">
-              <a href="${process.env.APP_URL || 'https://estrr.com'}" style="display: inline-block; background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%); color: #ffffff; text-decoration: none; padding: 12px 28px; font-weight: 700; font-size: 14px; border-radius: 8px; box-shadow: 0 4px 12px rgba(168, 85, 247, 0.2); text-transform: uppercase; letter-spacing: 0.05em;">
+              <a href="${process.env.APP_URL || 'https://estarrapp.com'}" style="display: inline-block; background: linear-gradient(135deg, #a855f7 0%, #6366f1 100%); color: #ffffff; text-decoration: none; padding: 12px 28px; font-weight: 700; font-size: 14px; border-radius: 8px; box-shadow: 0 4px 12px rgba(168, 85, 247, 0.2); text-transform: uppercase; letter-spacing: 0.05em;">
                 Go to Dashboard
               </a>
             </div>
@@ -279,7 +279,7 @@ app.post("/api/send-welcome", async (req, res) => {
             </p>
 
             <div style="text-align: center; margin: 32px 0;">
-              <a href="${process.env.APP_URL || 'https://estrr.com'}" style="display: inline-block; background: inline-block; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: #ffffff; text-decoration: none; padding: 12px 28px; font-weight: 700; font-size: 14px; border-radius: 8px; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2); text-transform: uppercase; letter-spacing: 0.05em;">
+              <a href="${process.env.APP_URL || 'https://estarrapp.com'}" style="display: inline-block; background: inline-block; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: #ffffff; text-decoration: none; padding: 12px 28px; font-weight: 700; font-size: 14px; border-radius: 8px; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2); text-transform: uppercase; letter-spacing: 0.05em;">
                 Complete My Profile
               </a>
             </div>

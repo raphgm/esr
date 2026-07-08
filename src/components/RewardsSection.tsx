@@ -29,7 +29,7 @@ export function RewardsSection() {
           <div className="p-6 bg-white border border-slate-200 rounded-xl shadow-sm flex flex-col justify-center items-start">
             <div className="text-[10px] font-bold uppercase tracking-wider mb-2 text-slate-500">Your Invite Link</div>
             <div className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 flex justify-between items-center mb-3">
-              <span className="text-xs font-mono text-slate-700 truncate mr-2">estrr.com/join/r/alex2026</span>
+              <span className="text-xs font-mono text-slate-700 truncate mr-2">estarrapp.com/join/r/alex2026</span>
               <button className="p-1.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-100 transition-colors">
                 <Share2 className="w-3.5 h-3.5 text-slate-500" />
               </button>

@@ -102,7 +102,7 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
 // Default initial profile structure to merge with
 const defaultProfile: UserProfile = {
   name: "Chinedu Okafor",
-  email: "chinedu@estrr.com",
+  email: "chinedu@estarrapp.com",
   profession: "Professional UGC Creator & Brand Consultant",
   bio: "Helping African startups tell captivating visual stories. Specializes in short-form funny TikTok skits, highly structured PiggyVest unboxing tutorials, and aesthetic fashion styling walkthroughs.",
   location: "Lagos, Nigeria",

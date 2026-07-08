@@ -38,10 +38,10 @@ export function AdminSection({
 }: AdminSectionProps) {
   // Mock users in database
   const [dbUsers, setDbUsers] = useState([
-    { id: "u1", name: "Chinedu Okafor", email: "chinedu@estrr.com", role: "Administrator", accountType: "freelancer", status: "Active" },
-    { id: "u2", name: "Aisha Yusuf", email: "aisha.y@estrr.com", role: "User", accountType: "freelancer", status: "Active" },
-    { id: "u3", name: "Emeka Obi", email: "emeka.obi@estrr.com", role: "User", accountType: "jobOwner", status: "Active" },
-    { id: "u4", name: "Fatima Bello", email: "fatima@estrr.com", role: "User", accountType: "freelancer", status: "Pending Verification" }
+    { id: "u1", name: "Chinedu Okafor", email: "chinedu@estarrapp.com", role: "Administrator", accountType: "freelancer", status: "Active" },
+    { id: "u2", name: "Aisha Yusuf", email: "aisha.y@estarrapp.com", role: "User", accountType: "freelancer", status: "Active" },
+    { id: "u3", name: "Emeka Obi", email: "emeka.obi@estarrapp.com", role: "User", accountType: "jobOwner", status: "Active" },
+    { id: "u4", name: "Fatima Bello", email: "fatima@estarrapp.com", role: "User", accountType: "freelancer", status: "Pending Verification" }
   ]);
 
   // Mock pending verifications

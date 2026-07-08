@@ -2,7 +2,7 @@ import { Course, Product, BrandCampaign, Job, ActivityPost, CommunityChannel } f
 
 export const initialProfile = {
   name: "Chinedu Okafor",
-  email: "chinedu@estrr.com",
+  email: "chinedu@estarrapp.com",
   profession: "Digital Creator & E-commerce Merchant",
   bio: "Passionate about building small businesses, content creation, and helping local artisans scale their products online.",
   location: "Lagos, Nigeria",

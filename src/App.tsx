@@ -90,7 +90,7 @@ export default function App() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
-  const [authEmail, setAuthEmail] = useState("chinedu@estrr.com");
+  const [authEmail, setAuthEmail] = useState("chinedu@estarrapp.com");
   const [authPassword, setAuthPassword] = useState("password123");
   const [authName, setAuthName] = useState("Chinedu Okafor");
   const [authBirthdate, setAuthBirthdate] = useState("");
@@ -239,7 +239,7 @@ export default function App() {
         if (provider === "linkedin" || provider === "github") {
           // For this environment, we simulate authentication by updating local state
           // and optionally saving a placeholder profile if needed.
-          const email = oauthUser?.email || `${provider}_user@estrr.com`;
+          const email = oauthUser?.email || `${provider}_user@estarrapp.com`;
           const name = oauthUser?.name || oauthUser?.login || "OAuth User";
           
           const updatedProfile = {
@@ -750,7 +750,7 @@ export default function App() {
                     type="email"
                     required
                     disabled={isAuthLoading}
-                    placeholder="chinedu@estrr.com"
+                    placeholder="chinedu@estarrapp.com"
                     value={authEmail}
                     onChange={(e) => setAuthEmail(e.target.value)}
                     className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-3 py-2 focus:outline-none focus:bg-slate-50 text-slate-900 font-medium disabled:opacity-60"
