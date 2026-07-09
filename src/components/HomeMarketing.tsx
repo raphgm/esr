@@ -607,10 +607,10 @@ export function HomeMarketing({
                 <div>
                   <div className="flex items-center gap-3 mb-4">
                     {/* Isometric Cube Icon Container */}
-                    <motion.div 
+                    <motion.div
                       animate={activeAnim}
                       style={{ perspective: "1000px" }}
-                      className="relative w-14 h-14"
+                      className="relative w-14 h-14 shrink-0"
                     >
                       {/* Top Face */}
                       <div className={`absolute top-0 left-2 w-10 h-3 bg-gradient-to-r ${vert.accentColor} opacity-30 skew-x-[45deg] rounded-t-sm`} />
@@ -621,10 +621,10 @@ export function HomeMarketing({
                         <IconComponent className="w-6 h-6" />
                       </div>
                     </motion.div>
-                    
-                    <div>
+
+                    <div className="min-w-0">
                       <p className="text-[10px] font-mono font-bold tracking-widest text-slate-400 uppercase">Expert Vertical</p>
-                      <h3 className="font-display font-black text-lg md:text-xl text-slate-900 leading-tight sm:whitespace-nowrap">
+                      <h3 className="font-display font-black text-lg md:text-xl text-slate-900 leading-tight break-words">
                         {vert.title}
                       </h3>
                     </div>

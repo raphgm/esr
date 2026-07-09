@@ -843,6 +843,7 @@ ActivityPost>("posts", initialPosts);
       title: "Gig Market & Escrow Services",
       items: [
         { id: "gigs", label: "AI Gig Builder", desc: "Draft & list your services", icon: Sparkles },
+        { id: "consultancy", label: "Consultancy", desc: "Manage consultancy projects & tasks", icon: Target },
         { id: "careers", label: "Jobs Board", desc: "Full-time & remote roles", icon: Compass },
         { id: "marketplace", label: "Brand Campaigns", desc: "Exclusive high-ticket sponsorships", icon: ShoppingCart },
       ]
