@@ -18,7 +18,10 @@ import {
   Check,
   ChevronRight,
   User,
-  AlertCircle
+  AlertCircle,
+  BookOpen,
+  Tv,
+  ShoppingBag
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { UserProfile } from "../types";
@@ -91,7 +94,7 @@ export default function GigsSection({ userProfile, onOpenAiChat }: GigsSectionPr
     {
       id: "gig-2",
       title: "I will design aesthetic pitch decks and Canva presentations",
-      sellerName: "Chinedu Okafor", // App's active user is also a seller!
+      sellerName: "Chinedu Okafor",
       sellerAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150",
       sellerRating: 5.0,
       reviewsCount: 14,
@@ -165,7 +168,7 @@ export default function GigsSection({ userProfile, onOpenAiChat }: GigsSectionPr
         "Feed conversion multiplier calculators",
         "WhatsApp support chat access for 15 days"
       ],
-      image: "https://images.unsplash.com/photo-1516467508483-a7212febe31a?auto=format&fit=crop&q=80&w=300",
+      image: "https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?auto=format&fit=crop&q=80&w=600",
       verified: true
     }
   ]);
@@ -324,7 +327,7 @@ export default function GigsSection({ userProfile, onOpenAiChat }: GigsSectionPr
         <div className="lg:col-span-3 flex flex-col gap-6">
           {/* Categories */}
           <div className="bg-white border border-slate-200/80 rounded-3xl p-5 shadow-sm flex flex-col gap-3">
-            <h3 className="font-display font-bold text-xs text-slate-9000 uppercase tracking-wider font-mono">
+            <h3 className="font-display font-bold text-xs text-slate-900 uppercase tracking-wider font-mono">
               Service Niches
             </h3>
             <div className="flex flex-col gap-1.5">
@@ -401,20 +404,20 @@ export default function GigsSection({ userProfile, onOpenAiChat }: GigsSectionPr
           <div className="bg-slate-950 text-slate-300 border border-slate-800 rounded-3xl p-5 flex flex-col gap-3.5">
             <div className="flex items-center gap-2 text-emerald-400">
               <ShieldCheck className="w-5 h-5 shrink-0" />
-              <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-slate-9000">
+              <span className="font-mono text-[10px] font-bold uppercase tracking-wider text-white">
                 Escrow Protection System
               </span>
             </div>
-            <p className="text-[10px] leading-relaxed text-slate-9000">
+            <p className="text-[10px] leading-relaxed text-slate-400">
               Every job created is linked to an independent escrow contract. Funds are debited from the buyer but held securely until final files are uploaded and validated.
             </p>
             <div className="border-t border-slate-900 pt-3 flex flex-col gap-1 text-[9px] font-mono">
               <div className="flex justify-between">
-                <span>Total Active Escrows:</span>
+                <span className="text-slate-500">Total Active Escrows:</span>
                 <span className="text-emerald-400 font-bold">148 contracts</span>
               </div>
               <div className="flex justify-between">
-                <span>Funded Value:</span>
+                <span className="text-slate-500">Funded Value:</span>
                 <span className="text-white font-bold">$4.2M USD</span>
               </div>
             </div>
@@ -426,7 +429,7 @@ export default function GigsSection({ userProfile, onOpenAiChat }: GigsSectionPr
           
           {/* Search bar */}
           <div className="relative bg-white border border-slate-200/80 rounded-xl shadow-xs overflow-hidden flex items-center pr-3">
-            <span className="pl-4 text-slate-9000">
+            <span className="pl-4 text-slate-400">
               <Search className="w-4 h-4" />
             </span>
             <input
@@ -470,12 +473,22 @@ export default function GigsSection({ userProfile, onOpenAiChat }: GigsSectionPr
                   } border rounded-3xl overflow-hidden hover:shadow-md transition-all flex flex-col justify-between group`}
                 >
                   {/* Gig Header Cover */}
-                  <div className="h-40 relative bg-slate-900 overflow-hidden">
-                    <img
-                      src={gig.image}
-                      alt={gig.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
-                    />
+                  <div className="h-40 relative overflow-hidden">
+                    <div className={`w-full h-full bg-gradient-to-br ${
+                      gig.category === "Video & Design" ? "from-indigo-600 to-purple-700" :
+                      gig.category === "Writing & Content" ? "from-amber-500 to-orange-600" :
+                      gig.category === "Tech & Setup" ? "from-cyan-600 to-blue-700" :
+                      gig.category === "Agric & Business" ? "from-emerald-600 to-teal-700" :
+                      "from-slate-700 to-slate-800"
+                    } group-hover:scale-105 transition-transform duration-500 flex items-center justify-center`}>
+                      <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center backdrop-blur-md">
+                        {gig.category === "Video & Design" && <Sparkles className="w-6 h-6 text-white/80" />}
+                        {gig.category === "Writing & Content" && <BookOpen className="w-6 h-6 text-white/80" />}
+                        {gig.category === "Tech & Setup" && <Tv className="w-6 h-6 text-white/80" />}
+                        {gig.category === "Agric & Business" && <Briefcase className="w-6 h-6 text-white/80" />}
+                        {!["Video & Design", "Writing & Content", "Tech & Setup", "Agric & Business"].includes(gig.category) && <Plus className="w-6 h-6 text-white/80" />}
+                      </div>
+                    </div>
                     <div className="absolute top-3 left-3 bg-slate-950/80 backdrop-blur-md px-2.5 py-1 rounded-full text-[9px] font-mono font-bold text-purple-300 border border-slate-800">
                       {gig.category}
                     </div>

@@ -123,7 +123,7 @@ export default function PortfolioSection({ userProfile, isPublicView = false }: 
                 <div>
                   <span className="text-[10px] font-bold uppercase text-slate-400 tracking-widest block mb-3">Verified Technical</span>
                   <div className="flex flex-wrap gap-2">
-                    {userProfile.formalSkills.map((skill, idx) => (
+                    {userProfile.formalSkills?.map((skill, idx) => (
                       <span key={idx} className="px-3 py-1.5 bg-blue-50 text-blue-700 border border-blue-100 rounded-xl text-xs font-bold flex items-center gap-1.5">
                         <ShieldCheck className="w-3.5 h-3.5 text-blue-500" />
                         {skill}
@@ -135,9 +135,9 @@ export default function PortfolioSection({ userProfile, isPublicView = false }: 
 
               {userProfile.creatorSkills && userProfile.creatorSkills.length > 0 && (
                 <div>
-                  <span className="text-[10px] font-bold uppercase text-slate-400 tracking-widest block mb-3">Creative & Trades</span>
+                  <span className="text-[10px] font-bold uppercase text-slate-400 tracking-widest block mb-3">Engineering & DevOps</span>
                   <div className="flex flex-wrap gap-2">
-                    {userProfile.creatorSkills.map((skill, idx) => (
+                    {userProfile.creatorSkills?.map((skill, idx) => (
                       <span key={idx} className="px-3 py-1.5 bg-purple-50 text-purple-700 border border-purple-100 rounded-xl text-xs font-bold">
                         {skill}
                       </span>
@@ -208,7 +208,7 @@ export default function PortfolioSection({ userProfile, isPublicView = false }: 
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-              {userProfile.certifications.map((cert, idx) => (
+              {userProfile.certifications?.map((cert, idx) => (
                 <div key={idx} className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100 rounded-2xl p-6 flex flex-col items-center text-center shadow-sm hover:shadow-md transition-all">
                   <div className="bg-white p-3 rounded-full shadow-sm mb-4">
                     <Award className="w-8 h-8 text-amber-600" />
@@ -247,8 +247,10 @@ export default function PortfolioSection({ userProfile, isPublicView = false }: 
                     <div className="w-2 h-2 bg-purple-500 rounded-full" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-slate-800">{activity}</h4>
-                    <p className="text-[10px] text-slate-400 font-mono mt-1 uppercase tracking-wider">Completed Milestone • Verified Off-chain</p>
+                    <h4 className="text-sm font-bold text-slate-800">{typeof activity === 'string' ? activity : activity.desc || 'Activity Log'}</h4>
+                    <p className="text-[10px] text-slate-400 font-mono mt-1 uppercase tracking-wider">
+                      {typeof activity === 'object' && activity.date ? `${activity.date} • ` : ''}Completed Milestone • Verified Off-chain
+                    </p>
                   </div>
                 </div>
               )) || (

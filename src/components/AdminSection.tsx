@@ -128,21 +128,6 @@ export function AdminSection({
     });
   };
 
-  const handleToggleAdminStatusDirectly = () => {
-    const newVal = !isAdmin;
-    setIsAdmin(newVal);
-    // Sync table state as well
-    setDbUsers(prev =>
-      prev.map(u => {
-        if (u.email === userProfile.email) {
-          return { ...u, role: newVal ? "Administrator" : "User" };
-        }
-        return u;
-      })
-    );
-    addLog("info", `Direct Administrative privilege toggled to: ${newVal ? "AUTHORIZED" : "REVOKED"}`);
-  };
-
   return (
     <div className="flex flex-col gap-6 md:gap-8 animate-fade-in pb-12">
       {/* Dynamic Heading */}
@@ -180,18 +165,6 @@ export function AdminSection({
               </h4>
             </div>
           </div>
-
-          <button
-            type="button"
-            onClick={handleToggleAdminStatusDirectly}
-            className={`px-3 py-1.5 rounded-lg text-[10px] font-mono font-black uppercase border transition-all cursor-pointer select-none active:scale-95 ${
-              isAdmin
-                ? "bg-white border-emerald-300 text-emerald-700 hover:bg-emerald-100/50"
-                : "bg-rose-600 border-rose-600 text-white hover:bg-rose-700"
-            }`}
-          >
-            {isAdmin ? "Revoke Admin" : "Authorize Admin"}
-          </button>
         </div>
       </div>
 
@@ -244,19 +217,6 @@ export function AdminSection({
 
             {/* Content & Lock Layer Overlay */}
             <div className="p-5 relative">
-              {/* If NOT admin, render security barrier banner */}
-              {!isAdmin && (
-                <div className="absolute inset-0 z-20 bg-slate-100/65 backdrop-blur-xs flex flex-col items-center justify-center p-6 text-center select-none animate-fade-in">
-                  <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center border border-rose-300 mb-3 shadow-md shadow-rose-200/40">
-                    <Lock className="w-6 h-6" />
-                  </div>
-                  <h4 className="text-sm font-black uppercase text-rose-900 tracking-tight">System Customization Barred</h4>
-                  <p className="text-xs text-rose-750 max-w-md font-medium mt-1 leading-normal">
-                    You are currently signed in as a standard user. Theme customizer controls are secured and restricted. To test this, click <span className="font-bold underline cursor-pointer hover:text-rose-950" onClick={handleToggleAdminStatusDirectly}>Authorize Admin</span> above.
-                  </p>
-                </div>
-              )}
-
               <p className="text-xs text-slate-500 font-medium mb-4 leading-relaxed">
                 Select the target cosmetic scheme for the navigation sidebar rail. The chosen setting updates state globally in real-time.
               </p>

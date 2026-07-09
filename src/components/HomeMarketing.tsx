@@ -109,7 +109,7 @@ export function HomeMarketing({
   const [activeVettingStep, setActiveVettingStep] = useState(0);
 
   // Crossover-style Earnings & Power Estimator State
-  const [calcRole, setCalcRole] = useState("Software Engineer");
+  const [calcRole, setCalcRole] = useState("Brand Marketing Strategist");
   const [calcHours, setCalcHours] = useState(40);
   const [calcCurrency, setCalcCurrency] = useState("USD");
 
@@ -127,13 +127,13 @@ export function HomeMarketing({
       title: "Subject Matter Real-World Trial",
       subtitle: "Practical execution of high-difficulty production tasks in virtual sandbox environments.",
       successRate: "Top 4% Pass",
-      description: "Instead of generic puzzle algorithms, applicants are given 72 hours to build, document, and deploy a high-fidelity application or security architecture matching strict production specs.",
-      criteria: ["Clean, type-safe clean code architecture", "Rigorous error handling & telemetry", "Strict adherence to constraints"]
+      description: "Instead of generic puzzle algorithms, applicants are given 72 hours to build, document, and deploy a high-fidelity campaign or architecture matching strict production specs.",
+      criteria: ["Clean, scalable architecture", "Rigorous error handling", "Strict adherence to constraints"]
     },
     {
       step: "03",
       title: "Direct Peer Architecture Audit",
-      subtitle: "Live cross-examination, live refactoring, and code review defense with active Principal Engineers.",
+      subtitle: "Live cross-examination, live refactoring, and code review defense with active Principals.",
       successRate: "Top 1.5% Pass",
       description: "The finalist candidates walk through their submission with senior domain experts, refactoring real-time Edge cases and defending their system layout choices to prove authentic expertise.",
       criteria: ["System scaling explanations", "Real-time live refactoring speed", "Soft skills & design communication"]
@@ -149,11 +149,11 @@ export function HomeMarketing({
   ];
 
   const calcRoles = [
-    { name: "Software Engineer", hourlyRate: 95, averageLocalSal: 1200 },
-    { name: "Product Manager", hourlyRate: 85, averageLocalSal: 1100 },
-    { name: "UI/UX Architect", hourlyRate: 75, averageLocalSal: 950 },
-    { name: "Fintech Lead / Financial Analyst", hourlyRate: 110, averageLocalSal: 1400 },
-    { name: "VP of Engineering", hourlyRate: 190, averageLocalSal: 2500 }
+    { name: "Brand Marketing Strategist", hourlyRate: 95, averageLocalSal: 1200 },
+    { name: "UGC Content Creator", hourlyRate: 85, averageLocalSal: 1100 },
+    { name: "Creative Video Producer", hourlyRate: 75, averageLocalSal: 950 },
+    { name: "Tech / Software Engineer", hourlyRate: 110, averageLocalSal: 1400 },
+    { name: "Social Media Director", hourlyRate: 190, averageLocalSal: 2500 }
   ];
 
   const currencies: Record<string, { symbol: string, rate: number, label: string }> = {
@@ -782,7 +782,7 @@ export function HomeMarketing({
                 <p className="text-[11px] text-slate-400 mt-3 text-left leading-normal font-sans">
                   {quizScore >= 80 
                     ? "✓ Outstanding match! You possess the necessary experience, portfolio, and self-direction parameters to interact with our top corporate escrows."
-                    : "✓ Verified match. Your credentials indicate good platform alignment. Complete our free Academy lessons to guarantee contract placement."
+                    : "✓ Verified match. Your credentials indicate good platform alignment. Complete our free Certifications to guarantee contract placement."
                   }
                 </p>
               </div>

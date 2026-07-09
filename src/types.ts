@@ -8,7 +8,7 @@ export interface PortfolioItem {
 }
 
 export interface UserProfile {
-  accountType?: "freelancer" | "jobOwner";
+  accountType?: "freelancer" | "jobOwner" | "creator" | "academyLearner";
   name: string;
   email: string;
   profession: string;
@@ -32,6 +32,7 @@ export interface UserProfile {
   history?: any[];
   portfolio?: PortfolioItem[];
   handle?: string;
+  hasSetupConnectProfile?: boolean;
 }
 
 export interface ActivityPost {
@@ -60,7 +61,7 @@ export interface ActivityPost {
 export interface Course {
   id: string;
   title: string;
-  category: "Digital" | "Business" | "Trades" | "Logistics" | "Agriculture" | "Tech" | "Career";
+  category: "AI & ML" | "Web3" | "Cloud DevOps" | "Data Science" | "Software Eng." | "Cybersecurity" | "Product Design" | string;
   description: string;
   rating: number;
   students: number;
@@ -100,6 +101,7 @@ export interface BrandCampaign {
   status: "Open" | "Reviewing" | "Approved" | "Closed";
   platform: "TikTok" | "Instagram" | "YouTube" | "UGC" | "Twitter";
   deliverables: string[];
+  image?: string;
   applicationsCount: number;
   createdDate: string;
 }

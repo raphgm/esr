@@ -38,18 +38,17 @@ export default function MarketplaceSection({
 
   // New product inputs
   const [newProdName, setNewProdName] = useState("");
-  const [newProdCat, setNewProdCat] = useState("Equipment");
+  const [newProdCat, setNewProdCat] = useState("Tech & SaaS");
   const [newProdPrice, setNewProdPrice] = useState("");
   const [newProdDesc, setNewProdDesc] = useState("");
   const [newProdImg, setNewProdImg] = useState("");
 
   const categories = [
     "All",
-    "Building Materials",
-    "Equipment",
-    "Fashion",
-    "Agriculture",
-    "Services",
+    "Digital IP",
+    "Agency Retainers",
+    "Smart Contracts",
+    "Tech & SaaS",
   ];
 
   const filteredProducts =
@@ -124,9 +123,9 @@ export default function MarketplaceSection({
   return (
     <div id="marketplace-section" className="flex flex-col gap-6">
       <PageBanner
-        title="Escrow Marketplace"
-        subtitle="SECURE TRADE PLATFORM"
-        description="Buy high-quality materials, rent specialized machinery, or source digital services from verified entrepreneurs. All payments are backed by ESTARR's 100% Escrow Protection."
+        title="Brand Campaigns"
+        subtitle="EXCLUSIVE SPONSORSHIPS"
+        description="Browse curated, high-budget brand campaigns. Once approved, your project automatically moves into our secure Escrow Pipeline to guarantee your payout."
         icon={ShoppingCart}
         actions={
           <div className="flex gap-3">
@@ -140,7 +139,7 @@ export default function MarketplaceSection({
             <button
               id="btn-open-cart"
               onClick={() => setIsCartOpen(true)}
-              className="bg-white hover:bg-slate-100 text-slate-800 border border-slate-200 px-5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 cursor-pointer transition-all shadow-sm relative"
+              className="bg-slate-900 hover:bg-slate-800 text-white border border-slate-700 px-5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 cursor-pointer transition-all shadow-sm relative"
             >
               <ShoppingCart className="w-4 h-4" />
               <span>Cart</span>
@@ -155,11 +154,11 @@ export default function MarketplaceSection({
       />
 
       {/* Escrow Banner */}
-      <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-4 flex gap-3 items-start text-xs text-emerald-800">
+      <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 flex gap-3 items-start text-xs text-emerald-400">
         <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
         <div>
           <h4 className="font-bold">ESTARR 100% Escrow Protection Guard</h4>
-          <p className="text-emerald-700 mt-0.5">
+          <p className="text-emerald-300 mt-0.5">
             Your money stays securely locked in escrow until the supplier
             delivers your items or completes the service. Upon verification, the
             escrow automatically pays out. Absolutely risk-free!
@@ -179,41 +178,53 @@ export default function MarketplaceSection({
           <div
             key={prod.id}
             id={`prod-card-${prod.id}`}
-            className="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
+            className="bg-slate-900 border border-slate-700 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
           >
-            <div className="relative h-48 overflow-hidden bg-slate-50 flex items-center justify-center">
-              <img
-                src={prod.image}
-                alt={prod.name}
-                className="w-full h-full object-cover"
-              />
+            <div className={`relative h-48 overflow-hidden flex items-center justify-center bg-gradient-to-br ${
+              prod.category === "Digital IP" ? "from-indigo-600 to-purple-700" :
+              prod.category === "Agency Retainers" ? "from-emerald-600 to-teal-700" :
+              prod.category === "Smart Contracts" ? "from-amber-500 to-orange-600" :
+              "from-slate-700 to-slate-800"
+            }`}>
+              <div className="absolute inset-0 bg-white/5 backdrop-blur-[1px]" />
+              <div className="relative z-10 flex flex-col items-center gap-2">
+                <div className="w-16 h-16 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center backdrop-blur-md shadow-lg">
+                  {prod.category === "Digital IP" && <Sparkles className="w-8 h-8 text-white/80" />}
+                  {prod.category === "Agency Retainers" && <ShoppingBag className="w-8 h-8 text-white/80" />}
+                  {prod.category === "Smart Contracts" && <ShieldCheck className="w-8 h-8 text-white/80" />}
+                  {!["Digital IP", "Agency Retainers", "Smart Contracts"].includes(prod.category) && <Plus className="w-8 h-8 text-white/80" />}
+                </div>
+                <span className="text-[10px] font-mono font-black text-white/40 uppercase tracking-[0.2em]">
+                  {prod.category}
+                </span>
+              </div>
               {prod.verified && (
                 <span className="absolute top-3 left-3 bg-slate-900/90 text-white text-[9px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
                   🛡️ VERIFIED SELLER
                 </span>
               )}
-              <span className="absolute bottom-3 right-3 bg-emerald-50 text-emerald-800 text-[9px] font-bold px-2.5 py-1 rounded-xl">
+              <span className="absolute bottom-3 right-3 bg-emerald-500/10 text-emerald-400 text-[9px] font-bold px-2.5 py-1 rounded-xl">
                 ${prod.price.toLocaleString()}
               </span>
             </div>
 
             <div className="p-5 flex-1 flex flex-col gap-4 justify-between">
               <div>
-                <div className="flex justify-between items-center text-[11px] text-slate-9000 font-mono mb-1">
+                <div className="flex justify-between items-center text-[11px] text-slate-400 font-mono mb-1">
                   <span>{prod.category}</span>
                   <span className="flex items-center gap-0.5 text-purple-500">
                     <Star className="w-3 h-3 fill-amber-500" />{" "}
                     {prod.sellerRating}
                   </span>
                 </div>
-                <h4 className="font-display font-bold text-sm text-slate-800 leading-snug line-clamp-1">
+                <h4 className="font-display font-bold text-sm text-white leading-snug line-clamp-1">
                   {prod.name}
                 </h4>
-                <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                <p className="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">
                   {prod.description}
                 </p>
 
-                <div className="text-[10px] text-slate-9000 font-medium mt-3 bg-slate-50 px-2.5 py-1.5 rounded-xl flex items-center justify-between border border-slate-100/50">
+                <div className="text-[10px] text-slate-400 font-medium mt-3 bg-slate-950 px-2.5 py-1.5 rounded-xl flex items-center justify-between border border-slate-800/50">
                   <span>
                     Seller: <strong>{prod.seller}</strong>
                   </span>
@@ -223,11 +234,11 @@ export default function MarketplaceSection({
                 </div>
               </div>
 
-              <div className="flex gap-2 pt-3 border-t border-slate-100">
+              <div className="flex gap-2 pt-3 border-t border-slate-800">
                 <button
                   id={`btn-prod-view-${prod.id}`}
                   onClick={() => setSelectedProduct(prod)}
-                  className="flex-1 bg-slate-100 hover:bg-slate-100 text-slate-800 py-2 rounded-xl text-xs font-bold cursor-pointer transition-colors"
+                  className="flex-1 bg-slate-800 hover:bg-slate-800 text-white py-2 rounded-xl text-xs font-bold cursor-pointer transition-colors"
                 >
                   View Details
                 </button>
@@ -245,15 +256,15 @@ export default function MarketplaceSection({
       </div>
 
       {/* AI recommendation sidebar-integration hook */}
-      <div className="bg-slate-50 border border-slate-100 rounded-xl p-6 flex items-start gap-4 shadow-sm">
+      <div className="bg-slate-950 border border-slate-800 rounded-xl p-6 flex items-start gap-4 shadow-sm">
         <div className="bg-slate-900 text-white p-2.5 rounded-xl font-bold font-mono text-xs">
           ESTARR AI
         </div>
         <div className="flex-1 flex flex-col gap-2">
-          <h4 className="font-display font-bold text-sm text-slate-900">
+          <h4 className="font-display font-bold text-sm text-white">
             Looking for a specific supplier, raw material, or trade asset?
           </h4>
-          <p className="text-xs text-slate-500 leading-relaxed">
+          <p className="text-xs text-slate-400 leading-relaxed">
             ESTARR AI can suggest local wholesale hubs, estimate bulk pricing,
             analyze importation rates, or write delivery logistics and proposals.
           </p>
@@ -266,7 +277,7 @@ export default function MarketplaceSection({
                   "business",
                 )
               }
-              className="bg-white hover:bg-slate-900 hover:text-white border border-slate-200 text-slate-800 px-3 py-1.5 rounded-xl text-[11px] font-semibold cursor-pointer transition-all"
+              className="bg-slate-900 hover:bg-slate-900 hover:text-white border border-slate-700 text-white px-3 py-1.5 rounded-xl text-[11px] font-semibold cursor-pointer transition-all"
             >
               🛍️ Suggest Sourcing Strategies
             </button>
@@ -278,7 +289,7 @@ export default function MarketplaceSection({
                   "business",
                 )
               }
-              className="bg-white hover:bg-slate-900 hover:text-white border border-slate-200 text-slate-800 px-3 py-1.5 rounded-xl text-[11px] font-semibold cursor-pointer transition-all"
+              className="bg-slate-900 hover:bg-slate-900 hover:text-white border border-slate-700 text-white px-3 py-1.5 rounded-xl text-[11px] font-semibold cursor-pointer transition-all"
             >
               📄 Request Supplier Email Template
             </button>
@@ -294,41 +305,47 @@ export default function MarketplaceSection({
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative"
+              className="bg-slate-900 rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl relative"
             >
               <button
                 id="btn-close-modal"
                 onClick={() => setSelectedProduct(null)}
-                className="absolute top-4 right-4 bg-slate-100 hover:bg-slate-100 text-slate-700 p-2 rounded-full cursor-pointer transition-colors"
+                className="absolute top-4 right-4 bg-slate-800 hover:bg-slate-800 text-slate-300 p-2 rounded-full cursor-pointer transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
 
               <div className="p-6 md:p-8 flex flex-col gap-6">
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-                  <div className="md:col-span-5 h-56 rounded-xl overflow-hidden bg-slate-100">
-                    <img
-                      src={selectedProduct.image}
-                      alt={selectedProduct.name}
-                      className="w-full h-full object-cover"
-                    />
+                  <div className={`md:col-span-5 h-56 rounded-xl overflow-hidden flex items-center justify-center bg-gradient-to-br ${
+                    selectedProduct.category === "Digital IP" ? "from-indigo-600 to-purple-700" :
+                    selectedProduct.category === "Agency Retainers" ? "from-emerald-600 to-teal-700" :
+                    selectedProduct.category === "Smart Contracts" ? "from-amber-500 to-orange-600" :
+                    "from-slate-700 to-slate-800"
+                  }`}>
+                    <div className="w-20 h-20 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center backdrop-blur-md">
+                      {selectedProduct.category === "Digital IP" && <Sparkles className="w-10 h-10 text-white/80" />}
+                      {selectedProduct.category === "Agency Retainers" && <ShoppingBag className="w-10 h-10 text-white/80" />}
+                      {selectedProduct.category === "Smart Contracts" && <ShieldCheck className="w-10 h-10 text-white/80" />}
+                      {!["Digital IP", "Agency Retainers", "Smart Contracts"].includes(selectedProduct.category) && <Plus className="w-10 h-10 text-white/80" />}
+                    </div>
                   </div>
                   <div className="md:col-span-7 flex flex-col justify-between">
                     <div>
-                      <span className="text-[10px] font-mono text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded font-bold">
+                      <span className="text-[10px] font-mono text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded font-bold">
                         {selectedProduct.category}
                       </span>
-                      <h3 className="font-display font-bold text-base md:text-lg text-slate-800 mt-2">
+                      <h3 className="font-display font-bold text-base md:text-lg text-white mt-2">
                         {selectedProduct.name}
                       </h3>
-                      <p className="text-xs text-slate-500 mt-1">
+                      <p className="text-xs text-slate-400 mt-1">
                         Listed by: <strong>{selectedProduct.seller}</strong> (
                         {selectedProduct.sellerRating} ★)
                       </p>
                     </div>
 
                     <div className="mt-4 md:mt-0">
-                      <span className="text-xl font-mono font-bold text-slate-800">
+                      <span className="text-xl font-mono font-bold text-white">
                         ${selectedProduct.price.toLocaleString()}
                       </span>
                       <p className="text-[10px] text-emerald-600 font-medium">
@@ -339,17 +356,17 @@ export default function MarketplaceSection({
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <h4 className="font-bold text-xs text-slate-800">
+                  <h4 className="font-bold text-xs text-white">
                     Description
                   </h4>
-                  <p className="text-xs text-slate-500 leading-relaxed">
+                  <p className="text-xs text-slate-400 leading-relaxed">
                     {selectedProduct.description}
                   </p>
                 </div>
 
                 {/* Reviews */}
                 <div className="flex flex-col gap-3">
-                  <h4 className="font-bold text-xs text-slate-800">
+                  <h4 className="font-bold text-xs text-white">
                     Customer Feedbacks
                   </h4>
                   {selectedProduct.reviews.length > 0 ? (
@@ -357,27 +374,27 @@ export default function MarketplaceSection({
                       {selectedProduct.reviews.map((rev, idx) => (
                         <div
                           key={idx}
-                          className="bg-slate-50 p-3 rounded-xl border border-slate-100/50 text-xs"
+                          className="bg-slate-950 p-3 rounded-xl border border-slate-800/50 text-xs"
                         >
-                          <div className="flex justify-between font-bold text-slate-700 mb-1">
+                          <div className="flex justify-between font-bold text-slate-300 mb-1">
                             <span>{rev.author}</span>
                             <span className="text-purple-500">
                               {"★".repeat(Math.round(rev.rating))}
                             </span>
                           </div>
-                          <p className="text-slate-500">{rev.comment}</p>
+                          <p className="text-slate-400">{rev.comment}</p>
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-xs text-slate-9000 italic">
+                    <p className="text-xs text-slate-400 italic">
                       No reviews yet for this listing. Be the first to buy and
                       leave feedback!
                     </p>
                   )}
                 </div>
 
-                <div className="flex gap-2 pt-4 border-t border-slate-100">
+                <div className="flex gap-2 pt-4 border-t border-slate-800">
                   <button
                     id="btn-modal-add-cart"
                     onClick={() => {
@@ -391,7 +408,7 @@ export default function MarketplaceSection({
                   <button
                     id="btn-modal-back"
                     onClick={() => setSelectedProduct(null)}
-                    className="bg-slate-100 hover:bg-slate-100 text-slate-800 px-6 py-3 rounded-xl text-xs font-bold cursor-pointer"
+                    className="bg-slate-800 hover:bg-slate-800 text-white px-6 py-3 rounded-xl text-xs font-bold cursor-pointer"
                   >
                     Close View
                   </button>
@@ -411,22 +428,22 @@ export default function MarketplaceSection({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 20 }}
               onSubmit={handleSellProduct}
-              className="bg-white rounded-3xl max-w-md w-full p-6 md:p-8 shadow-2xl relative flex flex-col gap-5"
+              className="bg-slate-900 rounded-3xl max-w-md w-full p-6 md:p-8 shadow-2xl relative flex flex-col gap-5"
             >
               <button
                 type="button"
                 id="btn-close-sell"
                 onClick={() => setIsSellOpen(false)}
-                className="absolute top-4 right-4 bg-slate-100 hover:bg-slate-100 text-slate-700 p-2 rounded-full cursor-pointer"
+                className="absolute top-4 right-4 bg-slate-800 hover:bg-slate-800 text-slate-300 p-2 rounded-full cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
 
               <div>
-                <h3 className="font-display font-bold text-lg text-slate-800">
-                  Sell on the Marketplace
+                <h3 className="font-display font-bold text-lg text-white">
+                  Launch a Campaign
                 </h3>
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs text-slate-400 mt-1">
                   List your products or services. Customers pay securely using
                   escrow.
                 </p>
@@ -434,7 +451,7 @@ export default function MarketplaceSection({
 
               <div className="flex flex-col gap-4">
                 <div className="flex flex-col gap-1">
-                  <label className="text-[10px] font-mono uppercase tracking-wider font-bold text-slate-500">
+                  <label className="text-[10px] font-mono uppercase tracking-wider font-bold text-slate-400">
                     Listing Name *
                   </label>
                   <input
@@ -443,32 +460,29 @@ export default function MarketplaceSection({
                     placeholder="e.g. Heavy Duty Plastering Sand"
                     value={newProdName}
                     onChange={(e) => setNewProdName(e.target.value)}
-                    className="bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 text-xs text-slate-700 focus:outline-none focus:border-slate-800"
+                    className="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-300 focus:outline-none focus:border-slate-800"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1">
-                    <label className="text-[10px] font-mono uppercase tracking-wider font-bold text-slate-500">
+                    <label className="text-[10px] font-mono uppercase tracking-wider font-bold text-slate-400">
                       Category
                     </label>
                     <select
                       value={newProdCat}
                       onChange={(e) => setNewProdCat(e.target.value)}
-                      className="bg-slate-50 border border-slate-100 rounded-xl px-3 py-2.5 text-xs text-slate-700 focus:outline-none"
+                      className="bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-300 focus:outline-none"
                     >
-                      <option value="Building Materials">
-                        Building Materials
-                      </option>
-                      <option value="Equipment">Equipment</option>
-                      <option value="Fashion">Fashion</option>
-                      <option value="Agriculture">Agriculture</option>
-                      <option value="Services">Services</option>
+                      <option value="Digital IP">Digital IP</option>
+                      <option value="Agency Retainers">Agency Retainers</option>
+                      <option value="Smart Contracts">Smart Contracts</option>
+                      <option value="Tech & SaaS">Tech & SaaS</option>
                     </select>
                   </div>
 
                   <div className="flex flex-col gap-1">
-                    <label className="text-[10px] font-mono uppercase tracking-wider font-bold text-slate-500">
+                    <label className="text-[10px] font-mono uppercase tracking-wider font-bold text-slate-400">
                       Price ($) *
                     </label>
                     <input
@@ -477,25 +491,25 @@ export default function MarketplaceSection({
                       placeholder="e.g. 5000"
                       value={newProdPrice}
                       onChange={(e) => setNewProdPrice(e.target.value)}
-                      className="bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 text-xs text-slate-700 focus:outline-none focus:border-slate-800"
+                      className="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-300 focus:outline-none focus:border-slate-800"
                     />
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-1">
-                  <label className="text-[10px] font-mono uppercase tracking-wider font-bold text-slate-500">
+                  <label className="text-[10px] font-mono uppercase tracking-wider font-bold text-slate-400">
                     Description
                   </label>
                   <textarea
                     placeholder="Provide details about delivery, sizes, or parameters..."
                     value={newProdDesc}
                     onChange={(e) => setNewProdDesc(e.target.value)}
-                    className="bg-slate-50 border border-slate-100 rounded-xl px-4 py-2 text-xs text-slate-700 focus:outline-none min-h-[60px]"
+                    className="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-xs text-slate-300 focus:outline-none min-h-[60px]"
                   />
                 </div>
 
                 <div className="flex flex-col gap-1">
-                  <label className="text-[10px] font-mono uppercase tracking-wider font-bold text-slate-500">
+                  <label className="text-[10px] font-mono uppercase tracking-wider font-bold text-slate-400">
                     Image URL
                   </label>
                   <input
@@ -503,7 +517,7 @@ export default function MarketplaceSection({
                     placeholder="e.g. https://images.unsplash.com/..."
                     value={newProdImg}
                     onChange={(e) => setNewProdImg(e.target.value)}
-                    className="bg-slate-50 border border-slate-100 rounded-xl px-4 py-2.5 text-xs text-slate-700 focus:outline-none"
+                    className="bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-300 focus:outline-none"
                   />
                 </div>
               </div>
@@ -528,11 +542,11 @@ export default function MarketplaceSection({
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
-              className="bg-white max-w-md w-full h-full shadow-2xl p-6 md:p-8 flex flex-col justify-between overflow-y-auto"
+              className="bg-slate-900 max-w-md w-full h-full shadow-2xl p-6 md:p-8 flex flex-col justify-between overflow-y-auto"
             >
               <div>
                 <div className="flex justify-between items-center mb-6">
-                  <h3 className="font-display font-bold text-lg text-slate-800 flex items-center gap-2">
+                  <h3 className="font-display font-bold text-lg text-white flex items-center gap-2">
                     <ShoppingBag className="w-5 h-5 text-emerald-600" /> Cart &
                     Checkout
                   </h3>
@@ -542,7 +556,7 @@ export default function MarketplaceSection({
                       setIsCartOpen(false);
                       setCheckoutStep("cart");
                     }}
-                    className="bg-slate-100 hover:bg-slate-100 text-slate-700 p-2 rounded-full cursor-pointer"
+                    className="bg-slate-800 hover:bg-slate-800 text-slate-300 p-2 rounded-full cursor-pointer"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -556,21 +570,28 @@ export default function MarketplaceSection({
                           {cart.map((item, idx) => (
                             <div
                               key={idx}
-                              className="flex gap-4 p-3 border border-slate-100 rounded-xl text-xs"
+                              className="flex gap-4 p-3 border border-slate-800 rounded-xl text-xs"
                             >
-                              <img
-                                src={item.product.image}
-                                className="w-12 h-12 rounded-xl object-cover"
-                              />
+                              <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-gradient-to-br ${
+                                item.product.category === "Digital IP" ? "from-indigo-600 to-purple-700" :
+                                item.product.category === "Agency Retainers" ? "from-emerald-600 to-teal-700" :
+                                item.product.category === "Smart Contracts" ? "from-amber-500 to-orange-600" :
+                                "from-slate-700 to-slate-800"
+                              }`}>
+                                {item.product.category === "Digital IP" && <Sparkles className="w-5 h-5 text-white/70" />}
+                                {item.product.category === "Agency Retainers" && <ShoppingBag className="w-5 h-5 text-white/70" />}
+                                {item.product.category === "Smart Contracts" && <ShieldCheck className="w-5 h-5 text-white/70" />}
+                                {!["Digital IP", "Agency Retainers", "Smart Contracts"].includes(item.product.category) && <Plus className="w-5 h-5 text-white/70" />}
+                              </div>
                               <div className="flex-1">
-                                <h4 className="font-bold text-slate-800 line-clamp-1">
+                                <h4 className="font-bold text-white line-clamp-1">
                                   {item.product.name}
                                 </h4>
-                                <p className="text-[10px] text-slate-9000 mt-0.5">
+                                <p className="text-[10px] text-slate-400 mt-0.5">
                                   Seller: {item.product.seller}
                                 </p>
                                 <div className="flex justify-between items-center mt-2 font-mono">
-                                  <span className="text-slate-500">
+                                  <span className="text-slate-400">
                                     Qty: {item.qty}
                                   </span>
                                   <span className="font-bold">
@@ -592,12 +613,12 @@ export default function MarketplaceSection({
                           ))}
                         </div>
 
-                        <div className="border-t border-slate-100 pt-4 mt-2">
-                          <div className="flex justify-between font-mono text-sm font-bold text-slate-800">
+                        <div className="border-t border-slate-800 pt-4 mt-2">
+                          <div className="flex justify-between font-mono text-sm font-bold text-white">
                             <span>Subtotal</span>
                             <span>${calculateSubtotal().toLocaleString()}</span>
                           </div>
-                          <p className="text-[10px] text-slate-9000 mt-1">
+                          <p className="text-[10px] text-slate-400 mt-1">
                             Escrow commission: 0% • Delivery arranged separately
                           </p>
                           <button
@@ -612,7 +633,7 @@ export default function MarketplaceSection({
                     ) : (
                       <div className="text-center py-12 flex flex-col items-center gap-3">
                         <ShoppingBag className="w-8 h-8 text-slate-300" />
-                        <p className="text-xs text-slate-500">
+                        <p className="text-xs text-slate-400">
                           Your shopping cart is currently empty.
                         </p>
                       </div>
@@ -626,18 +647,18 @@ export default function MarketplaceSection({
                       Secure Escrow Checkout
                     </span>
 
-                    <div className="border border-emerald-100 bg-emerald-50/50 rounded-xl p-4">
-                      <div className="flex justify-between font-mono font-bold text-slate-800 mb-1">
+                    <div className="border border-emerald-500/20 bg-emerald-500/10/50 rounded-xl p-4">
+                      <div className="flex justify-between font-mono font-bold text-white mb-1">
                         <span>Total Payable</span>
                         <span>${calculateSubtotal().toLocaleString()}</span>
                       </div>
-                      <p className="text-[10px] text-emerald-800">
+                      <p className="text-[10px] text-emerald-400">
                         Funded in Escrow Vault. Safe and guarded.
                       </p>
                     </div>
 
                     <div className="flex flex-col gap-2">
-                      <label className="font-bold text-slate-700">
+                      <label className="font-bold text-slate-300">
                         Choose Secure Payment Method
                       </label>
                       <div className="grid grid-cols-2 gap-2">
@@ -654,7 +675,7 @@ export default function MarketplaceSection({
                             className={`p-3 rounded-xl border text-left font-medium transition-all cursor-pointer ${
                               paymentMethod === method
                                 ? "bg-slate-900 text-white border-slate-950 shadow-sm"
-                                : "bg-slate-50 text-slate-700 border-slate-100 hover:bg-slate-100"
+                                : "bg-slate-950 text-slate-300 border-slate-800 hover:bg-slate-800"
                             }`}
                           >
                             {method}
@@ -663,8 +684,8 @@ export default function MarketplaceSection({
                       </div>
                     </div>
 
-                    <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 text-[11px] text-slate-500">
-                      <p className="font-bold mb-1 text-slate-500">
+                    <div className="bg-slate-950 border border-slate-800 rounded-xl p-4 text-[11px] text-slate-400">
+                      <p className="font-bold mb-1 text-slate-400">
                         🔒 ESTARR Escrow Agreement
                       </p>
                       <p className="leading-relaxed">
@@ -675,7 +696,7 @@ export default function MarketplaceSection({
                       </p>
                     </div>
 
-                    <div className="flex gap-2 mt-4 pt-4 border-t border-slate-100">
+                    <div className="flex gap-2 mt-4 pt-4 border-t border-slate-800">
                       <button
                         id="btn-place-order"
                         onClick={handlePlaceOrder}
@@ -686,7 +707,7 @@ export default function MarketplaceSection({
                       <button
                         id="btn-payment-back"
                         onClick={() => setCheckoutStep("cart")}
-                        className="bg-slate-100 hover:bg-slate-100 text-slate-800 px-4 py-3 rounded-xl text-xs font-bold cursor-pointer"
+                        className="bg-slate-800 hover:bg-slate-800 text-white px-4 py-3 rounded-xl text-xs font-bold cursor-pointer"
                       >
                         Back
                       </button>
@@ -696,14 +717,14 @@ export default function MarketplaceSection({
 
                 {checkoutStep === "success" && (
                   <div className="text-center py-8 flex flex-col items-center gap-4">
-                    <div className="bg-emerald-100 text-emerald-700 p-4 rounded-full">
+                    <div className="bg-emerald-100 text-emerald-300 p-4 rounded-full">
                       <ShieldCheck className="w-10 h-10" />
                     </div>
                     <div>
-                      <h4 className="font-display font-bold text-base text-slate-800">
+                      <h4 className="font-display font-bold text-base text-white">
                         Escrow Locked Successfully!
                       </h4>
-                      <p className="text-xs text-slate-500 mt-2 max-w-xs mx-auto leading-relaxed">
+                      <p className="text-xs text-slate-400 mt-2 max-w-xs mx-auto leading-relaxed">
                         Your funds are secured. The seller has been notified to
                         package and dispatch your order. Track your shipment or
                         contact the seller right inside Connect!
@@ -717,7 +738,7 @@ export default function MarketplaceSection({
                       }}
                       className="bg-slate-900 hover:bg-slate-800 text-white px-6 py-2.5 rounded-xl text-xs font-bold cursor-pointer transition-colors mt-2"
                     >
-                      Return to Marketplace
+                      Return to Campaigns
                     </button>
                   </div>
                 )}

@@ -103,16 +103,16 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
 const defaultProfile: UserProfile = {
   name: "Chinedu Okafor",
   email: "chinedu@estarrapp.com",
-  profession: "Professional UGC Creator & Brand Consultant",
-  bio: "Helping African startups tell captivating visual stories. Specializes in short-form funny TikTok skits, highly structured PiggyVest unboxing tutorials, and aesthetic fashion styling walkthroughs.",
+  profession: "Principal AI Engineer & Cloud Architect",
+  bio: "Helping African startups build scalable infrastructure. Specializes in distributed systems, AI agent development, and enterprise cloud migrations.",
   location: "Lagos, Nigeria",
   avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
-  formalSkills: ["UGC Storyboarding", "Video Editing", "Content Strategy", "Brand Copywriting"],
-  creatorSkills: ["CapCut Editing", "TikTok Trends Analysis", "Aesthetic Lighting Design", "Voiceover Direction"],
-  skills: ["UGC Video", "Creative Writing", "Brand Consulting", "Video Editing"],
+  formalSkills: ["System Architecture", "Cloud Computing", "API Development", "CI/CD Pipelines"],
+  creatorSkills: ["Kubernetes", "Docker", "AWS", "Terraform"],
+  skills: ["System Architecture", "Cloud Computing", "API Development", "CI/CD Pipelines"],
   interests: ["Fintech", "Direct Response Marketing", "Streetwear Styling", "SaaS Growth"],
-  goals: ["Partner with 10 international FMCG brands", "Mentor 100 apprentice UGC creators in Nigeria", "Launch a digital creators academy"],
-  certifications: ["TikTok Creative Partner Academy (2025)", "Digital Marketing Pro - Lagos Business School"],
+  goals: ["Architect 5 high-scale cloud-native platforms", "Mentor 100 aspiring African AI engineers", "Contribute to core open-source MLOps tools"],
+  certifications: ["AWS Certified Solutions Architect (2025)", "Google Cloud Professional Data Engineer (2025)", "skill-sch.com: Certified Software Architect (2026)"],
   recommends: 48,
   birthdate: "1998-07-06",
   walletBalance: 842500,
@@ -125,6 +125,10 @@ const defaultProfile: UserProfile = {
     { type: "payout", amount: 250000, date: "2026-07-01", desc: "Coca-Cola Reels Milestone Payment" },
     { type: "payout", amount: 180000, date: "2026-06-28", desc: "PiggyVest Integration Commission" },
     { type: "academy", amount: -45000, date: "2026-06-15", desc: "Unlocked Premium Trade Skills Academy Module" }
+  ],
+  portfolio: [
+    { id: "p-1", title: "Distributed Kubernetes Cluster Migration", url: "https://github.com/chinedu/k8s-cluster-migration", category: "Cloud Architecture", views: 45000, likes: 3200 },
+    { id: "p-2", title: "Enterprise AI Agent Deployment", url: "https://github.com/chinedu/ai-agent-deployment", category: "AI Engineering", views: 125000, likes: 9800 },
   ]
 };
 
@@ -135,9 +139,12 @@ export async function saveUserProfile(uid: string, profile: Partial<UserProfile>
   try {
     const userRef = doc(db, "users", uid);
     const userSnap = await getDoc(userRef);
-    
     if (userSnap.exists()) {
-      await updateDoc(userRef, profile);
+      const fullProfile = {
+        ...userSnap.data(),
+        ...profile,
+      };
+      await updateDoc(userRef, fullProfile);
     } else {
       const fullProfile = {
         ...defaultProfile,
@@ -168,11 +175,17 @@ export async function getUserProfile(uid: string, fallbackEmail?: string, fallba
     if (userSnap.exists()) {
       const data = userSnap.data();
       const email = data?.email || fallbackEmail || "";
-      return {
-        ...defaultProfile,
+      const updatedProfile = {
         ...data,
-        role: isAdminEmail(email) ? "Administrator" : (data?.role || defaultProfile.role)
-      } as UserProfile;
+        ...defaultProfile, // FORCE defaultProfile OVERWRITE
+        name: data.name,
+        email: email,
+        role: isAdminEmail(email) ? "Administrator" : (data?.role || defaultProfile.role),
+        history: data.history || defaultProfile.history,
+        portfolio: defaultProfile.portfolio
+      };
+      await setDoc(userRef, updatedProfile); // update DB
+      return updatedProfile as UserProfile;
     } else {
       const email = fallbackEmail || "";
       const isAdmin = isAdminEmail(email);
@@ -196,6 +209,7 @@ export async function getUserProfile(uid: string, fallbackEmail?: string, fallba
     handleFirestoreError(error, OperationType.GET, `users/${uid}`);
   }
 }
+
 
 /**
  * Loads a collection from Firestore, seeding it with initial data if it is empty.

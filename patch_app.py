@@ -1,42 +1,62 @@
-with open("src/App.tsx", "r") as f:
+import re
+
+with open('src/App.tsx', 'r') as f:
     content = f.read()
 
-old_content = """                    <span className="logo-blocky px-3 py-1 bg-orange-500 text-slate-900 border-slate-900 text-[10px] font-bold tracking-wide mb-6 inline-block">
-                      LOUD Connect Platform 2.0
-                    </span>
-                    <HeroCarousel />
-                  </div>"""
+# Add import
+import_statement = "import { VettingProtocolModal } from './components/VettingProtocolModal';\n"
+content = re.sub(r'(import .*?;)', r'\1\n' + import_statement, content, count=1)
 
-new_content = """                    <span className="logo-blocky px-3 py-1 bg-orange-500 text-slate-900 border-slate-900 text-[10px] font-bold tracking-wide mb-6 inline-block">
-                      LOUD Connect Platform 2.0
-                    </span>
-                    <div className="flex flex-col gap-10">
-                      <div className="animate-fade-in">
-                        <h1 className="text-5xl md:text-6xl leading-none font-bold tracking-tight mb-4 text-slate-900">
-                          Learn<br />
-                          <span className="text-orange-500">To</span> Earning.
-                        </h1>
-                        <p className="max-w-md text-base md:text-lg leading-snug text-slate-700">
-                          Africa's leading digital ecosystem where practical skills transform into sustainable professional growth.
-                        </p>
-                      </div>
-                      <div className="animate-fade-in" style={{ animationDelay: "100ms" }}>
-                        <h1 className="text-5xl md:text-6xl leading-none font-bold tracking-tight mb-4 text-slate-900">
-                          Networking &<br />
-                          <span className="text-orange-500">Identity</span>.
-                        </h1>
-                        <p className="max-w-md text-base md:text-lg leading-snug text-slate-700">
-                          Build your professional portfolio, connect with peers, and verify your credentials on-chain.
-                        </p>
-                      </div>
-                    </div>
-                  </div>"""
+# Add state
+state_statement = "  const [showVettingModal, setShowVettingModal] = useState(false);"
+content = content.replace('  const [showAuthModal, setShowAuthModal] = useState(false);', '  const [showAuthModal, setShowAuthModal] = useState(false);\n' + state_statement)
 
-if old_content in content:
-    content = content.replace(old_content, new_content)
-    with open("src/App.tsx", "w") as f:
-        f.write(content)
-    print("Replaced!")
-else:
-    print("Could not find old content!")
+# Replace signup success
+# It is around:
+#           setUserProfile(updatedProfile);
+#           setIsAuthenticated(true);
+#           setShowAuthModal(false);
+#           setIsAuthLoading(false);
+#           confetti...
 
+signup_success_replacement = """          setUserProfile(updatedProfile);
+          setIsAuthenticated(true);
+          setShowAuthModal(false);
+          if (authAccountType === "freelancer" && authMode === "signup") {
+            setShowVettingModal(true);
+          }
+          setIsAuthLoading(false);"""
+content = re.sub(r'setUserProfile\(updatedProfile\);\s*setIsAuthenticated\(true\);\s*setShowAuthModal\(false\);\s*setIsAuthLoading\(false\);', signup_success_replacement, content)
+
+# And in the fallback seamless registration
+fallback_signup_replacement = """              // Send signup welcome email
+              try {
+                await fetch('https://estarr-mail-dispatcher.onrender.com/send-welcome', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ email: authEmail, name: authName || authEmail.split("@")[0], type: "signup" })
+                }).catch(err => console.error("Async welcome email dispatch failed:", err));
+              } catch (e) {}
+              
+              if (authMode === "signup" && authAccountType === "freelancer") {
+                setShowVettingModal(true);
+              }"""
+content = content.replace('// Send signup welcome email\n              try {\n                await fetch(\'https://estarr-mail-dispatcher.onrender.com/send-welcome\', {\n                  method: \'POST\',\n                  headers: { \'Content-Type\': \'application/json\' },\n                  body: JSON.stringify({\n                    email: authEmail,\n                    name: authName || authEmail.split("@")[0],\n                    type: "signup"\n                  })\n                }).catch(err => console.error("Async welcome email dispatch failed:", err));\n              } catch (e) {}', fallback_signup_replacement)
+
+# Also there's one more block around line 761: `setShowAuthModal(false);` 
+# I will just place the VettingModal in the JSX
+
+modal_jsx = """      {showVettingModal && (
+        <VettingProtocolModal 
+          onClose={() => setShowVettingModal(false)}
+          onApply={() => {
+            setShowVettingModal(false);
+            alert("Application submitted! Check your email for the CCAT link.");
+          }}
+        />
+      )}
+"""
+content = content.replace('{showAuthModal && (', modal_jsx + '\n      {showAuthModal && (')
+
+with open('src/App.tsx', 'w') as f:
+    f.write(content)

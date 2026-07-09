@@ -57,12 +57,19 @@ export default function EventsSection() {
             key={event.id}
             className="bg-white border border-slate-200 rounded-xl overflow-hidden flex flex-col shadow-sm"
           >
-            <div className="h-48 relative">
-              <img
-                src={event.image}
-                alt={event.title}
-                className="w-full h-full object-cover"
-              />
+            <div className="h-48 relative overflow-hidden">
+              <div className={`w-full h-full bg-gradient-to-br ${
+                event.type === "hybrid" ? "from-indigo-600 to-purple-700" :
+                event.type === "virtual" ? "from-cyan-600 to-blue-700" :
+                event.type === "in-person" ? "from-emerald-600 to-teal-700" :
+                "from-slate-700 to-slate-800"
+              } flex items-center justify-center`}>
+                <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center backdrop-blur-md">
+                  {event.type === "hybrid" && <Calendar className="w-8 h-8 text-white/80" />}
+                  {event.type === "virtual" && <Video className="w-8 h-8 text-white/80" />}
+                  {event.type === "in-person" && <MapPin className="w-8 h-8 text-white/80" />}
+                </div>
+              </div>
               <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-[10px] font-bold font-mono uppercase shadow-sm">
                 {event.type}
               </div>

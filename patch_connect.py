@@ -1,40 +1,73 @@
-with open("src/components/ConnectSection.tsx", "r") as f:
+import re
+
+with open('src/components/ConnectSection.tsx', 'r') as f:
     content = f.read()
 
-# We need to remove the giant hero card we added to ConnectSection.tsx
-old_content = """<div className="grid grid-cols-1 border border-slate-200 bg-white shadow-sm hover:shadow-md transition-shadow rounded-xl">
-        <div className="p-6 md:p-10 flex flex-col justify-between rounded-xl">
-          <div className="mt-2">
-            <span className="logo-blocky px-3 py-1 bg-orange-500 text-slate-900 border-slate-900 text-[10px] font-bold tracking-wide mb-6 inline-block">
-              LOUD Connect Platform 2.0
-            </span>
-            <HeroCarousel />
+state_insert = """  const [isSettingUpProfile, setIsSettingUpProfile] = useState(!userProfile.hasSetupConnectProfile);
+  const [setupBio, setSetupBio] = useState(userProfile.bio || "");
+  const [setupProfession, setSetupProfession] = useState(userProfile.profession || "");
+"""
+
+content = re.sub(r'  const \[activeTab, setActiveTab\] = useState<.*?\(initialSubTab \|\| "feed"\);', state_insert + r'\g<0>', content, flags=re.DOTALL)
+
+render_insert = """  if (isSettingUpProfile) {
+    return (
+      <div id="connect-section" className="flex flex-col gap-6">
+        <PageBanner
+          title="ESTARR Professional Hub Setup"
+          subtitle="CONNECT & COLLABORATE"
+          description="Grow your professional presence by completing your profile."
+          icon={Users}
+        />
+        <div className="bg-white border border-slate-200 rounded-3xl p-8 max-w-xl mx-auto w-full shadow-sm">
+          <div className="flex items-center gap-4 mb-8 pb-6 border-b border-slate-100">
+            <div className="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center">
+              <UserCheck className="w-8 h-8 text-purple-600" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-display font-bold text-slate-900 leading-tight">Welcome to the Hub</h2>
+              <p className="text-sm text-slate-500 mt-1">Let's set up your connect profile first.</p>
+            </div>
           </div>
-          <div className="grid grid-cols-3 gap-4 mt-12 pt-6 border-t border-slate-200/10">
-            <div>
-              <div className="text-2xl md:text-3xl font-bold font-mono tracking-tighter text-slate-900">124K</div>
-              <div className="text-[9px] uppercase font-bold tracking-widest text-slate-500">Active Learners</div>
-            </div>
-            <div>
-              <div className="text-2xl md:text-3xl font-bold font-mono tracking-tighter text-slate-900">₦850M</div>
-              <div className="text-[9px] uppercase font-bold tracking-widest text-slate-500">Market Vol</div>
-            </div>
-            <div>
-              <div className="text-2xl md:text-3xl font-bold font-mono tracking-tighter text-slate-900">12.5K</div>
-              <div className="text-[9px] uppercase font-bold tracking-widest text-slate-500">Verified Jobs</div>
-            </div>
-          </div>
+          <form onSubmit={async (e) => {
+             e.preventDefault();
+             await onUpdateProfile({ ...userProfile, bio: setupBio, profession: setupProfession, hasSetupConnectProfile: true });
+             setIsSettingUpProfile(false);
+          }} className="flex flex-col gap-5">
+             <div className="flex flex-col gap-2">
+                <label className="text-xs font-bold text-slate-900 uppercase tracking-wider">Professional Title</label>
+                <input 
+                  type="text"
+                  className="border border-slate-200 rounded-xl p-3 focus:outline-none focus:border-purple-500 text-sm bg-slate-50 focus:bg-white transition-colors"
+                  placeholder="e.g. Content Creator & Strategist"
+                  value={setupProfession}
+                  onChange={(e) => setSetupProfession(e.target.value)}
+                  required
+                />
+             </div>
+             <div className="flex flex-col gap-2">
+                <label className="text-xs font-bold text-slate-900 uppercase tracking-wider">Short Bio</label>
+                <textarea 
+                  className="border border-slate-200 rounded-xl p-3 focus:outline-none focus:border-purple-500 text-sm bg-slate-50 focus:bg-white transition-colors"
+                  rows={4} 
+                  placeholder="Tell us about your professional background and what you are looking to achieve..."
+                  value={setupBio}
+                  onChange={(e) => setSetupBio(e.target.value)}
+                  required
+                />
+             </div>
+             <button type="submit" className="bg-purple-600 text-white font-bold py-3.5 rounded-xl hover:bg-purple-700 transition-colors mt-4 flex items-center justify-center gap-2">
+               Complete Setup <Check className="w-4 h-4" />
+             </button>
+          </form>
         </div>
-      </div>"""
+      </div>
+    );
+  }
 
-new_content = """<PageBanner
-        title="LOUD Professional Network"
-        subtitle="CONNECT & COLLABORATE"
-        description="Build your professional portfolio, connect with peers, find mentors, and endorse practical skills within the LOUD ecosystem."
-        icon={Users}
-      />"""
+"""
 
-content = content.replace(old_content, new_content)
+content = re.sub(r'  return \(\n    <div id="connect-section"', render_insert + r'  return (\n    <div id="connect-section"', content, flags=re.DOTALL)
 
-with open("src/components/ConnectSection.tsx", "w") as f:
+with open('src/components/ConnectSection.tsx', 'w') as f:
     f.write(content)

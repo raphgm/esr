@@ -1,4 +1,6 @@
 import React, { useState, useRef } from "react";
+import { VettingProtocolModal } from './components/VettingProtocolModal';
+
 import { motion } from "motion/react";
 import confetti from "canvas-confetti";
 import { UserProfile, Course, Product, BrandCampaign, ProjectTask, Job, ActivityPost, CommunityChannel } from "./types";
@@ -23,7 +25,6 @@ import ProjectsSection from "./components/ProjectsSection";
 import GigsSection from "./components/GigsSection";
 import PaymentsSection from "./components/PaymentsSection";
 import EventsSection from "./components/EventsSection";
-import AnalyticsSection from "./components/AnalyticsSection";
 import CommunitySection from "./components/CommunitySection";
 import CompanionAppDownload from "./components/CompanionAppDownload";
 import ChatDrawer from "./components/ChatDrawer";
@@ -77,30 +78,137 @@ import {
   Linkedin,
   Github,
   HelpCircle,
-  LogOut} from "lucide-react";
+  LogOut,
+  Globe} from "lucide-react";
 
-const initialTasks: ProjectTask[] = [
-  { id: "t1", title: "Instagram Reels Campaign Video", desc: "$250,000 || Coca-Cola Nigeria || Shoot 1x aesthetic morning routine Reel featuring Coke Zero Sugar and tag @cocacolanigeria.", status: "inprogress", priority: "High", assignee: "Coca-Cola Nigeria", dueDate: "2026-07-12", category: "marketing" },
-  { id: "t2", title: "TikTok Meme Ad Integration", desc: "$180,000 || PiggyVest Fintech || Produce 1x high-retention funny meme TikTok video showcasing the automated savings features of PiggyVest.", status: "todo", priority: "Medium", assignee: "PiggyVest Fintech", dueDate: "2026-07-15", category: "design" },
-  { id: "t3", title: "UGC Styling Video Reel", desc: "$120,000 || Kala Bespoke Fashion || Deliver 1x aesthetic unboxing and styling walkthrough of the latest summer linen jackets.", status: "review", priority: "High", assignee: "Kala Bespoke Fashion", dueDate: "2026-07-09", category: "dev" }
+const initialTasks: ProjectTask[] = [];
+
+const homeDemoTasks: ProjectTask[] = [
+  { id: "t1", title: "Distributed System Migration", desc: "$250,000 || Enterprise Corp || Architect and deploy a scalable microservices infrastructure with high availability.", status: "inprogress", priority: "High", assignee: "Enterprise Corp", dueDate: "2026-07-12", category: "infrastructure" },
+  { id: "t2", title: "AI Agent Orchestration Pipeline", desc: "$180,000 || FinTech Next || Develop and integrate a fleet of autonomous agents for predictive financial modeling.", status: "todo", priority: "Medium", assignee: "FinTech Next", dueDate: "2026-07-15", category: "ai_ml" },
+  { id: "t3", title: "Cloud Native Security Audit", desc: "$120,000 || SecureCloud Tech || Perform comprehensive security audit and implement zero-trust architecture for enterprise cloud.", status: "review", priority: "High", assignee: "SecureCloud Tech", dueDate: "2026-07-09", category: "security" }
 ];
+
+const currencySymbols: Record<string, string> = {
+  USD: "$",
+  EUR: "€",
+  GBP: "£",
+  NGN: "₦",
+  KES: "KSh ",
+  INR: "₹",
+};
+
+const currencyRates: Record<string, number> = {
+  USD: 1,
+  EUR: 0.92,
+  GBP: 0.78,
+  NGN: 1500,
+  KES: 130,
+  INR: 83,
+};
+
+const translations = {
+  EN: {
+    heroTitle: "ESTARR",
+    heroSubtitle: "Empowering Creators & Pros",
+    activeEscrow: "Enterprise Smart Contracts",
+    secure: "Secure",
+    allInOne: "All-in-one digital ecosystem",
+    askAi: "ASK AI CO-PILOT",
+    intelligence: "ESTARR Intelligence",
+    configureProfile: "Configure Profile",
+    noActiveProjects: "No active projects",
+    seedDemo: "Seed Demo Contracts",
+    createFirst: "Create First Project"
+  },
+  ES: {
+    heroTitle: "ESTARR",
+    heroSubtitle: "Empoderando a Creadores y Pros",
+    activeEscrow: "Canal de Escrow Activo",
+    secure: "Seguro",
+    allInOne: "Ecosistema digital todo en uno",
+    askAi: "PREGUNTAR AL CO-PILOTO IA",
+    intelligence: "Inteligencia ESTARR",
+    configureProfile: "Configurar Perfil",
+    noActiveProjects: "Sin proyectos activos",
+    seedDemo: "Sembrar Contratos de Demostración",
+    createFirst: "Crear Primer Proyecto"
+  },
+  FR: {
+    heroTitle: "ESTARR",
+    heroSubtitle: "Autonomiser les Créateurs & Pros",
+    activeEscrow: "Pipeline d'Escrow Actif",
+    secure: "Sécurisé",
+    allInOne: "Écosystème numérique tout-en-un",
+    askAi: "DEMANDER AU CO-PILOTE IA",
+    intelligence: "Intelligence ESTARR",
+    configureProfile: "Configurer le Profil",
+    noActiveProjects: "Aucun projet actif",
+    seedDemo: "Générer les Contrats Démo",
+    createFirst: "Créer le Premier Projet"
+  },
+  SW: {
+    heroTitle: "ESTARR",
+    heroSubtitle: "Kuwezesha Wabunifu na Wataalamu",
+    activeEscrow: "Mfumo Amilifu wa Escrow",
+    secure: "Salama",
+    allInOne: "Ekolojia ya kidijitali ya yote kwa moja",
+    askAi: "ULIZA MSAIDIZI WA AI",
+    intelligence: "Akili ya ESTARR",
+    configureProfile: "Sanidi Wasifu",
+    noActiveProjects: "Hakuna miradi amilifu",
+    seedDemo: "Weka Mikataba ya Demo",
+    createFirst: "Unda Mradi wa Kwanza"
+  },
+  HI: {
+    heroTitle: "ESTARR",
+    heroSubtitle: "क्रिएटर्स और प्रोफेशनल्स को सशक्त बनाना",
+    activeEscrow: "सक्रिय एस्क्रो पाइपलाइन",
+    secure: "सुरक्षित",
+    allInOne: "ऑल-इन-वन डिजिटल इकोसिस्टम",
+    askAi: "एआई को-पायलट से पूछें",
+    intelligence: "ESTARR इंटेलिजेंस",
+    configureProfile: "प्रोफ़ाइल कॉन्फ़िगर करें",
+    noActiveProjects: "कोई सक्रिय परियोजना नहीं",
+    seedDemo: "डेमो अनुबंध लोड करें",
+    createFirst: "पहली परियोजना बनाएं"
+  }
+};
 
 export default function App() {
   // Authentication State
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showVettingModal, setShowVettingModal] = useState(false);
   const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
   const [authEmail, setAuthEmail] = useState("chinedu@estarrapp.com");
   const [authPassword, setAuthPassword] = useState("password123");
   const [authName, setAuthName] = useState("Chinedu Okafor");
   const [authBirthdate, setAuthBirthdate] = useState("");
-  const [authAccountType, setAuthAccountType] = useState<"freelancer" | "jobOwner">("freelancer");
+  const [authAccountType, setAuthAccountType] = useState<"freelancer" | "jobOwner" | "creator" | "academyLearner">("freelancer");
   const [authConfirmPassword, setAuthConfirmPassword] = useState("");
   const [applyingAs, setApplyingAs] = useState("Developer");
   const [authError, setAuthError] = useState<string | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState(false);
   const [isLinkCopied, setIsLinkCopied] = useState(false);
+
+  // Global Settings States
+  const [globalCurrency, setGlobalCurrency] = useState<"USD" | "EUR" | "GBP" | "NGN" | "KES" | "INR">("USD");
+  const [globalLanguage, setGlobalLanguage] = useState<"EN" | "ES" | "FR" | "SW" | "HI">("EN");
+  const [isGlobalDropdownOpen, setIsGlobalDropdownOpen] = useState(false);
+
+  const formatCurrency = (val: string | number) => {
+    let num = 150000;
+    if (typeof val === "number") {
+      num = val;
+    } else {
+      const clean = val.replace(/[^0-9]/g, "");
+      num = parseInt(clean, 10) || 150000;
+    }
+    const converted = Math.round(num * currencyRates[globalCurrency]);
+    return currencySymbols[globalCurrency] + converted.toLocaleString();
+  };
 
   // Hiring Wizard State (Toptal style onboarding for Owners/jobOwners)
   const [hireWizardStep, setHireWizardStep] = useState<number>(1);
@@ -118,8 +226,24 @@ export default function App() {
 
   // Router State
   const [activeTab, setActiveTab] = useState<
-    "home" | "connect" | "academy" | "marketplace" | "projects" | "gigs" | "community" | "mobile" | "teams" | "careers" | "about" | "how-it-works" | "payments" | "events" | "analytics" | "admin" | "portfolio"
+    "home" | "connect" | "academy" | "marketplace" | "projects" | "gigs" | "community" | "mobile" | "teams" | "careers" | "about" | "how-it-works" | "payments" | "events" | "admin" | "portfolio"
   >("home");
+
+  const heroVideoRef = useRef<HTMLVideoElement>(null);
+
+  React.useEffect(() => {
+    if (activeTab === "home" && heroVideoRef.current) {
+      const video = heroVideoRef.current;
+      video.muted = true;
+      video.playsInline = true;
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          console.warn("Autoplay was prevented or video failed to load, retrying on interaction...", error);
+        });
+      }
+    }
+  }, [activeTab]);
   const [connectSubTab, setConnectSubTab] = useState<"feed" | "directory" | "mentorship" | "companion">("feed");
 
   const [collapsedNavSections, setCollapsedNavSections] = useState<Record<string, boolean>>({
@@ -265,9 +389,12 @@ export default function App() {
             accountType: "freelancer" as const
           };
           
-          setUserProfile(updatedProfile);
+                    setUserProfile(updatedProfile);
           setIsAuthenticated(true);
           setShowAuthModal(false);
+          if (authAccountType === "freelancer" && authMode === "signup") {
+            setShowVettingModal(true);
+          }
           setIsAuthLoading(false);
           
           confetti({
@@ -470,22 +597,36 @@ export default function App() {
           const fetchedPosts = await getCollectionData<ActivityPost>("posts", initialPosts);
           setPosts(fetchedPosts);
 
-          const fetchedCourses = await getCollectionData<Course>("courses", initialCourses);
+                    const fetchedCourses = await getCollectionData<Course>("courses", initialCourses);
           setCourses(fetchedCourses);
 
           const fetchedProducts = await getCollectionData<Product>("products", initialProducts);
-          setProducts(fetchedProducts);
+          setProducts(initialProducts);
+          // Re-seed updated initial products to Firebase
+          initialProducts.forEach(p => saveCollectionItem("products", p));
 
-          const fetchedCampaigns = await getCollectionData<BrandCampaign>("campaigns", initialCampaigns);
-          setCampaigns(fetchedCampaigns);
+          const fetchedCampaigns = await getCollectionData<BrandCampaign>("campaigns", []);
+          
+          // Cleanup mock campaigns
+          const validCampaigns = fetchedCampaigns.filter(c => !c.id.startsWith("camp-") && !c.id.startsWith("c"));
+          fetchedCampaigns.forEach(async (c) => {
+            if (c.id.startsWith("camp-") || c.id.startsWith("c")) {
+              try { await deleteCollectionItem("campaigns", c.id); } catch(e) {}
+            }
+          });
+          setCampaigns(validCampaigns);
 
-          const fetchedTasks = await getCollectionData<ProjectTask>("tasks", initialTasks);
-          if (userEmail === "chinedu@estarrapp.com") {
-            setTasks(fetchedTasks);
-          } else {
-            const userSpecificTasks = fetchedTasks.filter(t => t.userId === user.uid);
-            setTasks(userSpecificTasks);
-          }
+          const fetchedTasks = await getCollectionData<ProjectTask>("tasks", []);
+          
+          // Cleanup mock tasks
+          const mockTaskTitles = ["Distributed System Migration", "AI Agent Orchestration Pipeline", "Cloud Native Security Audit", "TikTok Meme Ad", "Instagram Reels", "UGC Styling"];
+          const validTasks = fetchedTasks.filter(t => !mockTaskTitles.includes(t.title) && !t.id.startsWith("t"));
+          fetchedTasks.forEach(async (t) => {
+            if (mockTaskTitles.includes(t.title) || t.id.startsWith("t")) {
+              try { await deleteCollectionItem("tasks", t.id); } catch(e) {}
+            }
+          });
+          setTasks(validTasks);
 
           const fetchedJobs = await getCollectionData<Job>("jobs", initialJobs);
           setJobs(fetchedJobs);
@@ -570,7 +711,7 @@ export default function App() {
                 email: authEmail,
                 birthdate: authBirthdate || "1998-07-06",
                 accountType: authAccountType,
-                profession: authAccountType === "freelancer" ? (applyingAs ? `${applyingAs} Specialist` : "Professional Freelancer") : (selectedRoleType ? `Hiring: ${selectedRoleType}` : "Job Provider / Owner"),
+                profession: authAccountType === "creator" ? "Creator" : authAccountType === "academyLearner" ? "Certified Creator" : authAccountType === "freelancer" ? (applyingAs ? `${applyingAs} Specialist` : "Professional Freelancer") : (selectedRoleType ? `Hiring: ${selectedRoleType}` : "Job Provider / Owner"),
               });
               // Send signup welcome email
               try {
@@ -597,27 +738,51 @@ export default function App() {
           }
         }
       } else {
-        const userCredential = await createUserWithEmailAndPassword(auth, authEmail, authPassword);
-        const user = userCredential.user;
-        await saveUserProfile(user.uid, {
-          name: authName,
-          email: authEmail,
-          birthdate: authBirthdate || "1998-07-06",
-          accountType: authAccountType,
-          profession: authAccountType === "freelancer" ? (applyingAs ? `${applyingAs} Specialist` : "Professional Freelancer") : (selectedRoleType ? `Hiring: ${selectedRoleType}` : "Job Provider / Owner"),
-        });
-        // Send signup welcome email
         try {
-          fetch("/api/send-welcome", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              email: authEmail,
-              name: authName,
-              type: "signup"
-            })
-          }).catch(err => console.error("Async welcome email dispatch failed:", err));
-        } catch (e) {}
+          const userCredential = await createUserWithEmailAndPassword(auth, authEmail, authPassword);
+          const user = userCredential.user;
+          await saveUserProfile(user.uid, {
+            name: authName,
+            email: authEmail,
+            birthdate: authBirthdate || "1998-07-06",
+            accountType: authAccountType,
+            profession: authAccountType === "creator" ? "Creator" : authAccountType === "academyLearner" ? "Certified Creator" : authAccountType === "freelancer" ? (applyingAs ? `${applyingAs} Specialist` : "Professional Freelancer") : (selectedRoleType ? `Hiring: ${selectedRoleType}` : "Job Provider / Owner"),
+          });
+          // Send signup welcome email
+          try {
+            fetch("/api/send-welcome", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                email: authEmail,
+                name: authName,
+                type: "signup"
+              })
+            }).catch(err => console.error("Async welcome email dispatch failed:", err));
+          } catch (e) {}
+          
+          if (authAccountType === "freelancer") {
+            setShowVettingModal(true);
+          }
+        } catch (signUpErr: any) {
+          if (signUpErr.code === "auth/email-already-in-use") {
+            console.log("Email already in use on signup. Attempting seamless auto-login fallback...");
+            try {
+              await signInWithEmailAndPassword(auth, authEmail, authPassword);
+              // Successfully logged in as existing user. Let's prevent the vetting modal since they aren't new.
+              setAuthMode("signin"); // Will prevent the vetting modal condition
+            } catch (signInErr: any) {
+              if (signInErr.code === "auth/wrong-password" || signInErr.code === "auth/invalid-credential") {
+                const customError = new Error("An account with this email exists, but the password provided is incorrect. Please sign in instead.");
+                (customError as any).code = "auth/email-already-in-use-wrong-password";
+                throw customError;
+              }
+              throw signInErr;
+            }
+          } else {
+            throw signUpErr;
+          }
+        }
       }
       setShowAuthModal(false);
     } catch (error: any) {
@@ -627,6 +792,8 @@ export default function App() {
         friendlyMessage = "Incorrect email or password. If you don't have an account, please click SIGN UP below to register first!";
       } else if (error.code === "auth/email-already-in-use") {
         friendlyMessage = "An account with this email already exists. Try signing in instead.";
+      } else if (error.code === "auth/email-already-in-use-wrong-password") {
+        friendlyMessage = error.message;
       } else if (error.code === "auth/weak-password") {
         friendlyMessage = "Password is too weak. Please use at least 6 characters.";
       } else if (error.code === "auth/invalid-email") {
@@ -695,6 +862,16 @@ export default function App() {
         </div>
       </div>
 
+            {showVettingModal && (
+        <VettingProtocolModal 
+          onClose={() => setShowVettingModal(false)}
+          onApply={() => {
+            setShowVettingModal(false);
+            alert("Application submitted! Check your email for the CCAT link.");
+          }}
+        />
+      )}
+
       {showAuthModal && (
         <div className="fixed inset-0 z-50 bg-slate-50/90 backdrop-blur-xs flex flex-col justify-center items-center p-4 selection:bg-purple-600 selection:text-white border-4 border-slate-200">
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#0a0a0a_1px,transparent_1px),linear-gradient(to_bottom,#0a0a0a_1px,transparent_1px)] bg-[size:5rem_5rem] opacity-5 pointer-events-none" />
@@ -730,7 +907,7 @@ export default function App() {
                 </div>
 
                 {/* Account Type Selector - Screenshot 1 Style */}
-                <div className="mb-6 max-w-xs">
+                <div className="mb-6 w-full">
                   <span className="font-display font-extrabold text-[11px] uppercase tracking-wider text-slate-900 block mb-1.5">
                     Account Type *
                   </span>
@@ -738,7 +915,7 @@ export default function App() {
                     <button
                       type="button"
                       onClick={() => setAuthAccountType("freelancer")}
-                      className={`flex-1 py-1.5 px-4 rounded-full border text-xs font-bold tracking-tight transition-all cursor-pointer ${
+                      className={`flex-1 py-1.5 px-3 rounded-full border text-xs font-bold tracking-tight transition-all cursor-pointer ${
                         authAccountType === "freelancer"
                           ? "bg-purple-50 border-purple-500 text-purple-600 shadow-xs"
                           : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"
@@ -749,13 +926,35 @@ export default function App() {
                     <button
                       type="button"
                       onClick={() => setAuthAccountType("jobOwner")}
-                      className={`flex-1 py-1.5 px-4 rounded-full border text-xs font-bold tracking-tight transition-all cursor-pointer ${
+                      className={`flex-1 py-1.5 px-3 rounded-full border text-xs font-bold tracking-tight transition-all cursor-pointer ${
                         authAccountType === "jobOwner"
                           ? "bg-purple-50 border-purple-500 text-purple-600 shadow-xs"
                           : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"
                       }`}
                     >
                       Owner
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAuthAccountType("creator")}
+                      className={`flex-1 py-1.5 px-3 rounded-full border text-xs font-bold tracking-tight transition-all cursor-pointer ${
+                        authAccountType === "creator"
+                          ? "bg-purple-50 border-purple-500 text-purple-600 shadow-xs"
+                          : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"
+                      }`}
+                    >
+                      Creator
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setAuthAccountType("academyLearner")}
+                      className={`flex-1 py-1.5 px-3 rounded-full border text-xs font-bold tracking-tight transition-all cursor-pointer ${
+                        authAccountType === "academyLearner"
+                          ? "bg-purple-50 border-purple-500 text-purple-600 shadow-xs"
+                          : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"
+                      }`}
+                    >
+                      Learner
                     </button>
                   </div>
                 </div>
@@ -1135,7 +1334,7 @@ export default function App() {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="flex flex-col gap-3">
                         <div className="flex flex-col gap-1">
                           <span className="font-display font-extrabold text-[9px] uppercase tracking-wider text-slate-900">
                             Account Type *
@@ -1167,6 +1366,30 @@ export default function App() {
                               }`}
                             >
                               Owner
+                            </button>
+                            <button
+                              type="button"
+                              disabled={isAuthLoading}
+                              onClick={() => setAuthAccountType("creator")}
+                              className={`flex-1 py-1.5 px-2 rounded-full border text-[10px] font-bold tracking-tight transition-all disabled:opacity-60 cursor-pointer ${
+                                authAccountType === "creator"
+                                  ? "bg-purple-50 border-purple-500 text-purple-600"
+                                  : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"
+                              }`}
+                            >
+                              Creator
+                            </button>
+                            <button
+                              type="button"
+                              disabled={isAuthLoading}
+                              onClick={() => setAuthAccountType("academyLearner")}
+                              className={`flex-1 py-1.5 px-2 rounded-full border text-[10px] font-bold tracking-tight transition-all disabled:opacity-60 cursor-pointer ${
+                                authAccountType === "academyLearner"
+                                  ? "bg-purple-50 border-purple-500 text-purple-600"
+                                  : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"
+                              }`}
+                            >
+                              Learner
                             </button>
                           </div>
                         </div>
@@ -1331,7 +1554,7 @@ export default function App() {
           </div>
           <div>
             <h1 className="font-display font-bold text-sm md:text-base uppercase tracking-tight text-white">ESTARR</h1>
-            <p className="text-[10px] text-slate-400 font-medium tracking-wide font-bold">Empowering Creators & Pros</p>
+            <p className="text-[10px] text-slate-400 font-medium tracking-wide font-bold">{translations[globalLanguage].heroSubtitle}</p>
           </div>
         </button>
 
@@ -1350,7 +1573,14 @@ export default function App() {
           </button>
           
           <button
-            onClick={() => setActiveTab("projects")}
+            onClick={() => {
+              if (!isAuthenticated) {
+                setAuthMode("signup");
+                setShowAuthModal(true);
+              } else {
+                setActiveTab("projects");
+              }
+            }}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold transition-all uppercase tracking-wider cursor-pointer ${
               activeTab === "projects"
                 ? "bg-purple-600 text-white shadow-md shadow-purple-500/20"
@@ -1358,11 +1588,20 @@ export default function App() {
             }`}
           >
             <Layers className="w-3 h-3" />
-            <span>Projects</span>
+            <span className="flex items-center gap-1">
+              Projects
+            </span>
           </button>
 
           <button
-            onClick={() => setActiveTab("connect")}
+            onClick={() => {
+              if (!isAuthenticated) {
+                setAuthMode("signup");
+                setShowAuthModal(true);
+              } else {
+                setActiveTab("connect");
+              }
+            }}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold transition-all uppercase tracking-wider cursor-pointer ${
               activeTab === "connect"
                 ? "bg-purple-600 text-white shadow-md shadow-purple-500/20"
@@ -1370,11 +1609,20 @@ export default function App() {
             }`}
           >
             <Users className="w-3 h-3" />
-            <span>Connect</span>
+            <span className="flex items-center gap-1">
+              Connect
+            </span>
           </button>
 
           <button
-            onClick={() => setActiveTab("academy")}
+            onClick={() => {
+              if (!isAuthenticated) {
+                setAuthMode("signup");
+                setShowAuthModal(true);
+              } else {
+                setActiveTab("academy");
+              }
+            }}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold transition-all uppercase tracking-wider cursor-pointer ${
               activeTab === "academy"
                 ? "bg-purple-600 text-white shadow-md shadow-purple-500/20"
@@ -1382,11 +1630,20 @@ export default function App() {
             }`}
           >
             <Award className="w-3 h-3" />
-            <span>Academy</span>
+            <span className="flex items-center gap-1">
+              Work Certification
+            </span>
           </button>
 
           <button
-            onClick={() => setActiveTab("marketplace")}
+            onClick={() => {
+              if (!isAuthenticated) {
+                setAuthMode("signup");
+                setShowAuthModal(true);
+              } else {
+                setActiveTab("marketplace");
+              }
+            }}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold transition-all uppercase tracking-wider cursor-pointer ${
               activeTab === "marketplace"
                 ? "bg-purple-600 text-white shadow-md shadow-purple-500/20"
@@ -1394,12 +1651,87 @@ export default function App() {
             }`}
           >
             <ShoppingCart className="w-3 h-3" />
-            <span>Marketplace</span>
+            <span className="flex items-center gap-1">
+              Storefront
+            </span>
           </button>
         </nav>
 
         {/* Global User Profile Indicator */}
         <div className="flex items-center gap-3">
+          {/* Globalizer Widget */}
+          <div className="relative">
+            <button
+              onClick={() => setIsGlobalDropdownOpen(!isGlobalDropdownOpen)}
+              className="bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 px-3 py-1.5 rounded-xl cursor-pointer transition-colors shadow-sm flex items-center gap-1.5 text-[10px] font-bold"
+              title="Global Settings (Currency & Language)"
+            >
+              <Globe className="w-3.5 h-3.5 text-purple-400 animate-pulse shrink-0" />
+              <span className="font-mono text-[10px] tracking-wider uppercase">{globalLanguage} | {globalCurrency}</span>
+            </button>
+
+            {isGlobalDropdownOpen && (
+              <>
+                <div 
+                  className="fixed inset-0 z-40 cursor-default" 
+                  onClick={() => setIsGlobalDropdownOpen(false)}
+                />
+                <div className="absolute right-0 mt-2 w-56 bg-slate-950 border border-slate-800 rounded-xl p-3 shadow-xl z-50 animate-in fade-in slide-in-from-top-2 duration-150 text-white">
+                  <div className="mb-2.5 pb-2 border-b border-slate-900">
+                    <span className="text-[9px] font-bold text-purple-400 uppercase tracking-wider block mb-1">Global Currency</span>
+                    <div className="grid grid-cols-3 gap-1">
+                      {(["USD", "EUR", "GBP", "NGN", "KES", "INR"] as const).map((curr) => (
+                        <button
+                          key={curr}
+                          onClick={() => {
+                            setGlobalCurrency(curr);
+                            setIsGlobalDropdownOpen(false);
+                            confetti({ particleCount: 30, spread: 40, colors: ["#9d50bb", "#6e48aa"] });
+                          }}
+                          className={`px-1.5 py-1 text-[10px] font-mono font-bold rounded-lg transition-colors border cursor-pointer ${
+                            globalCurrency === curr
+                              ? "bg-purple-900/30 border-purple-500 text-purple-300"
+                              : "bg-slate-900/40 border-slate-800/80 text-slate-400 hover:bg-slate-900 hover:text-white"
+                          }`}
+                        >
+                          {curr}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <span className="text-[9px] font-bold text-purple-400 uppercase tracking-wider block mb-1">Display Language</span>
+                    <div className="flex flex-col gap-1">
+                      {[
+                        { code: "EN", name: "English (Global)" },
+                        { code: "ES", name: "Español (LatAm)" },
+                        { code: "FR", name: "Français (Europe/Africa)" },
+                        { code: "SW", name: "Kiswahili (East Africa)" },
+                        { code: "HI", name: "हिन्दी (India)" },
+                      ].map((lang) => (
+                        <button
+                          key={lang.code}
+                          onClick={() => {
+                            setGlobalLanguage(lang.code as any);
+                            setIsGlobalDropdownOpen(false);
+                          }}
+                          className={`w-full text-left px-2.5 py-1.5 text-[10px] font-semibold rounded-lg transition-colors flex items-center justify-between cursor-pointer ${
+                            globalLanguage === lang.code
+                              ? "bg-purple-900/30 text-purple-300 font-bold"
+                              : "text-slate-400 hover:bg-slate-900/80 hover:text-white"
+                          }`}
+                        >
+                          <span>{lang.name}</span>
+                          <span className="text-[9px] font-mono text-slate-500">{lang.code}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
           {isAuthenticated ? (
             <>
               <button
@@ -1569,9 +1901,8 @@ export default function App() {
               title: "Core Hub & Insights",
               items: [
                 { id: "home", label: "Home", desc: "Editorial ecosystem overview", icon: Home },
-                { id: "academy", label: "Academy", desc: "Practical classes & quizzes", icon: Award },
+                { id: "academy", label: "Work Certification", desc: "Professional playbooks & licenses", icon: Award },
                 { id: "portfolio", label: "Professional Portfolio", desc: "Showcase skills & projects", icon: Briefcase },
-                { id: "analytics", label: "IT & Creator Analytics", desc: "Tech/Social metrics & Media Kit", icon: LineChart },
               ]
             },
             {
@@ -1579,8 +1910,8 @@ export default function App() {
               items: [
                 { id: "projects", label: "Escrow Hub", desc: "Paid milestones & escrow", icon: CheckSquare },
                 { id: "careers", label: "Jobs Board", desc: "Full-time & freelance opportunities", icon: Compass },
-                { id: "gigs", label: "Gigs", desc: "Escrow micro-service market", icon: Laptop },
-                { id: "marketplace", label: "Marketplace", desc: "Escrow trade & storefronts", icon: ShoppingCart },
+                { id: "gigs", label: "Gigs", desc: "Escrow gig market", icon: Laptop },
+                { id: "marketplace", label: "Brand Campaigns", desc: "Exclusive high-ticket sponsorships", icon: ShoppingCart },
               ]
             },
             {
@@ -1598,12 +1929,12 @@ export default function App() {
                 { id: "rewards", label: "Ambassadors", desc: "Earn Points & Rewards", icon: Gift }
               ]
             },
-            {
+            ...(isAdmin ? [{
               title: "Admin Controls",
               items: [
                 { id: "admin", label: "Admin Dashboard", desc: "System settings & metrics", icon: ShieldCheck }
               ]
-            }
+            }] : [])
           ].map((section) => {
             const isCollapsed = collapsedNavSections[section.title];
             const hasActiveItem = section.items.some(item => item.id === activeTab);
@@ -1637,19 +1968,21 @@ export default function App() {
                     {section.items.map((item) => {
                       const Icon = item.icon;
                       const isActive = activeTab === item.id;
+                      const isPublic = ["home", "about", "how-it-works", "teams"].includes(item.id);
+                      const isLocked = !isAuthenticated && !isPublic;
                       return (
                         <button
                           key={item.id}
                           id={`btn-nav-tab-${item.id}`}
                           onClick={() => {
-                            if (!isAuthenticated) {
+                            if (isLocked) {
                               setAuthMode("signup");
                               setShowAuthModal(true);
                             } else {
                               setActiveTab(item.id as any);
                             }
                           }}
-                          className={`w-full text-left p-2 transition-all duration-200 cursor-pointer rounded-xl border ${
+                          className={`w-full text-left p-2 transition-all duration-200 cursor-pointer rounded-xl border relative ${
                             isActive
                               ? sidebarStyles[sidebarTheme].activeItemClass
                               : sidebarStyles[sidebarTheme].inactiveItemClass
@@ -1657,9 +1990,11 @@ export default function App() {
                         >
                           <div className="flex items-start gap-3">
                             <Icon className={`w-4 h-4 shrink-0 mt-0.5 transition-colors ${isActive ? "text-white" : "text-slate-500"}`} />
-                            <div>
-                              <span className="text-xs font-bold uppercase tracking-tight block leading-tight">{item.label}</span>
-                              <span className={`text-[9px] block leading-tight mt-0.5 font-medium transition-colors ${isActive ? sidebarStyles[sidebarTheme].activeDescClass : sidebarStyles[sidebarTheme].descClass}`}>
+                            <div className="flex-1 min-w-0 pr-4">
+                              <span className="text-xs font-bold uppercase tracking-tight flex items-center gap-1.5 leading-tight">
+                                {item.label}
+                              </span>
+                              <span className={`text-[9px] block leading-tight mt-0.5 font-medium transition-colors truncate ${isActive ? sidebarStyles[sidebarTheme].activeDescClass : sidebarStyles[sidebarTheme].descClass}`}>
                                 {item.desc}
                               </span>
                             </div>
@@ -1685,19 +2020,26 @@ export default function App() {
                   {/* Background Video Loop with Tech Grid & Glow Fallbacks */}
                   <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none z-0" />
                   <video
+                    ref={heroVideoRef}
                     autoPlay
                     loop
                     muted
                     playsInline
                     preload="auto"
-                    className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none opacity-45 mix-blend-multiply transition-opacity duration-1000"
+                    onPause={(e) => {
+                      e.currentTarget.play().catch(() => {});
+                    }}
+                    onEnded={(e) => {
+                      e.currentTarget.play().catch(() => {});
+                    }}
+                    className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none opacity-25 transition-opacity duration-1000"
                   >
                     <source
-                      src="https://vjs.zencdn.net/v/oceans.mp4"
+                      src="https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-nodes-connecting-in-space-32599-large.mp4"
                       type="video/mp4"
                     />
                     <source
-                      src="https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-nodes-connecting-in-space-32599-large.mp4"
+                      src="https://vjs.zencdn.net/v/oceans.mp4"
                       type="video/mp4"
                     />
                   </video>
@@ -1767,56 +2109,72 @@ export default function App() {
                 {/* Hero Right: Featured & AI */}
                 <div className="lg:col-span-5 flex flex-col rounded-xl">
                   {/* Stream */}
-                  <div className="flex-1 p-6 md:p-8 bg-[#FAF9F6] border border-[#EBE8E0] text-slate-900 shadow-sm flex flex-col justify-between min-h-[220px] rounded-xl">
+                  <div className="flex-1 p-6 md:p-8 bg-[#FDFDF9] border border-[#EFEBE3] text-slate-900 shadow-sm flex flex-col justify-between min-h-[220px] rounded-xl">
                     <div>
-                      <div className="flex items-center justify-between mb-6">
-                        <h2 className="text-[10px] uppercase tracking-[0.25em] font-bold text-purple-500">Active Escrow Pipeline</h2>
-                        <span className="text-[8px] font-mono bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full font-bold border border-purple-200">
-                          SECURE
+                      <div className="flex items-center justify-between mb-8">
+                        <h2 className="text-[13px] uppercase tracking-wide font-bold text-[#b441f7]">{translations[globalLanguage].activeEscrow}</h2>
+                        <span className="text-[11px] bg-[#f4e6ff] text-[#911fdf] px-3.5 py-1.5 rounded-full font-bold">
+                          {translations[globalLanguage].secure}
                         </span>
                       </div>
                       <div className="space-y-0">
-                        {tasks.slice(0, 3).map((task, index) => {
+                        {(tasks && tasks.length > 0 ? tasks : homeDemoTasks).slice(0, 3).map((task, index) => {
                           // Parse budget and client
-                          let budget = "$150,000";
+                          let budget = formatCurrency(150000);
                           let client = task.assignee || "Client";
                           if (task.desc.includes("||")) {
                             const parts = task.desc.split("||");
                             if (parts.length >= 2) {
-                              budget = parts[0].trim();
+                              budget = formatCurrency(parts[0].trim());
                               client = parts[1].trim();
                             }
                           } else {
-                            if (task.id === "t1") budget = "$250,000";
-                            else if (task.id === "t2") budget = "$180,000";
-                            else if (task.id === "t3") budget = "$120,000";
+                            if (task.id === "t1") budget = formatCurrency(250000);
+                            else if (task.id === "t2") budget = formatCurrency(180000);
+                            else if (task.id === "t3") budget = formatCurrency(120000);
                           }
-
                           let percentage = 8;
-                          let statusText = "Locked";
-                          let statusColor = "text-purple-500";
+                          let statusText = "LOCKED";
+                          let statusColor = "text-[#b441f7]";
                           let borderColor = "via-amber-400";
+                          let strokeColor = "stroke-amber-500";
 
                           if (task.status === "inprogress") {
                             percentage = 67;
-                            statusText = "In Progress";
-                            statusColor = "text-purple-500";
-                            borderColor = "via-purple-400";
+                            statusText = "IN PROGRESS";
+                            statusColor = "text-[#b441f7]";
+                            borderColor = "via-[#b441f7]";
+                            strokeColor = "stroke-[#b441f7]";
                           } else if (task.status === "review") {
                             percentage = 92;
-                            statusText = "In Review";
-                            statusColor = "text-emerald-600";
-                            borderColor = "via-emerald-400";
+                            statusText = "IN REVIEW";
+                            statusColor = "text-[#03a96b]";
+                            borderColor = "via-amber-300"; // Based on screenshot
+                            strokeColor = "stroke-[#03a96b]";
                           } else if (task.status === "done") {
                             percentage = 100;
-                            statusText = "Released";
+                            statusText = "RELEASED";
                             statusColor = "text-blue-600";
                             borderColor = "via-blue-400";
+                            strokeColor = "stroke-blue-500";
+                          }
+                          
+                          if (index === 0) {
+                             borderColor = "via-[#b441f7]";
+                             strokeColor = "stroke-[#b441f7]";
+                          } else if (index === 1) {
+                             borderColor = "via-amber-300";
+                             strokeColor = "stroke-amber-500";
+                             statusColor = "text-[#b441f7]";
+                          } else {
+                             borderColor = "via-amber-300";
+                             strokeColor = "stroke-[#03a96b]";
+                             statusColor = "text-[#03a96b]";
                           }
 
-                          // SVG parameters for 36px circular indicator
-                          const size = 36;
-                          const strokeWidth = 3;
+                          // SVG parameters for 40px circular indicator
+                          const size = 44;
+                          const strokeWidth = 4;
                           const center = size / 2;
                           const radius = center - strokeWidth;
                           const circumference = 2 * Math.PI * radius;
@@ -1824,11 +2182,11 @@ export default function App() {
 
                           const isDueSoon = task.dueDate && task.status !== "done" ? (new Date(task.dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60) <= 48 : false;
                           const categoryColors: Record<string, string> = {
-                            marketing: "bg-pink-100 text-pink-700 border-pink-200",
-                            dev: "bg-cyan-100 text-cyan-700 border-cyan-200",
-                            design: "bg-fuchsia-100 text-fuchsia-700 border-fuchsia-200",
+                            marketing: "bg-pink-100 text-[#d61c77]",
+                            dev: "bg-cyan-100 text-[#099abf]",
+                            design: "bg-[#f4e6ff] text-[#911fdf]",
                           };
-                          const defaultCatColor = "bg-slate-100 text-slate-500 border-slate-200";
+                          const defaultCatColor = "bg-slate-100 text-slate-500";
                           const categoryClass = task.category ? categoryColors[task.category] || defaultCatColor : "";
 
 
@@ -1843,42 +2201,39 @@ export default function App() {
                                     setActiveTab("projects");
                                   }
                                 }} 
-                                className={`group cursor-pointer p-4 -mx-4 rounded-xl hover:bg-purple-50/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_15px_rgba(168,85,247,0.08)] flex justify-between items-center gap-3`}
+                                className={`group cursor-pointer p-5 -mx-5 rounded-2xl hover:bg-white/50 transition-all duration-300 flex justify-between items-center gap-4`}
                               >
                                 <div className="flex-1 min-w-0">
-                                  <h3 className="text-sm font-bold italic tracking-tight text-slate-900 group-hover:text-purple-600 transition-colors truncate">
+                                  <h3 className="text-[17px] font-bold italic tracking-tight text-slate-900 group-hover:text-purple-600 transition-colors truncate">
                                     {task.title}
                                   </h3>
-                                  <p className="text-[10px] text-slate-500 truncate mt-0.5">
-                                    {client} • <span className="font-semibold text-slate-900">{budget}</span>
-                                  </p>
-                                  <div className="mt-1 flex items-center gap-2">
-                                    <span className={`text-[9px] font-mono font-bold uppercase tracking-wider shrink-0 ${statusColor}`}>
+                                  <div className="mt-3 flex items-center gap-3">
+                                    <span className={`text-[10px] font-mono font-bold uppercase tracking-widest shrink-0 ${statusColor}`}>
                                       {statusText}
                                     </span>
                                     
                                     {task.category && (
-                                      <span className={`text-[8px] font-mono font-bold uppercase px-1.5 py-0.5 rounded-full border ${categoryClass}`}>
+                                      <span className={`text-[10px] font-mono font-bold uppercase px-2.5 py-1 rounded-full ${categoryClass}`}>
                                         {task.category}
                                       </span>
                                     )}
 
                                     {isDueSoon && (
-                                      <span className="flex items-center gap-1 text-[9px] font-mono font-bold text-rose-500 bg-rose-500/10 px-1.5 py-0.5 rounded-full">
-                                        <Clock className="w-2.5 h-2.5" /> Due Soon
+                                      <span className="flex items-center gap-1.5 text-[10px] font-mono font-bold text-[#f93e6c] bg-[#ffe4ec] px-2.5 py-1 rounded-full">
+                                        <Clock className="w-3 h-3" /> Due Soon
                                       </span>
                                     )}
                                   </div>
                                 </div>
 
-                                <div className="flex items-center gap-2 shrink-0">
+                                <div className="flex items-center gap-3 shrink-0">
                                   {/* Quick Cycle Button */}
                                   <button 
                                     onClick={(e) => cycleTaskStatus(e, task.id, task.status)}
-                                    className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-purple-100 text-slate-400 hover:text-purple-600 transition-colors border border-transparent hover:border-purple-200"
+                                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-200 text-[#9ca3af] hover:text-[#6b7280] transition-colors border border-transparent"
                                     title="Cycle Status"
                                   >
-                                    <FastForward className="w-3.5 h-3.5" />
+                                    <FastForward className="w-4 h-4" />
                                   </button>
                                   
                                   {/* Circular Progress Indicator */}
@@ -1889,7 +2244,7 @@ export default function App() {
                                         cx={center}
                                         cy={center}
                                         r={radius}
-                                        className="stroke-[#EBE8E0] fill-none"
+                                        className="stroke-[#EFEBE3] fill-none"
                                         strokeWidth={strokeWidth}
                                       />
                                       {/* Animated Progress Circle */}
@@ -1897,29 +2252,21 @@ export default function App() {
                                         cx={center}
                                         cy={center}
                                         r={radius}
-                                        className={`fill-none transition-all duration-500 ${
-                                          task.status === "inprogress"
-                                            ? "stroke-purple-500"
-                                            : task.status === "review"
-                                            ? "stroke-emerald-500"
-                                            : task.status === "done"
-                                            ? "stroke-blue-500"
-                                            : "stroke-amber-500"
-                                        }`}
+                                        className={`fill-none transition-all duration-500 ${strokeColor}`}
                                         strokeWidth={strokeWidth}
                                         strokeDasharray={circumference}
                                         strokeDashoffset={strokeDashoffset}
                                         strokeLinecap="round"
                                       />
                                     </svg>
-                                    <span className="absolute text-[8px] font-mono font-bold text-white tracking-tighter">
+                                    <span className="absolute text-[10px] font-bold text-slate-900 tracking-tighter">
                                       {percentage}%
                                     </span>
                                   </div>
                                 </div>
                               </div>
                               {index < 2 && (
-                                <div className={`h-[2px] w-full bg-gradient-to-r from-transparent ${borderColor} to-transparent opacity-80`} />
+                                <div className={`h-[2px] w-full bg-gradient-to-r from-transparent ${borderColor} to-transparent opacity-40`} />
                               )}
                             </React.Fragment>
                           );
@@ -1931,7 +2278,7 @@ export default function App() {
                   {/* AI Quick Copilot card */}
                   <div className="bg-purple-600 p-6 text-white border-t border-slate-800 relative flex flex-col justify-between rounded-xl">
                     <div>
-                      <div className="text-[9px] font-semibold tracking-wide text-purple-200 mb-1">ESTARR Intelligence</div>
+                      <div className="text-[9px] font-semibold tracking-wide text-purple-200 mb-1">{translations[globalLanguage].intelligence}</div>
                       <p className="font-bold text-xs leading-tight mb-4 text-white">
                         "I've analyzed your portfolio. You are 12% away from qualifying for 'Senior Content Creator' roles in the Jobs Board."
                       </p>
@@ -1940,7 +2287,7 @@ export default function App() {
                       onClick={() => handleOpenAi("Help me close the 12% gap to qualify as a Senior Content Creator in the Jobs Board.", "general")}
                       className="flex justify-between items-center w-full bg-slate-950 hover:bg-slate-800 text-white p-2.5 border border-slate-800 transition-all cursor-pointer font-bold text-[10px] uppercase tracking-wider rounded-xl"
                     >
-                      <span>Ask AI Co-pilot</span>
+                      <span>{translations[globalLanguage].askAi}</span>
                       <span className="w-5 h-5 rounded-full bg-white text-purple-600 flex items-center justify-center font-bold">?</span>
                     </button>
                   </div>
@@ -2014,6 +2361,7 @@ export default function App() {
               onUpdateTasks={handleUpdateTasks}
               onOpenAiChat={handleOpenAi}
               onNavigate={setActiveTab}
+              campaigns={campaigns}
             />
           )}
 
@@ -2030,10 +2378,6 @@ export default function App() {
 
           {activeTab === "events" && (
             <EventsSection />
-          )}
-
-          {activeTab === "analytics" && (
-            <AnalyticsSection userProfile={userProfile} onUpdateProfile={handleUpdateProfile} />
           )}
 
           {activeTab === "portfolio" && (
@@ -2053,7 +2397,7 @@ export default function App() {
             <RewardsSection />
           )}
 
-          {activeTab === "admin" && (
+          {activeTab === "admin" && isAdmin && (
             <AdminSection
               isAdmin={isAdmin}
               setIsAdmin={setIsAdmin}

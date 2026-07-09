@@ -1,7 +1,7 @@
 import { PageBanner } from "./PageBanner";
 import React, { useState } from "react";
 import confetti from "canvas-confetti";
-import { ProjectTask, UserProfile } from "../types";
+import { ProjectTask, UserProfile, BrandCampaign } from "../types";
 import {
   Plus,
   Search,
@@ -25,7 +25,6 @@ import {
 import { motion, AnimatePresence } from "motion/react";
 import { VoiceRecorder, AudioPlayer } from "./VoiceRecorder";
 import { MessageSquare } from "lucide-react";
-import RealEstateSection from "./RealEstateSection";
 
 interface ProjectsSectionProps {
   userProfile: UserProfile;
@@ -33,12 +32,13 @@ interface ProjectsSectionProps {
   onUpdateTasks: (tasks: ProjectTask[]) => void;
   onOpenAiChat: (prompt: string, context: string) => void;
   onNavigate?: (tab: string) => void;
+  campaigns?: BrandCampaign[];
 }
 
 // Transaction Feed to show realistic escrow updates
 const initialEscrowFeed = [
-  { id: "f1", text: "Coca-Cola Nigeria deposited $250,000 into Escrow for 'Instagram Reels Campaign Video'", time: "10 mins ago", type: "deposit" },
-  { id: "f2", text: "PiggyVest Fintech released $180,000 to Chinedu Okafor's bank account", time: "1 hour ago", type: "release" },
+  { id: "f1", text: "Enterprise Corp deposited $250,000 into Escrow for 'Distributed System Migration'", time: "10 mins ago", type: "deposit" },
+  { id: "f2", text: "FinTech Next released $180,000 to Chinedu Okafor's bank account", time: "1 hour ago", type: "release" },
   { id: "f3", text: "Amo Feed Mills verified poultry vlog deliverables and released $200,000", time: "3 hours ago", type: "verify" },
   { id: "f4", text: "Secured Escrow smart contract verified by ESTARR Node", time: "5 hours ago", type: "secure" }
 ];
@@ -60,13 +60,13 @@ function parseTaskDetails(task: ProjectTask) {
     // Hardcoded fallbacks for the initial tasks
     if (task.id === "t1") {
       budget = 250000;
-      client = "Coca-Cola Nigeria";
+      client = "Enterprise Corp";
     } else if (task.id === "t2") {
       budget = 180000;
-      client = "PiggyVest Fintech";
+      client = "FinTech Next";
     } else if (task.id === "t3") {
       budget = 120000;
-      client = "Kala Bespoke Fashion";
+      client = "SecureCloud Tech";
     }
   }
 
@@ -79,8 +79,9 @@ export default function ProjectsSection({
   onUpdateTasks,
   onOpenAiChat,
   onNavigate,
+  campaigns,
 }: ProjectsSectionProps) {
-  const [activeTab, setActiveTab] = useState<"board" | "deal-builder" | "escrow-feed" | "realestate">("board");
+  const [activeTab, setActiveTab] = useState<"board" | "deal-builder" | "escrow-feed" >("board");
   
   // States for contract creation
   const [newTitle, setNewTitle] = useState("");
@@ -221,7 +222,7 @@ export default function ProjectsSection({
       ];
       let pitch = `Hey brand team! I am a Lagos-based lifestyle creator with high local engagement. I'll craft a high-retention 45s integration that naturally integrates your product. Let's create an Escrow contract to guarantee structured deliverables and swift payouts!`;
       let title = "High-Converting UGC Video Partnership";
-      let suggestedClient = "PiggyVest Fintech";
+      let suggestedClient = "FinTech Next";
 
       const query = serviceType.toLowerCase();
       if (query.includes("youtube") || query.includes("long") || query.includes("podcast") || query.includes("vlog")) {
@@ -253,7 +254,7 @@ export default function ProjectsSection({
         ];
         pitch = `Hi! I specialize in high-converting fashion styling guides on Instagram. I will showcase your premium linen garments in high-traffic areas of Lagos. Let's establish our milestones safely in Escrow!`;
         title = "Instagram Aesthetic Styling Campaign";
-        suggestedClient = "Kala Bespoke Fashion";
+        suggestedClient = "SecureCloud Tech";
       }
 
       setEstimatedDeal({
@@ -337,7 +338,7 @@ export default function ProjectsSection({
 
       <PageBanner
         title="Escrow Hub & Paid Milestones"
-        subtitle="WARNINGS & RESULTS-DRIVEN CONTRACTS"
+        subtitle="SECURE ESCROW PIPELINE"
         description={
           <div className="flex flex-col gap-3">
             <p>
@@ -394,7 +395,7 @@ export default function ProjectsSection({
         <div className="lg:col-span-4 flex flex-col gap-6">
           
           {/* Section Navigation Tabs */}
-          <div className="bg-white border border-slate-200 rounded-3xl p-2.5 shadow-sm grid grid-cols-2 gap-1.5">
+          <div className="bg-white border border-slate-200 rounded-3xl p-2.5 shadow-sm grid grid-cols-3 gap-1.5">
             <button
               onClick={() => setActiveTab("board")}
               className={`py-2 rounded-xl text-[11px] font-extrabold transition-all cursor-pointer text-center ${
@@ -404,16 +405,6 @@ export default function ProjectsSection({
               }`}
             >
               📋 Contracts Board
-            </button>
-            <button
-              onClick={() => setActiveTab("realestate")}
-              className={`py-2 rounded-xl text-[11px] font-extrabold transition-all cursor-pointer text-center ${
-                activeTab === "realestate"
-                  ? "bg-slate-900 text-white"
-                  : "text-slate-500 hover:bg-slate-50"
-              }`}
-            >
-              🏠 Real Estate
             </button>
             <button
               onClick={() => setActiveTab("deal-builder")}
@@ -524,21 +515,9 @@ export default function ProjectsSection({
               </div>
 
               <div className="flex flex-col gap-3.5">
-                {initialEscrowFeed.map((feed) => (
-                  <div key={feed.id} className="flex gap-3 items-start border-b border-slate-100 pb-3 last:border-0 last:pb-0">
-                    <div className="p-2 bg-slate-50 rounded-xl border border-slate-100 shrink-0 mt-0.5">
-                      <Lock className="w-3.5 h-3.5 text-slate-9000" />
-                    </div>
-                    <div className="flex flex-col gap-0.5">
-                      <p className="text-[11px] text-slate-700 font-semibold leading-relaxed">
-                        {feed.text}
-                      </p>
-                      <span className="text-[9px] font-mono text-slate-9000 font-medium">
-                        {feed.time}
-                      </span>
-                    </div>
-                  </div>
-                ))}
+                <div className="text-center p-6 text-slate-500 text-xs">
+                  No active escrow activities.
+                </div>
               </div>
             </div>
           )}
@@ -556,41 +535,39 @@ export default function ProjectsSection({
               </div>
 
               <div className="flex flex-col gap-3">
-                <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 flex flex-col gap-2 hover:border-purple-600 transition-colors">
-                  <div className="flex justify-between items-start">
-                    <span className="text-[10px] font-bold text-purple-500 uppercase">Zikoko Media</span>
-                    <span className="text-xs font-mono font-black text-slate-900">$150,000</span>
-                  </div>
-                  <h5 className="font-bold text-xs text-slate-800">Short-form TikTok Video Campaign</h5>
-                  <button
-                    onClick={() => {
-                      setServiceType("Craft 2x viral TikTok reels showcasing local comedy hacks");
-                      setActiveTab("deal-builder");
-                      handleEstimateDeal();
-                    }}
-                    className="w-full bg-white border border-slate-200 text-slate-700 hover:border-slate-400 py-1.5 rounded-xl text-[10px] font-bold cursor-pointer transition-colors mt-1"
+                {campaigns && campaigns.length > 0 ? campaigns.slice(0, 3).map((camp, i) => (
+                  <div
+                    key={camp.id || i}
+                    className="bg-slate-50 border border-slate-100 rounded-xl overflow-hidden flex flex-col hover:border-purple-600 transition-colors"
                   >
-                    Estimate Campaign Pricing & Milestones
-                  </button>
-                </div>
-
-                <div className="bg-slate-50 border border-slate-100 rounded-xl p-4 flex flex-col gap-2 hover:border-purple-600 transition-colors">
-                  <div className="flex justify-between items-start">
-                    <span className="text-[10px] font-bold text-purple-500 uppercase">PiggyVest (Fintech)</span>
-                    <span className="text-xs font-mono font-black text-slate-900">$250,000</span>
+                    {camp.image && (
+                      <div className="w-full h-32 overflow-hidden bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
+                        <Sparkles className="w-8 h-8 text-white/30" />
+                      </div>
+                    )}
+                    <div className="p-4 flex flex-col gap-2">
+                      <div className="flex justify-between items-start">
+                        <span className="text-[10px] font-bold text-purple-500 uppercase">{camp.brand}</span>
+                        <span className="text-xs font-mono font-black text-slate-900">${camp.budget.toLocaleString()}</span>
+                      </div>
+                      <h5 className="font-bold text-xs text-slate-800">{camp.title}</h5>
+                      <button
+                        onClick={() => {
+                          setServiceType(`Shoot organic ${camp.platform} content for ${camp.brand} showing: ${(camp.deliverables || []).join(", ")}`);
+                          setActiveTab("deal-builder");
+                          handleEstimateDeal();
+                        }}
+                        className="w-full bg-white border border-slate-200 text-slate-700 hover:border-slate-400 py-1.5 rounded-xl text-[10px] font-bold cursor-pointer transition-colors mt-1"
+                      >
+                        Estimate Campaign Pricing & Milestones
+                      </button>
+                    </div>
                   </div>
-                  <h5 className="font-bold text-xs text-slate-800">Finance Micro-influencer Promo series</h5>
-                  <button
-                    onClick={() => {
-                      setServiceType("Shoot 3x aesthetic lifestyle vlogs highlighting automated savings");
-                      setActiveTab("deal-builder");
-                      handleEstimateDeal();
-                    }}
-                    className="w-full bg-white border border-slate-200 text-slate-700 hover:border-slate-400 py-1.5 rounded-xl text-[10px] font-bold cursor-pointer transition-colors mt-1"
-                  >
-                    Estimate Campaign Pricing & Milestones
-                  </button>
-                </div>
+                )) : (
+                  <div className="text-center p-6 text-slate-500 text-xs">
+                    No active campaigns currently available.
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -611,12 +588,6 @@ export default function ProjectsSection({
 
         {/* Right Column: Escrow Contract Board & Workspaces */}
         <div className="lg:col-span-8 flex flex-col gap-6">
-          {activeTab === "realestate" ? (
-            <RealEstateSection 
-              userProfile={userProfile}
-              onOpenAiChat={onOpenAiChat}
-            />
-          ) : (
             <>
               <div className="flex justify-between items-center">
                 <h3 className="font-display font-black text-lg text-slate-900 tracking-tight">
@@ -741,14 +712,16 @@ export default function ProjectsSection({
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-2 font-display">No active projects</h3>
               <p className="text-slate-500 mb-6 max-w-sm text-sm">
-                Your escrow pipeline is currently empty. Start a new project or create a contract to begin collaborating securely.
+                Your escrow pipeline is currently empty. Create a new milestone contract to get started.
               </p>
-              <button 
-                onClick={() => setActiveTab("deal-builder")}
-                className="btn-primary text-xs flex items-center gap-2"
-              >
-                <Plus className="w-4 h-4" /> Create First Project
-              </button>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button 
+                  onClick={() => setActiveTab("deal-builder")}
+                  className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer flex items-center gap-2 justify-center"
+                >
+                  <Plus className="w-4 h-4" /> Create First Project
+                </button>
+              </div>
             </div>
           ) : (
           <div className="flex flex-col gap-4">
@@ -829,10 +802,10 @@ export default function ProjectsSection({
                       const { budget, client, cleanDesc } = parseTaskDetails(task);
                       
                       const isDueSoon = task.dueDate && task.status !== "done" ? (new Date(task.dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60) <= 48 : false;
-                      const categoryColors: Record<string, string> = {
-                        marketing: "bg-pink-50 text-pink-600 border-pink-200",
-                        dev: "bg-cyan-50 text-cyan-600 border-cyan-200",
-                        design: "bg-fuchsia-50 text-fuchsia-500 border-fuchsia-200",
+                                            const categoryColors: Record<string, string> = {
+                        infrastructure: "bg-pink-50 text-pink-600 border-pink-200",
+                        security: "bg-cyan-50 text-cyan-600 border-cyan-200",
+                        ai_ml: "bg-fuchsia-50 text-fuchsia-500 border-fuchsia-200",
                       };
                       const defaultCatColor = "bg-slate-50 text-slate-500 border-slate-200";
                       const categoryClass = task.category ? categoryColors[task.category] || defaultCatColor : "";
@@ -1027,7 +1000,6 @@ export default function ProjectsSection({
           </div>
           )}
           </>
-          )}
         </div>
       </div>
     </div>

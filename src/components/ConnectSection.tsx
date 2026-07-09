@@ -56,23 +56,23 @@ const mockPeers: (UserProfile & { id: string })[] = [
     id: "peer-fatima",
     name: "Fatima Bello",
     email: "fatima.b@example.com",
-    profession: "Commercial Catering Specialist",
-    bio: "Passionate about traditional African gourmet delicacies and high-volume corporate event catering.",
+    profession: "Software Architect",
+    bio: "Passionate about scalable system design and high-volume microservices architecture.",
     location: "Ikeja, Lagos",
     avatar:
       "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150",
-    formalSkills: ["Culinary Arts", "Food Safety Certification"],
-    creatorSkills: ["Baking", "Menu Design", "WhatsApp Selling", "Event Planning"],
+    formalSkills: ["Computer Science", "Cloud Architecture Certification"],
+    creatorSkills: ["React", "Node.js", "System Design", "Tech Blogging"],
     skills: [
-      "Baking",
-      "Menu Design",
-      "Food Safety",
-      "WhatsApp Selling",
-      "Event Planning",
+      "Microservices",
+      "System Design",
+      "React",
+      "Node.js",
+      "Tech Blogging",
     ],
-    interests: ["Catering", "Small Business"],
-    goals: ["Open a physical restaurant in Lagos", "Learn pastry techniques"],
-    certifications: ["Academy: Professional Catering 101"],
+    interests: ["Software Architecture", "Open Source"],
+    goals: ["Build a scalable distributed system", "Publish a tech book"],
+    certifications: ["AWS Certified Solutions Architect"],
     recommends: 16,
     birthdate: "1995-07-06",
   },
@@ -80,22 +80,22 @@ const mockPeers: (UserProfile & { id: string })[] = [
     id: "peer-kofi",
     name: "Kofi Mensah",
     email: "kofi.m@example.com",
-    profession: "Poultry Farming Consultant",
-    bio: "Agropreneur helping youths start and run profitable high-yield broiler systems across West Africa.",
+    profession: "Cloud DevOps Engineer",
+    bio: "Infrastructure expert helping startups build resilient CI/CD pipelines across hybrid clouds.",
     location: "Accra, Ghana",
     avatar:
       "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150",
-    formalSkills: ["Agric Science", "Farm Biosecurity"],
-    creatorSkills: ["Poultry Management", "Broiler Feeds", "Vegetable Farming", "Farm Vlogging"],
+    formalSkills: ["Computer Engineering", "Kubernetes Administration"],
+    creatorSkills: ["Docker", "Terraform", "CI/CD", "Tech Vlogging"],
     skills: [
-      "Poultry Management",
-      "Broiler Feeds",
-      "Farm Biosecurity",
-      "Vegetable Farming",
+      "Kubernetes",
+      "Docker",
+      "Terraform",
+      "CI/CD",
     ],
-    interests: ["Agriculture", "Logistics"],
-    goals: ["Expand organic feed sales", "Establish solar coops"],
-    certifications: ["W.A. Agricultural Union Fellow"],
+    interests: ["DevOps", "Infrastructure as Code"],
+    goals: ["Open source a deployment tool", "Achieve 99.999% uptime"],
+    certifications: ["Certified Kubernetes Administrator"],
     recommends: 29,
     birthdate: "1993-07-08",
   },
@@ -103,25 +103,25 @@ const mockPeers: (UserProfile & { id: string })[] = [
     id: "peer-aisha",
     name: "Aisha Yusuf",
     email: "aisha.y@example.com",
-    profession: "Ankara Fashion Stylist",
-    bio: "Creative lead blending traditional patterns with modern silhouettes. Custom apparel and training academy.",
+    profession: "AI Researcher",
+    bio: "Machine learning specialist focused on generative AI models and natural language processing.",
     location: "Surulere, Lagos",
     avatar:
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150",
-    formalSkills: ["Fashion Design Certification", "Textile Science"],
-    creatorSkills: ["Tailoring", "Pattern Drafting Basics", "Fabric Sourcing", "Instagram Styling"],
+    formalSkills: ["Data Science Certification", "Machine Learning"],
+    creatorSkills: ["Python", "PyTorch", "LLM Tuning", "AI Research"],
     skills: [
-      "Taking Body Measurements",
-      "Pattern Drafting Basics",
-      "Tailoring",
-      "Fabric Sourcing",
+      "Python",
+      "PyTorch",
+      "LLM Tuning",
+      "Natural Language Processing",
     ],
-    interests: ["Fashion Design", "Business Registration"],
+    interests: ["Artificial Intelligence", "Deep Learning"],
     goals: [
-      "Launch international wholesale catalog",
-      "Hire 5 apprentice tailors",
+      "Publish a paper on LLM optimization",
+      "Build a generalized AI agent",
     ],
-    certifications: ["Fashion Guild Masterclass Level 2"],
+    certifications: ["Google AI Specialist"],
     recommends: 18,
     birthdate: "1997-07-15",
   },
@@ -145,6 +145,9 @@ export default function ConnectSection({
   onUpdateProfile,
   initialSubTab,
 }: ConnectSectionProps) {
+  const [isSettingUpProfile, setIsSettingUpProfile] = useState(!userProfile.hasSetupConnectProfile);
+  const [setupBio, setSetupBio] = useState(userProfile.bio || "");
+  const [setupProfession, setSetupProfession] = useState(userProfile.profession || "");
   const [activeTab, setActiveTab] = useState<
     "feed" | "directory" | "mentorship" | "companion"
   >(initialSubTab || "feed");
@@ -676,6 +679,76 @@ export default function ConnectSection({
     setCommentInputs({ ...commentInputs, [postId]: "" });
   };
 
+  // Toast state
+  const [toast, setToast] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
+  const showToast = (message: string, type: "success" | "error" | "info" = "success") => {
+    setToast({ message, type });
+    setTimeout(() => {
+      setToast(prev => prev?.message === message ? null : prev);
+    }, 4000);
+  };
+
+  const handleConnectPeer = async (peer: UserProfile & { id: string }) => {
+    const currentStatus = connectionsList.find(c => c.peerId === peer.id)?.status;
+    if (currentStatus === "pending") {
+      showToast(`Connection request to ${peer.name} is already pending!`, "info");
+      return;
+    }
+    if (currentStatus === "connected") {
+      showToast(`You are already connected with ${peer.name}!`, "info");
+      return;
+    }
+
+    try {
+      const newConn = {
+        id: `conn-${Date.now()}-${peer.id}`,
+        peerId: peer.id,
+        status: "pending" as const
+      };
+      await saveCollectionItem("connections", newConn);
+      setConnectionsList(prev => [...prev, newConn]);
+      showToast(`Connection request sent to ${peer.name} successfully!`, "success");
+    } catch (err) {
+      console.error("Failed to connect peer:", err);
+      showToast("Failed to initiate connection. Please try again.", "error");
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!chatMessageInput.trim() || !chatPeer) return;
+    const textToSend = chatMessageInput.trim();
+    setChatMessageInput("");
+
+    const newMsg = {
+      id: `msg-${Date.now()}`,
+      sender: "me",
+      recipient: chatPeer.name,
+      text: textToSend,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+
+    try {
+      await saveCollectionItem("peer_messages", newMsg);
+      setPeerMessages(prev => [...prev, newMsg]);
+
+      // Trigger automatic high-quality response simulation
+      setTimeout(async () => {
+        const replyMsg = {
+          id: `msg-${Date.now() + 1}`,
+          sender: chatPeer.name,
+          recipient: "me",
+          text: `Hey there! Thank you for reaching out to me on ESTARR. I've received your message and will review it shortly. Let's build something amazing together!`,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+        await saveCollectionItem("peer_messages", replyMsg);
+        setPeerMessages(prev => [...prev, replyMsg]);
+      }, 1500);
+    } catch (err) {
+      console.error("Failed to send message:", err);
+      showToast("Could not send message. Please try again.", "error");
+    }
+  };
+
   // Profile recommendation
   const handleRecommendPeer = async (peer: UserProfile & { id: string }) => {
     try {
@@ -689,10 +762,67 @@ export default function ConnectSection({
         ...prev,
         [peer.name]: updatedPeer.recommends
       }));
+      showToast(`You successfully endorsed ${peer.name} for their outstanding skills!`, "success");
     } catch (err) {
       console.error("Failed to save recommendation to Firestore:", err);
+      showToast("Could not save endorsement. Please try again.", "error");
     }
   };
+
+  if (isSettingUpProfile) {
+    return (
+      <div id="connect-section" className="flex flex-col gap-6">
+        <PageBanner
+          title="ESTARR Professional Hub Setup"
+          subtitle="CONNECT & COLLABORATE"
+          description="Grow your professional presence by completing your profile."
+          icon={Users}
+        />
+        <div className="bg-white border border-slate-200 rounded-3xl p-8 max-w-xl mx-auto w-full shadow-sm">
+          <div className="flex items-center gap-4 mb-8 pb-6 border-b border-slate-100">
+            <div className="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center">
+              <UserCheck className="w-8 h-8 text-purple-600" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-display font-bold text-slate-900 leading-tight">Welcome to the Hub</h2>
+              <p className="text-sm text-slate-500 mt-1">Let's set up your connect profile first.</p>
+            </div>
+          </div>
+          <form onSubmit={async (e) => {
+             e.preventDefault();
+             await onUpdateProfile({ ...userProfile, bio: setupBio, profession: setupProfession, hasSetupConnectProfile: true });
+             setIsSettingUpProfile(false);
+          }} className="flex flex-col gap-5">
+             <div className="flex flex-col gap-2">
+                <label className="text-xs font-bold text-slate-900 uppercase tracking-wider">Professional Title</label>
+                <input 
+                  type="text"
+                  className="border border-slate-200 rounded-xl p-3 focus:outline-none focus:border-purple-500 text-sm bg-slate-50 focus:bg-white transition-colors"
+                  placeholder="e.g. Content Creator & Strategist"
+                  value={setupProfession}
+                  onChange={(e) => setSetupProfession(e.target.value)}
+                  required
+                />
+             </div>
+             <div className="flex flex-col gap-2">
+                <label className="text-xs font-bold text-slate-900 uppercase tracking-wider">Short Bio</label>
+                <textarea 
+                  className="border border-slate-200 rounded-xl p-3 focus:outline-none focus:border-purple-500 text-sm bg-slate-50 focus:bg-white transition-colors"
+                  rows={4} 
+                  placeholder="Tell us about your professional background and what you are looking to achieve..."
+                  value={setupBio}
+                  onChange={(e) => setSetupBio(e.target.value)}
+                  required
+                />
+             </div>
+             <button type="submit" className="bg-purple-600 text-white font-bold py-3.5 rounded-xl hover:bg-purple-700 transition-colors mt-4 flex items-center justify-center gap-2">
+               Complete Setup <Check className="w-4 h-4" />
+             </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div id="connect-section" className="flex flex-col gap-6">
@@ -748,7 +878,7 @@ export default function ConnectSection({
                 <div>
                   <span className="text-[9px] font-bold uppercase text-slate-400 tracking-widest block mb-1">Formal Skills (skill-sch.com)</span>
                   <div className="flex flex-wrap gap-1">
-                    {userProfile.formalSkills.map((skill, sIdx) => (
+                    {userProfile.formalSkills?.map((skill, sIdx) => (
                       <span key={sIdx} className="text-[10px] bg-blue-50 text-blue-700 border border-blue-100 px-2 py-0.5 rounded-full flex items-center gap-1">
                         <ShieldCheck className="w-3 h-3 text-emerald-500 shrink-0" />
                         {skill}
@@ -761,7 +891,7 @@ export default function ConnectSection({
                 <div>
                   <span className="text-[9px] font-bold uppercase text-slate-400 tracking-widest block mb-1">Creator Skills (ESTARR)</span>
                   <div className="flex flex-wrap gap-1">
-                    {userProfile.creatorSkills.map((skill, sIdx) => (
+                    {userProfile.creatorSkills?.map((skill, sIdx) => (
                       <span key={sIdx} className="text-[10px] bg-purple-50 text-purple-700 border border-purple-100 px-2 py-0.5 rounded-full">
                         {skill}
                       </span>
@@ -2064,11 +2194,12 @@ export default function ConnectSection({
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {mockPeers.map((peer, i) => {
+                {peersList.map((peer, i) => {
                   const currentRecCount =
                     peerRecommends[peer.name] !== undefined
                       ? peerRecommends[peer.name]
                       : peer.recommends;
+                  const connStatus = connectionsList.find(c => c.peerId === peer.id)?.status;
                   return (
                     <div
                       key={i}
@@ -2100,10 +2231,20 @@ export default function ConnectSection({
                             Available for Hire
                           </span>
                           <button
-                            onClick={() => alert(`Direct connection request sent to ${peer.name} for a potential gig.`)}
-                            className="text-[10px] bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-lg font-bold transition-colors shadow-sm"
+                            onClick={() => handleConnectPeer(peer)}
+                            className={`text-[10px] px-3 py-1.5 rounded-lg font-bold transition-all shadow-sm ${
+                              connStatus === "pending"
+                                ? "bg-slate-100 text-slate-500 border border-slate-200 cursor-not-allowed"
+                                : connStatus === "connected"
+                                ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                                : "bg-purple-600 hover:bg-purple-700 text-white cursor-pointer"
+                            }`}
                           >
-                            Quick Connect
+                            {connStatus === "pending"
+                              ? "Pending"
+                              : connStatus === "connected"
+                              ? "Connected"
+                              : "Quick Connect"}
                           </button>
                         </div>
                       </div>
@@ -2145,7 +2286,10 @@ export default function ConnectSection({
                         </span>
                         <div className="flex gap-3">
                           <button
-                            onClick={() => alert(`Direct message initiated with ${peer.name}.`)}
+                            onClick={() => {
+                              setChatPeer(peer);
+                              showToast(`Private chat opened with ${peer.name}.`, "info");
+                            }}
                             className="text-purple-600 hover:text-purple-700 font-semibold flex items-center gap-1 cursor-pointer"
                           >
                             <MessageSquare className="w-4 h-4" /> Message
@@ -2274,7 +2418,7 @@ export default function ConnectSection({
                     </motion.div>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {mockPeers.map((peer, i) => (
+                      {peersList.map((peer, i) => (
                         <div
                           key={i}
                           className="border border-slate-100 rounded-xl p-5 flex flex-col justify-between gap-4 hover:border-emerald-300 transition-all"
@@ -2811,6 +2955,138 @@ export default function ConnectSection({
           </div>
         </div>
       )}
+
+      {/* Dynamic Professional Toast Notifications */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            className="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-slate-900 text-white px-5 py-4 rounded-2xl shadow-2xl border border-slate-800 max-w-sm"
+          >
+            <div className={`w-2 h-2 rounded-full shrink-0 ${
+              toast.type === "success" ? "bg-emerald-400 animate-pulse" :
+              toast.type === "error" ? "bg-rose-400" : "bg-blue-400"
+            }`} />
+            <p className="text-xs font-medium leading-relaxed">{toast.message}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Real-time Private Messaging Panel */}
+      <AnimatePresence>
+        {chatPeer && (
+          <div className="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-xs flex justify-end">
+            {/* Backdrop click to close */}
+            <div className="absolute inset-0 -z-10" onClick={() => setChatPeer(null)} />
+            
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="bg-white w-full max-w-md h-full flex flex-col shadow-2xl border-l border-slate-100"
+            >
+              {/* Chat Header */}
+              <div className="p-5 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    <img
+                      src={chatPeer.avatar}
+                      alt={chatPeer.name}
+                      className="w-10 h-10 rounded-full object-cover border border-purple-100"
+                    />
+                    <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-white animate-pulse" />
+                  </div>
+                  <div>
+                    <h4 className="font-display font-black text-sm text-slate-800 leading-tight">
+                      {chatPeer.name}
+                    </h4>
+                    <p className="text-[10px] text-emerald-600 font-bold uppercase tracking-wide">
+                      {chatPeer.profession}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setChatPeer(null)}
+                  className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-all"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Chat Messages */}
+              <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-slate-50/50">
+                <div className="text-center">
+                  <span className="text-[10px] bg-slate-100 text-slate-500 px-3 py-1 rounded-full font-mono">
+                    ESTARR Encrypted Handshake Established
+                  </span>
+                </div>
+                
+                {peerMessages
+                  .filter(
+                    (msg) =>
+                      (msg.sender === "me" && msg.recipient === chatPeer.name) ||
+                      (msg.sender === chatPeer.name && msg.recipient === "me")
+                  )
+                  .map((msg, idx) => {
+                    const isMe = msg.sender === "me";
+                    return (
+                      <div
+                        key={idx}
+                        className={`flex ${isMe ? "justify-end" : "justify-start"}`}
+                      >
+                        <div
+                          className={`max-w-[80%] rounded-2xl px-4 py-3 text-xs shadow-xs ${
+                            isMe
+                              ? "bg-purple-600 text-white rounded-br-none"
+                              : "bg-white text-slate-800 border border-slate-100 rounded-bl-none"
+                          }`}
+                        >
+                          <p className="leading-relaxed">{msg.text}</p>
+                          <span
+                            className={`text-[9px] block text-right mt-1 font-mono opacity-60 ${
+                              isMe ? "text-purple-200" : "text-slate-400"
+                            }`}
+                          >
+                            {msg.timestamp}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+
+              {/* Chat Input */}
+              <div className="p-4 border-t border-slate-100 bg-white">
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSendMessage();
+                  }}
+                  className="flex gap-2"
+                >
+                  <input
+                    type="text"
+                    value={chatMessageInput}
+                    onChange={(e) => setChatMessageInput(e.target.value)}
+                    placeholder={`Message ${chatPeer.name.split(" ")[0]}...`}
+                    className="flex-1 bg-slate-50 border border-slate-200 text-xs px-4 py-3 rounded-xl focus:outline-none focus:border-purple-500 focus:bg-white transition-all text-slate-800"
+                  />
+                  <button
+                    type="submit"
+                    disabled={!chatMessageInput.trim()}
+                    className="bg-purple-600 hover:bg-purple-700 disabled:opacity-40 text-white w-10 h-10 rounded-xl flex items-center justify-center transition-all shadow-md shrink-0 cursor-pointer"
+                  >
+                    <Send className="w-4 h-4" />
+                  </button>
+                </form>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

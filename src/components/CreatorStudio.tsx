@@ -18,7 +18,8 @@ import {
   CheckCircle2,
   AlertCircle,
   Sparkles,
-  Zap
+  Zap,
+  Tv
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { UserProfile, Course } from "../types";
@@ -328,12 +329,16 @@ export const CreatorStudio: React.FC<CreatorStudioProps> = ({
                   exit={{ opacity: 0, scale: 0.9 }}
                   className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm group hover:border-emerald-200 transition-all"
                 >
-                  <div className="relative h-48 bg-slate-900 overflow-hidden">
-                    <img 
-                      src={item.thumbnail || item.url} 
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
-                      alt={item.title}
-                    />
+                  <div className={`relative h-48 flex items-center justify-center bg-gradient-to-br ${
+                    item.type === "video" ? "from-indigo-600 to-purple-700" :
+                    item.type === "slide" ? "from-cyan-600 to-blue-700" :
+                    "from-emerald-600 to-teal-700"
+                  } overflow-hidden`}>
+                    <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center backdrop-blur-md">
+                      {item.type === "video" && <Video className="w-8 h-8 text-white/80" />}
+                      {item.type === "slide" && <FileText className="w-8 h-8 text-white/80" />}
+                      {item.type === "photo" && <ImageIcon className="w-8 h-8 text-white/80" />}
+                    </div>
                     <div className="absolute top-3 left-3 flex gap-2">
                       <span className={`px-2 py-1 rounded-lg text-[9px] font-black uppercase ${
                         item.type === "video" ? "bg-red-500 text-white" :
@@ -549,7 +554,16 @@ export const CreatorStudio: React.FC<CreatorStudioProps> = ({
                 <div className="space-y-4">
                   {courses.filter(c => c.instructorName === userProfile.name).map(course => (
                     <div key={course.id} className="flex gap-4 p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                      <img src={course.image} className="w-16 h-16 rounded-xl object-cover" />
+                      <div className={`w-16 h-16 rounded-xl shrink-0 flex items-center justify-center bg-gradient-to-br ${
+                        course.category === "AI & ML" ? "from-indigo-600 to-purple-700" :
+                        course.category === "Web3" ? "from-amber-500 to-orange-600" :
+                        course.category === "Cloud DevOps" ? "from-cyan-600 to-blue-700" :
+                        "from-slate-700 to-slate-800"
+                      }`}>
+                        {course.category === "AI & ML" && <Sparkles className="w-6 h-6 text-white/80" />}
+                        {course.category === "Cloud DevOps" && <Tv className="w-6 h-6 text-white/80" />}
+                        {!["AI & ML", "Cloud DevOps"].includes(course.category) && <Zap className="w-6 h-6 text-white/80" />}
+                      </div>
                       <div>
                         <span className="text-[10px] font-black text-emerald-600 uppercase">{course.category}</span>
                         <h5 className="text-sm font-black text-slate-900">{course.title}</h5>
