@@ -8,7 +8,6 @@ ESTARR is a comprehensive platform for managing apprenticeships, gigs, and profe
 - **Video Content**: Upload and manage video mini-vlogs (Powered by AWS).
 
 ## Setup Guides
-- [OAuth Setup Guide](./OAUTH_SETUP_GUIDE.md): Instructions for GitHub and LinkedIn integration.
 - [Mobile & AWS Guide](./AWS_AND_MOBILE_GUIDE.md): Deep dive into Mobile app development and AWS Infrastructure.
 
 ---
