@@ -13,6 +13,9 @@ import { initializeApp, getApps, getApp, cert } from "firebase-admin/app";
 import { getAuth, type Auth } from "firebase-admin/auth";
 
 dotenv.config();
+// Fallback: on Hostinger the git deploy wipes untracked files in the app root,
+// so production secrets live one level up (domains/estarrapp.com/.env).
+dotenv.config({ path: path.resolve(process.cwd(), "../.env") });
 
 const app = express();
 const PORT = 3000;
