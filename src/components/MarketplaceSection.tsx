@@ -125,7 +125,7 @@ export default function MarketplaceSection({
       <PageBanner
         title="Brand Campaigns"
         subtitle="EXCLUSIVE SPONSORSHIPS"
-        description="Browse curated, high-budget brand campaigns. Once approved, your project automatically moves into our secure Escrow Pipeline to guarantee your payout."
+        description="Browse curated, high-budget brand campaigns. Once approved, your consultancy engagement automatically moves into our secure Escrow Pipeline to guarantee your payout."
         icon={ShoppingCart}
         actions={
           <div className="flex gap-3">
@@ -262,7 +262,7 @@ export default function MarketplaceSection({
         </div>
         <div className="flex-1 flex flex-col gap-2">
           <h4 className="font-display font-bold text-sm text-white">
-            Looking for a specific supplier, raw material, or trade asset?
+            Looking for a specific supplier, service, or talent asset?
           </h4>
           <p className="text-xs text-slate-400 leading-relaxed">
             ESTARR AI can suggest local wholesale hubs, estimate bulk pricing,

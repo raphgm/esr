@@ -9,37 +9,14 @@ import axios from "axios";
 import cookieParser from "cookie-parser";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { initializeApp, getApps, getApp, cert } from "firebase-admin/app";
-import { getAuth, type Auth } from "firebase-admin/auth";
 
 dotenv.config();
-// Fallback: on Hostinger the git deploy wipes untracked files in the app root,
-// so production secrets live one level up (domains/estarrapp.com/.env).
-dotenv.config({ path: path.resolve(process.cwd(), "../.env") });
 
 const app = express();
 const PORT = 3000;
 
 app.use(express.json());
 app.use(cookieParser());
-
-// Initialize Firebase Admin lazily so the server doesn't crash on boot if the
-// service account isn't configured yet (only needed for LinkedIn custom-token sign-in).
-let adminAuth: Auth | null = null;
-function getAdminAuth(): Auth {
-  if (!adminAuth) {
-    const raw = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
-    if (!raw) {
-      throw new Error("FIREBASE_SERVICE_ACCOUNT_KEY environment variable is not set.");
-    }
-    const serviceAccount = JSON.parse(raw);
-    const appInstance = getApps().length
-      ? getApp()
-      : initializeApp({ credential: cert(serviceAccount) });
-    adminAuth = getAuth(appInstance);
-  }
-  return adminAuth;
-}
 
 // Initialize Gemini SDK lazily to avoid crashing on boot if key is missing in dev
 let aiClient: GoogleGenAI | null = null;
@@ -578,41 +555,15 @@ app.get("/auth/linkedin/callback", async (req, res) => {
 
     const userData = userResponse.data;
 
-    // Firebase has no native LinkedIn provider, so mint a custom token for a
-    // Firebase Auth user tied to this LinkedIn identity (namespaced by "sub").
-    const uid = `linkedin_${userData.sub}`;
-    const fbAuth = getAdminAuth();
-    try {
-      await fbAuth.updateUser(uid, {
-        email: userData.email,
-        emailVerified: !!userData.email_verified,
-        displayName: userData.name,
-        photoURL: userData.picture,
-      });
-    } catch (err: any) {
-      if (err.code === "auth/user-not-found") {
-        await fbAuth.createUser({
-          uid,
-          email: userData.email,
-          emailVerified: !!userData.email_verified,
-          displayName: userData.name,
-          photoURL: userData.picture,
-        });
-      } else {
-        throw err;
-      }
-    }
-    const customToken = await fbAuth.createCustomToken(uid, { provider: "linkedin" });
-
     res.send(`
       <html>
         <body>
           <script>
             if (window.opener) {
-              window.opener.postMessage({
-                type: 'OAUTH_AUTH_SUCCESS',
-                provider: 'linkedin',
-                customToken: ${JSON.stringify(customToken)},
+              window.opener.postMessage({ 
+                type: 'OAUTH_AUTH_SUCCESS', 
+                provider: 'linkedin', 
+                token: '${access_token}',
                 user: ${JSON.stringify(userData)}
               }, '*');
               window.close();

@@ -61,9 +61,9 @@ const mockPeers: (UserProfile & { id: string })[] = [
     location: "Ikeja, Lagos",
     avatar:
       "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150",
-    formalSkills: ["Computer Science", "Cloud Architecture Certification"],
-    creatorSkills: ["React", "Node.js", "System Design", "Tech Blogging"],
     skills: [
+      "Computer Science",
+      "AI Architecture Credential",
       "Microservices",
       "System Design",
       "React",
@@ -85,17 +85,18 @@ const mockPeers: (UserProfile & { id: string })[] = [
     location: "Accra, Ghana",
     avatar:
       "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150",
-    formalSkills: ["Computer Engineering", "Kubernetes Administration"],
-    creatorSkills: ["Docker", "Terraform", "CI/CD", "Tech Vlogging"],
     skills: [
-      "Kubernetes",
+      "Computer Engineering",
+      "Kubernetes Administration",
       "Docker",
       "Terraform",
       "CI/CD",
+      "Tech Vlogging",
+      "Kubernetes",
     ],
     interests: ["DevOps", "Infrastructure as Code"],
     goals: ["Open source a deployment tool", "Achieve 99.999% uptime"],
-    certifications: ["Certified Kubernetes Administrator"],
+    certifications: ["Certified Kubernetes Administration"],
     recommends: 29,
     birthdate: "1993-07-08",
   },
@@ -108,12 +109,13 @@ const mockPeers: (UserProfile & { id: string })[] = [
     location: "Surulere, Lagos",
     avatar:
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150",
-    formalSkills: ["Data Science Certification", "Machine Learning"],
-    creatorSkills: ["Python", "PyTorch", "LLM Tuning", "AI Research"],
     skills: [
+      "Data Science AI Credential",
+      "Machine Learning",
       "Python",
       "PyTorch",
       "LLM Tuning",
+      "AI Research",
       "Natural Language Processing",
     ],
     interests: ["Artificial Intelligence", "Deep Learning"],
@@ -217,7 +219,7 @@ export default function ConnectSection({
     "software-architect": {
       name: "Software Architect",
       skills: ["Advanced React Architecture", "Distributed Systems", "Off-chain State Channels", "Vite & Build Tooling"],
-      certification: "skill-sch.com: Certified Software Architect (2026)"
+      certification: "skill-sch.com: Certified AI Architect (2026)"
     },
     "smart-contract-developer": {
       name: "Smart Contract Developer",
@@ -232,7 +234,7 @@ export default function ConnectSection({
     "digital-marketing": {
       name: "Digital Marketing Specialist",
       skills: ["TikTok Ads & Campaigns", "Instagram Outreach Metrics", "Canva Styling", "UGC Asset Production"],
-      certification: "skill-sch.com: Certified E-commerce Marketer (2026)"
+      certification: "skill-sch.com: Certified AI Marketer (2026)"
     }
   };
 
@@ -256,8 +258,8 @@ export default function ConnectSection({
           const profileData = skillSchProfiles[selectedProfile as keyof typeof skillSchProfiles];
           
           // Merge unique skills
-          const currentFormal = userProfile.formalSkills || [];
-          const updatedFormal = Array.from(new Set([...currentFormal, ...profileData.skills]));
+          const currentSkills = userProfile.skills || [];
+          const updatedSkills = Array.from(new Set([...currentSkills, ...profileData.skills]));
           
           // Merge unique certifications
           const currentCerts = userProfile.certifications || [];
@@ -265,7 +267,7 @@ export default function ConnectSection({
 
           onUpdateProfile({
             ...userProfile,
-            formalSkills: updatedFormal,
+            skills: updatedSkills,
             certifications: updatedCerts
           });
 
@@ -320,15 +322,15 @@ export default function ConnectSection({
           const importedName = linkedinUser.name || "LinkedIn User";
           const importedAvatar = linkedinUser.picture;
 
-          const currentFormal = userProfile.formalSkills || [];
-          const updatedFormal = Array.from(new Set([...currentFormal, "LinkedIn Certified Professional"]));
+          const currentSkills = userProfile.skills || [];
+          const updatedSkills = Array.from(new Set([...currentSkills, "LinkedIn Certified Professional"]));
           
           const currentCerts = userProfile.certifications || [];
           const updatedCerts = Array.from(new Set([...currentCerts, `LinkedIn Verified: ${importedName}`]));
 
           onUpdateProfile({
             ...userProfile,
-            formalSkills: updatedFormal,
+            skills: updatedSkills,
             certifications: updatedCerts,
             avatar: importedAvatar || userProfile.avatar
           });
@@ -866,7 +868,7 @@ export default function ConnectSection({
               </div>
               <div>
                 <span className="block font-mono font-bold text-lg text-slate-700">
-                  {(userProfile.formalSkills?.length || 0) + (userProfile.creatorSkills?.length || 0)}
+                  {userProfile.skills?.length || 0}
                 </span>
                 <span className="text-[10px] text-slate-9000 uppercase tracking-wider">
                   Skills
@@ -874,25 +876,13 @@ export default function ConnectSection({
               </div>
             </div>
             <div className="w-full pt-4 mt-2 border-t border-slate-100 flex flex-col gap-3 text-left">
-              {userProfile.formalSkills && userProfile.formalSkills.length > 0 && (
+              {userProfile.skills && userProfile.skills.length > 0 && (
                 <div>
-                  <span className="text-[9px] font-bold uppercase text-slate-400 tracking-widest block mb-1">Formal Skills (skill-sch.com)</span>
+                  <span className="text-[9px] font-bold uppercase text-slate-400 tracking-widest block mb-1">Verified Skills & Expertise</span>
                   <div className="flex flex-wrap gap-1">
-                    {userProfile.formalSkills?.map((skill, sIdx) => (
-                      <span key={sIdx} className="text-[10px] bg-blue-50 text-blue-700 border border-blue-100 px-2 py-0.5 rounded-full flex items-center gap-1">
+                    {userProfile.skills?.map((skill, sIdx) => (
+                      <span key={sIdx} className="text-[10px] bg-purple-50 text-purple-700 border border-purple-100 px-2 py-0.5 rounded-full flex items-center gap-1">
                         <ShieldCheck className="w-3 h-3 text-emerald-500 shrink-0" />
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {userProfile.creatorSkills && userProfile.creatorSkills.length > 0 && (
-                <div>
-                  <span className="text-[9px] font-bold uppercase text-slate-400 tracking-widest block mb-1">Creator Skills (ESTARR)</span>
-                  <div className="flex flex-wrap gap-1">
-                    {userProfile.creatorSkills?.map((skill, sIdx) => (
-                      <span key={sIdx} className="text-[10px] bg-purple-50 text-purple-700 border border-purple-100 px-2 py-0.5 rounded-full">
                         {skill}
                       </span>
                     ))}
@@ -1324,8 +1314,8 @@ export default function ConnectSection({
                     ) : (
                       <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-slate-900">
                         <Video className="w-12 h-12 text-slate-700 mb-4 animate-pulse" />
-                        <h4 className="font-bold text-sm text-slate-300 mb-1">No Trade Videos Yet</h4>
-                        <p className="text-xs text-slate-500 mb-4 leading-relaxed">Be the first to record a tutorial or upload a trade video to the ESTARR community!</p>
+                        <h4 className="font-bold text-sm text-slate-300 mb-1">No Talent Showcases Yet</h4>
+                        <p className="text-xs text-slate-500 mb-4 leading-relaxed">Be the first to record a tutorial or upload a talent showcase to the ESTARR community!</p>
                         <button
                           type="button"
                           onClick={() => {
@@ -1591,7 +1581,7 @@ export default function ConnectSection({
                     ESTARR Birthday Board & Support Network
                   </h3>
                   <p className="text-xs text-slate-500">
-                    Support your peers as they grow their trades. Each reaction and comment builds stronger vocational community ties!
+                    Support your peers as they grow their skills. Each reaction and comment builds stronger vocational community ties!
                   </p>
                 </div>
 
@@ -1744,7 +1734,7 @@ export default function ConnectSection({
                   <textarea
                     value={newPostContent}
                     onChange={(e) => setNewPostContent(e.target.value)}
-                    placeholder={`Share a video, post a milestone, ask a question, or talk trades, ${userProfile.name.split(" ")[0]}...`}
+                    placeholder={`Share a video, post a milestone, ask a question, or talk talent, ${userProfile.name.split(" ")[0]}...`}
                     className="w-full resize-none border-none text-slate-700 placeholder-slate-400 text-sm focus:outline-none min-h-[80px]"
                   />
                 </div>
@@ -2254,23 +2244,11 @@ export default function ConnectSection({
                       </p>
 
                       <div className="flex flex-col gap-2">
-                        {peer.formalSkills && peer.formalSkills.length > 0 && (
+                        {peer.skills && peer.skills.length > 0 && (
                           <div>
-                            <span className="text-[9px] font-bold uppercase text-slate-400 tracking-widest block mb-1">Formal Skills (skill-sch.com)</span>
+                            <span className="text-[9px] font-bold uppercase text-slate-400 tracking-widest block mb-1">Verified Skills & Expertise</span>
                             <div className="flex flex-wrap gap-1">
-                              {peer.formalSkills.map((skill, sIdx) => (
-                                <span key={sIdx} className="text-[10px] bg-blue-50 text-blue-700 border border-blue-100 px-2 py-0.5 rounded-full">
-                                  {skill}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                        {peer.creatorSkills && peer.creatorSkills.length > 0 && (
-                          <div>
-                            <span className="text-[9px] font-bold uppercase text-slate-400 tracking-widest block mb-1">Creator Skills (ESTARR)</span>
-                            <div className="flex flex-wrap gap-1">
-                              {peer.creatorSkills.map((skill, sIdx) => (
+                              {peer.skills.map((skill, sIdx) => (
                                 <span key={sIdx} className="text-[10px] bg-purple-50 text-purple-700 border border-purple-100 px-2 py-0.5 rounded-full">
                                   {skill}
                                 </span>
@@ -2383,7 +2361,7 @@ export default function ConnectSection({
                             How this mentor can guide you:
                           </p>
                           <ul className="list-disc pl-4 space-y-1">
-                            <li>Review your practical project submissions.</li>
+                            <li>Review your practical consultancy submissions.</li>
                             <li>
                               Suggest local business structures and licenses.
                             </li>
@@ -2462,7 +2440,7 @@ export default function ConnectSection({
                     Become a ESTARR Pioneer Mentor
                   </h4>
                   <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
-                    Have you successfully built a small business or trade? Join
+                    Have you successfully built a small business or talent? Join
                     our volunteer group to mentor peers. Your contributions will
                     reward you with exclusive badges and high ranking on our
                     peer directory.
@@ -2514,7 +2492,7 @@ export default function ConnectSection({
             {/* Content Body */}
             <div className="p-6 flex-1 overflow-y-auto flex flex-col gap-4">
               <p className="text-xs text-slate-9000">
-                Showcase your trade, craft, products, or practical tips in real-time! Record a video up to <span className="text-emerald-400 font-bold">30 seconds</span> and share it directly onto the community feed.
+                Showcase your talent, craft, products, or practical tips in real-time! Record a video up to <span className="text-emerald-400 font-bold">30 seconds</span> and share it directly onto the community feed.
               </p>
 
               {/* Video Player Display Container */}
@@ -2588,11 +2566,11 @@ export default function ConnectSection({
 
               {/* Guidance Tips */}
               <div className="bg-slate-950 border border-slate-800 rounded-xl p-4 flex flex-col gap-1.5 text-xs text-slate-300">
-                <span className="font-bold text-emerald-400 flex items-center gap-1">💡 Tips for a Great Trade Video:</span>
+                <span className="font-bold text-emerald-400 flex items-center gap-1">💡 Tips for a Great Talent Showcase:</span>
                 <ul className="list-disc pl-4 space-y-0.5 text-slate-9000 text-[11px]">
                   <li>Position yourself in a well-lit, quiet area.</li>
                   <li>Speak clearly and demonstrate your tools, materials, or products in action!</li>
-                  <li>Mention your name, trade, and location to connect with local buyers or partners.</li>
+                  <li>Mention your name, talent, and location to connect with local buyers or partners.</li>
                 </ul>
               </div>
             </div>

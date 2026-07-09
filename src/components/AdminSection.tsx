@@ -38,10 +38,10 @@ export function AdminSection({
 }: AdminSectionProps) {
   // Mock users in database
   const [dbUsers, setDbUsers] = useState([
-    { id: "u1", name: "Chinedu Okafor", email: "chinedu@estarrapp.com", role: "Administrator", accountType: "freelancer", status: "Active" },
-    { id: "u2", name: "Aisha Yusuf", email: "aisha.y@estarrapp.com", role: "User", accountType: "freelancer", status: "Active" },
-    { id: "u3", name: "Emeka Obi", email: "emeka.obi@estarrapp.com", role: "User", accountType: "jobOwner", status: "Active" },
-    { id: "u4", name: "Fatima Bello", email: "fatima@estarrapp.com", role: "User", accountType: "freelancer", status: "Pending Verification" }
+    { id: "u1", name: "Chinedu Okafor", email: "chinedu@estarrapp.com", role: "User", accountType: "Freelancer", status: "Active" },
+    { id: "u2", name: "Aisha Yusuf", email: "aisha.y@estarrapp.com", role: "User", accountType: "Freelancer", status: "Active" },
+    { id: "u3", name: "Emeka Obi", email: "emeka.obi@estarrapp.com", role: "User", accountType: "Client", status: "Active" },
+    { id: "u4", name: "Fatima Bello", email: "fatima@estarrapp.com", role: "User", accountType: "Freelancer", status: "Pending Verification" }
   ]);
 
   // Mock pending verifications
@@ -67,26 +67,9 @@ export function AdminSection({
   });
 
   const handleRoleToggle = (userId: string) => {
-    setDbUsers(prev =>
-      prev.map(u => {
-        if (u.id === userId) {
-          const newRole = u.role === "Administrator" ? "User" : "Administrator";
-          // If toggling active user (Chinedu Okafor)
-          if (u.email === userProfile.email) {
-            setIsAdmin(newRole === "Administrator");
-          }
-          return { ...u, role: newRole };
-        }
-        return u;
-      })
-    );
-
-    // Add log
-    const targetUser = dbUsers.find(u => u.id === userId);
-    if (targetUser) {
-      const newRole = targetUser.role === "Administrator" ? "User" : "Administrator";
-      addLog("info", `Role for ${targetUser.name} toggled to ${newRole}`);
-    }
+    // Only authorized system admins can promote others in a real app
+    // For this simulation, we disable promoting others via the UI to respect strict admin rules
+    addLog("warning", "Manual role modification is locked for security. Admin privileges are email-bound.");
   };
 
   const handleApproveVerification = (id: string, name: string) => {
@@ -131,37 +114,39 @@ export function AdminSection({
   return (
     <div className="flex flex-col gap-6 md:gap-8 animate-fade-in pb-12">
       {/* Dynamic Heading */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-5">
-        <div>
-          <div className="logo-blocky !bg-purple-600 !text-white px-2.5 py-1 text-[10px] font-bold tracking-widest inline-flex items-center gap-1.5 rounded-md mb-2 uppercase">
-            <Settings className="w-3.5 h-3.5 animate-spin" style={{ animationDuration: "10s" }} /> System Administration
-          </div>
-          <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight text-slate-950 font-display">
+      <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 border-b border-slate-200 pb-8">
+        <div className="flex-1">
+          <h1 className="text-4xl md:text-5xl font-black tracking-tighter text-slate-950 font-display uppercase mb-2">
+            System Administration
+          </h1>
+          <h3 className="text-lg font-bold text-purple-600 uppercase tracking-widest mb-3">
             Ecosystem Admin Portal
-          </h2>
-          <p className="text-xs text-slate-500 font-medium mt-1">
-            Configure global variables, manage secure trade-craft verifications, and audit ledger pipelines.
+          </h3>
+          <p className="text-sm text-slate-500 font-medium max-w-2xl leading-relaxed">
+            Configure global variables, manage secure talent verifications, and audit ledger pipelines.
           </p>
         </div>
 
         {/* Global Access Status Card */}
-        <div className={`p-4 rounded-xl border flex items-center justify-between gap-6 transition-all duration-350 min-w-[280px] ${
-          isAdmin 
-            ? "bg-emerald-50 border-emerald-200 shadow-md shadow-emerald-500/5" 
-            : "bg-rose-50 border-rose-200 shadow-md shadow-rose-500/5"
-        }`}>
-          <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center border transition-colors ${
+        <div className="flex flex-col gap-3">
+          <div className={`p-5 rounded-2xl border-2 flex items-center gap-4 transition-all duration-350 min-w-[280px] ${
+            isAdmin 
+              ? "bg-slate-950 border-slate-900 shadow-xl" 
+              : "bg-rose-50 border-rose-200 shadow-sm"
+          }`}>
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center border-2 transition-colors ${
               isAdmin 
-                ? "bg-emerald-100 border-emerald-300 text-emerald-600 animate-pulse" 
+                ? "bg-purple-600/10 border-purple-500/30 text-purple-400 animate-pulse" 
                 : "bg-rose-100 border-rose-300 text-rose-600"
             }`}>
-              {isAdmin ? <ShieldCheck className="w-6 h-6" /> : <ShieldAlert className="w-6 h-6" />}
+              {isAdmin ? <ShieldCheck className="w-7 h-7" /> : <ShieldAlert className="w-7 h-7" />}
             </div>
             <div>
-              <p className="text-[10px] font-mono font-black uppercase text-slate-400 tracking-wider">SECURE SESSION</p>
-              <h4 className={`text-sm font-bold uppercase ${isAdmin ? "text-emerald-800" : "text-rose-800"}`}>
-                {isAdmin ? "Admin Authorized" : "Standard User"}
+              <p className={`text-[10px] font-mono font-black uppercase tracking-[0.2em] mb-1 ${
+                isAdmin ? "text-purple-400" : "text-rose-400"
+              }`}>SECURE SESSION</p>
+              <h4 className={`text-sm font-black uppercase tracking-widest ${isAdmin ? "text-white" : "text-rose-800"}`}>
+                {isAdmin ? "Admin Authorized" : "Access Restricted"}
               </h4>
             </div>
           </div>
@@ -171,21 +156,24 @@ export function AdminSection({
       {/* Grid of Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: "Active Escrows", value: stats.activeEscrows, desc: "Multichain trade contracts", icon: Layers, color: "text-purple-600 bg-purple-100/50 border-purple-200" },
-          { label: "Ledger Volume", value: stats.escrowVolume, desc: "Total secured funds", icon: Database, color: "text-indigo-600 bg-indigo-100/50 border-indigo-200" },
-          { label: "Sys Node Status", value: stats.systemNodeStatus, desc: "Off-chain latency", icon: Activity, color: "text-emerald-600 bg-emerald-100/50 border-emerald-200" },
-          { label: "API Ping Latency", value: stats.apiLatency, desc: "Antigravity core engine", icon: Sparkles, color: "text-amber-600 bg-amber-100/50 border-amber-200" }
+          { label: "Active Escrows", value: "1240", desc: "Multichain talent contracts", icon: Layers, color: "text-purple-600 bg-purple-100/50 border-purple-200" },
+          { label: "Ledger Volume", value: "$34,150,000", desc: "Total secured funds", icon: Database, color: "text-indigo-600 bg-indigo-100/50 border-indigo-200" },
+          { label: "Sys Node Status", value: "Healthy (Lagos-01)", desc: "Off-chain latency", icon: Activity, color: "text-emerald-600 bg-emerald-100/50 border-emerald-200" },
+          { label: "API Ping Latency", value: "14ms", desc: "Antigravity core engine", icon: Sparkles, color: "text-amber-600 bg-amber-100/50 border-amber-200" }
         ].map((item, idx) => {
           const Icon = item.icon;
           return (
-            <div key={idx} className="bg-white border border-slate-200/90 rounded-xl p-4 flex items-center justify-between shadow-xs">
-              <div>
-                <p className="text-[10px] font-mono font-bold uppercase text-slate-400 tracking-wider">{item.label}</p>
-                <h3 className="text-xl font-extrabold tracking-tight text-slate-900 mt-1">{item.value}</h3>
-                <p className="text-[10px] text-slate-500 font-medium mt-0.5">{item.desc}</p>
+            <div key={idx} className="bg-white border-2 border-slate-200 rounded-2xl p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-all group">
+              <div className="flex items-center justify-between mb-4">
+                <div className={`w-12 h-12 rounded-xl border flex items-center justify-center shrink-0 ${item.color}`}>
+                  <Icon className="w-6 h-6" />
+                </div>
+                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               </div>
-              <div className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 ${item.color}`}>
-                <Icon className="w-5 h-5" />
+              <div>
+                <p className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] mb-1">{item.label}</p>
+                <h3 className="text-2xl font-black tracking-tighter text-slate-900">{item.value}</h3>
+                <p className="text-[10px] text-slate-500 font-bold mt-1 uppercase tracking-tight">{item.desc}</p>
               </div>
             </div>
           );
@@ -345,7 +333,7 @@ export function AdminSection({
                       </td>
                       <td className="px-4 py-4">
                         <span className="font-mono text-[9px] font-bold uppercase px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-650">
-                          {user.accountType === "freelancer" ? "Freelancer" : "Job Owner"}
+                          {user.accountType}
                         </span>
                       </td>
                       <td className="px-4 py-4">
@@ -368,14 +356,13 @@ export function AdminSection({
                       <td className="px-5 py-4 text-right">
                         <button
                           type="button"
-                          onClick={() => handleRoleToggle(user.id)}
-                          className={`text-[9px] font-mono font-black uppercase tracking-wider px-2 py-1 border rounded-lg transition-colors cursor-pointer ${
+                          className={`text-[9px] font-mono font-black uppercase tracking-wider px-2 py-1 border rounded-lg opacity-50 cursor-not-allowed ${
                             user.role === "Administrator"
-                              ? "bg-slate-100 border-slate-300 text-slate-600 hover:bg-slate-200"
-                              : "bg-purple-600 border-purple-600 text-white hover:bg-purple-700"
+                              ? "bg-slate-100 border-slate-300 text-slate-600"
+                              : "bg-purple-600 border-purple-600 text-white"
                           }`}
                         >
-                          {user.role === "Administrator" ? "Demote" : "Promote Admin"}
+                          {user.role === "Administrator" ? "Demoted" : "Role Locked"}
                         </button>
                       </td>
                     </tr>

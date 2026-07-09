@@ -8,15 +8,13 @@ export interface PortfolioItem {
 }
 
 export interface UserProfile {
-  accountType?: "freelancer" | "jobOwner" | "creator" | "academyLearner";
+  accountType?: "freelancer" | "jobOwner";
   name: string;
   email: string;
   profession: string;
   bio: string;
   location: string;
   avatar: string;
-  formalSkills: string[];
-  creatorSkills: string[];
   skills: string[];
   interests: string[];
   goals: string[];
@@ -102,11 +100,12 @@ export interface BrandCampaign {
   platform: "TikTok" | "Instagram" | "YouTube" | "UGC" | "Twitter";
   deliverables: string[];
   image?: string;
+  color?: string;
   applicationsCount: number;
   createdDate: string;
 }
 
-export interface ProjectTask {
+export interface ConsultancyTask {
   id: string;
   category?: "marketing" | "dev" | "design" | string;
   title: string;
@@ -115,6 +114,7 @@ export interface ProjectTask {
   priority: "High" | "Medium" | "Low";
   assignee: string;
   dueDate: string;
+  amount?: number;
   userId?: string;
   comments?: { id: string; author: string; text: string; audioUrl?: string; audioDuration?: number; time: string }[];
 }
@@ -189,3 +189,45 @@ export interface DjinniPitch {
   createdAt: string;
 }
 
+
+export interface Survey {
+  id: string;
+  title: string;
+  description: string;
+  type: "survey" | "poll";
+  questions: { id: string; question: string; options?: string[]; type: "single" | "multiple" | "text" }[];
+  responsesCount: number;
+  createdAt: string;
+  creatorId: string;
+}
+
+export interface AIModel {
+  id: string;
+  name: string;
+  type: string;
+  status: "Training" | "Deployed" | "Evaluating" | "Failed";
+  accuracy: string;
+  latency: string;
+  cost: string;
+  createdAt: string;
+}
+
+export interface ValidationTask {
+  id: string;
+  title: string;
+  prompt: string;
+  type: "RLHF" | "Safety" | "Bias";
+  responses: { text: string; id: string }[];
+  status: "Pending" | "Completed";
+  points: number;
+}
+
+export interface Dataset {
+  id: string;
+  name: string;
+  type: string;
+  size: string;
+  items: string;
+  status: "Ready" | "Annotating" | "Processing";
+  createdAt: string;
+}

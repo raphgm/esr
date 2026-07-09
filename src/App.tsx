@@ -3,7 +3,8 @@ import { VettingProtocolModal } from './components/VettingProtocolModal';
 
 import { motion } from "motion/react";
 import confetti from "canvas-confetti";
-import { UserProfile, Course, Product, BrandCampaign, ProjectTask, Job, ActivityPost, CommunityChannel } from "./types";
+import { UserProfile, Course, Product, BrandCampaign, ConsultancyTask, Job, 
+ActivityPost, CommunityChannel } from "./types";
 import {
   initialProfile,
   initialPosts,
@@ -14,14 +15,14 @@ import {
   initialChannels
 } from "./mockData";
 import { auth, getUserProfile, saveUserProfile, getCollectionData, saveCollectionItem, deleteCollectionItem } from "./lib/firebase";
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as firebaseSignOut, onAuthStateChanged, GithubAuthProvider, signInWithCredential, signInWithCustomToken } from "firebase/auth";
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as firebaseSignOut, onAuthStateChanged } from "firebase/auth";
 
 // Components
 import ConnectSection from "./components/ConnectSection";
-import AcademySection from "./components/AcademySection";
+import { AILabSection } from "./components/AILabSection";
 import PortfolioSection from "./components/PortfolioSection";
 import MarketplaceSection from "./components/MarketplaceSection";
-import ProjectsSection from "./components/ProjectsSection";
+import ConsultancySection from "./components/ConsultancySection";
 import GigsSection from "./components/GigsSection";
 import PaymentsSection from "./components/PaymentsSection";
 import EventsSection from "./components/EventsSection";
@@ -38,6 +39,7 @@ import { RewardsSection } from "./components/RewardsSection";
 import { NotificationsDrawer } from "./components/NotificationsDrawer";
 import { BackgroundDoodles } from "./components/BackgroundDoodles";
 import { AdminSection } from "./components/AdminSection";
+import { UserDashboard } from "./components/UserDashboard";
 
 // Icons
 import {
@@ -66,7 +68,6 @@ import {
   CreditCard,
   Calendar,
   LineChart,
-  Building,
   ChevronDown,
   ChevronUp,
   ChevronRight,
@@ -79,15 +80,15 @@ import {
   Github,
   HelpCircle,
   LogOut,
-  Globe} from "lucide-react";
+  Globe,
+  Cpu,
+  
+  Target, Activity, BrainCircuit
+} from "lucide-react";
 
-const initialTasks: ProjectTask[] = [];
+const initialTasks: ConsultancyTask[] = [];
 
-const homeDemoTasks: ProjectTask[] = [
-  { id: "t1", title: "Distributed System Migration", desc: "$250,000 || Enterprise Corp || Architect and deploy a scalable microservices infrastructure with high availability.", status: "inprogress", priority: "High", assignee: "Enterprise Corp", dueDate: "2026-07-12", category: "infrastructure" },
-  { id: "t2", title: "AI Agent Orchestration Pipeline", desc: "$180,000 || FinTech Next || Develop and integrate a fleet of autonomous agents for predictive financial modeling.", status: "todo", priority: "Medium", assignee: "FinTech Next", dueDate: "2026-07-15", category: "ai_ml" },
-  { id: "t3", title: "Cloud Native Security Audit", desc: "$120,000 || SecureCloud Tech || Perform comprehensive security audit and implement zero-trust architecture for enterprise cloud.", status: "review", priority: "High", assignee: "SecureCloud Tech", dueDate: "2026-07-09", category: "security" }
-];
+const homeDemoTasks: ConsultancyTask[] = [];
 
 const currencySymbols: Record<string, string> = {
   USD: "$",
@@ -110,68 +111,66 @@ const currencyRates: Record<string, number> = {
 const translations = {
   EN: {
     heroTitle: "ESTARR",
-    heroSubtitle: "Empowering Creators & Pros",
-    activeEscrow: "Enterprise Smart Contracts",
-    secure: "Secure",
-    allInOne: "All-in-one digital ecosystem",
+    heroSubtitle: "Top 3% Talent Pool",
+    allInOne: "Elite Talent & AI Ecosystem",
     askAi: "ASK AI CO-PILOT",
     intelligence: "ESTARR Intelligence",
     configureProfile: "Configure Profile",
-    noActiveProjects: "No active projects",
-    seedDemo: "Seed Demo Contracts",
-    createFirst: "Create First Project"
+    noActiveConsultancy: "No active consultancy",
+    seedDemo: "Seed Demo Infrastructure",
+    createFirst: "Start First Consultancy"
   },
   ES: {
     heroTitle: "ESTARR",
-    heroSubtitle: "Empoderando a Creadores y Pros",
+    heroSubtitle: "Hub de Comercio para Creadores y Pros de TI",
     activeEscrow: "Canal de Escrow Activo",
     secure: "Seguro",
-    allInOne: "Ecosistema digital todo en uno",
+    allInOne: "Protección de Escrow y Ecosistema de Talento IA",
     askAi: "PREGUNTAR AL CO-PILOTO IA",
     intelligence: "Inteligencia ESTARR",
     configureProfile: "Configurar Perfil",
-    noActiveProjects: "Sin proyectos activos",
+    noActiveConsultancy: "Sin consultoría activa",
     seedDemo: "Sembrar Contratos de Demostración",
-    createFirst: "Crear Primer Proyecto"
+    createFirst: "Iniciar Primera Consultoría"
   },
   FR: {
     heroTitle: "ESTARR",
-    heroSubtitle: "Autonomiser les Créateurs & Pros",
+    heroSubtitle: "Hub de Commerce pour Créateurs & Pros de l'IT",
     activeEscrow: "Pipeline d'Escrow Actif",
     secure: "Sécurisé",
-    allInOne: "Écosystème numérique tout-en-un",
+    allInOne: "Protection d'Escrow & Écosystème de Talent IA",
     askAi: "DEMANDER AU CO-PILOTE IA",
     intelligence: "Intelligence ESTARR",
     configureProfile: "Configurer le Profil",
-    noActiveProjects: "Aucun projet actif",
+    noActiveConsultancy: "Aucune consultation active",
     seedDemo: "Générer les Contrats Démo",
-    createFirst: "Créer le Premier Projet"
+    createFirst: "Lancer la Première Consultation"
   },
   SW: {
     heroTitle: "ESTARR",
-    heroSubtitle: "Kuwezesha Wabunifu na Wataalamu",
+    heroSubtitle: "Kitovu cha Biashara cha IT Pro na Muumba",
     activeEscrow: "Mfumo Amilifu wa Escrow",
     secure: "Salama",
-    allInOne: "Ekolojia ya kidijitali ya yote kwa moja",
+    allInOne: "Ulinzi wa Escrow na Ekolojia ya Talent ya AI",
     askAi: "ULIZA MSAIDIZI WA AI",
     intelligence: "Akili ya ESTARR",
     configureProfile: "Sanidi Wasifu",
-    noActiveProjects: "Hakuna miradi amilifu",
+    noActiveConsultancy: "Hakuna ushauri amilifu",
     seedDemo: "Weka Mikataba ya Demo",
-    createFirst: "Unda Mradi wa Kwanza"
+    createFirst: "Anza Ushauri wa Kwanza"
   },
   HI: {
     heroTitle: "ESTARR",
-    heroSubtitle: "क्रिएटर्स और प्रोफेशनल्स को सशक्त बनाना",
+    heroSubtitle: "आईटी प्रो और क्रिएटर ट्रेड हब",
     activeEscrow: "सक्रिय एस्क्रो पाइपलाइन",
     secure: "सुरक्षित",
-    allInOne: "ऑल-इन-वन डिजिटल इकोसिस्टम",
+    allInOne: "एस्क्रो सुरक्षा और एआई टैलेंट इकोसिस्टम",
     askAi: "एआई को-पायलट से पूछें",
     intelligence: "ESTARR इंटेलिजेंस",
     configureProfile: "प्रोफ़ाइल कॉन्फ़िगर करें",
-    noActiveProjects: "कोई सक्रिय परियोजना नहीं",
+    noActiveConsultancy: "कोई सक्रिय परियोजना नहीं",
     seedDemo: "डेमो अनुबंध लोड करें",
-    createFirst: "पहली परियोजना बनाएं"
+    createFirst: "पहली परामर्श सेवा शुरू करें"
   }
 };
 
@@ -186,7 +185,7 @@ export default function App() {
   const [authPassword, setAuthPassword] = useState("password123");
   const [authName, setAuthName] = useState("Chinedu Okafor");
   const [authBirthdate, setAuthBirthdate] = useState("");
-  const [authAccountType, setAuthAccountType] = useState<"freelancer" | "jobOwner" | "creator" | "academyLearner">("freelancer");
+  const [authAccountType, setAuthAccountType] = useState<"freelancer" | "jobOwner">("freelancer");
   const [authConfirmPassword, setAuthConfirmPassword] = useState("");
   const [applyingAs, setApplyingAs] = useState("Developer");
   const [authError, setAuthError] = useState<string | null>(null);
@@ -197,6 +196,8 @@ export default function App() {
   const [globalCurrency, setGlobalCurrency] = useState<"USD" | "EUR" | "GBP" | "NGN" | "KES" | "INR">("USD");
   const [globalLanguage, setGlobalLanguage] = useState<"EN" | "ES" | "FR" | "SW" | "HI">("EN");
   const [isGlobalDropdownOpen, setIsGlobalDropdownOpen] = useState(false);
+
+  const [isConsultancyDropdownOpen, setIsConsultancyDropdownOpen] = useState(false);
 
   const formatCurrency = (val: string | number) => {
     let num = 150000;
@@ -226,8 +227,12 @@ export default function App() {
 
   // Router State
   const [activeTab, setActiveTab] = useState<
-    "home" | "connect" | "academy" | "marketplace" | "projects" | "gigs" | "community" | "mobile" | "teams" | "careers" | "about" | "how-it-works" | "payments" | "events" | "admin" | "portfolio"
-  >("home");
+    "home" | "connect" | "ai-lab" | "marketplace" | "consultancy" | "gigs" | "community" | "mobile" | "teams" | "careers" | "about" | "how-it-works" | "payments" | "events" | "admin" | "portfolio"
+  >(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("survey")) return "ai-lab";
+    return "home";
+  });
 
   const heroVideoRef = useRef<HTMLVideoElement>(null);
 
@@ -248,7 +253,7 @@ export default function App() {
 
   const [collapsedNavSections, setCollapsedNavSections] = useState<Record<string, boolean>>({
     "Core Hub & Insights": false,
-    "Escrow & Professional Trade": false,
+    "Escrow & Professional Talent": false,
     "Network & Social": false,
     "Fintech & App Utilities": false,
     "Admin Controls": false,
@@ -304,11 +309,12 @@ export default function App() {
 
   // Core App states
   const [userProfile, setUserProfile] = useState<UserProfile>(initialProfile);
-  const [posts, setPosts] = useState<ActivityPost[]>(initialPosts);
+  const [posts, setPosts] = useState<
+ActivityPost[]>(initialPosts);
   const [courses, setCourses] = useState<Course[]>(initialCourses);
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [campaigns, setCampaigns] = useState<BrandCampaign[]>(initialCampaigns);
-  const [tasks, setTasks] = useState<ProjectTask[]>(initialTasks);
+  const [tasks, setTasks] = useState<ConsultancyTask[]>(initialTasks);
   const [jobs, setJobs] = useState<Job[]>(initialJobs);
   const [channels, setChannels] = useState<CommunityChannel[]>(initialChannels);
 
@@ -370,44 +376,44 @@ export default function App() {
 
   React.useEffect(() => {
     const handleMessage = async (event: MessageEvent) => {
+      // Validate origin if possible, but '*' is used in server res.send
       if (event.data?.type === "OAUTH_AUTH_SUCCESS") {
-        const { provider, token, customToken } = event.data;
-
-        try {
-          if (provider === "github" && token) {
-            // Establishes a real Firebase Auth session from the GitHub access token.
-            // Requires GitHub to be enabled as a Sign-in provider in the Firebase console.
-            const credential = GithubAuthProvider.credential(token);
-            await signInWithCredential(auth, credential);
-          } else if (provider === "linkedin" && customToken) {
-            // Firebase has no native LinkedIn provider, so the server mints a custom token.
-            await signInWithCustomToken(auth, customToken);
-          } else {
-            throw new Error(`Missing credentials for ${provider} sign-in.`);
-          }
-
-          // onAuthStateChanged (below) picks up the new session, loads the Firestore
-          // profile, and sets isAuthenticated/isAdmin — nothing more to do here.
+        const { provider, user: oauthUser } = event.data;
+        
+        if (provider === "linkedin" || provider === "github") {
+          // For this environment, we simulate authentication by updating local state
+          // and optionally saving a placeholder profile if needed.
+          const email = oauthUser?.email || `${provider}_user@estarrapp.com`;
+          const name = oauthUser?.name || oauthUser?.login || "OAuth User";
+          
+          const updatedProfile = {
+            ...userProfile,
+            name: name,
+            email: email,
+            avatar: oauthUser?.picture || oauthUser?.avatar_url || userProfile.avatar,
+            profession: `${provider === "linkedin" ? "LinkedIn" : "GitHub"} Verified Professional`,
+            accountType: "freelancer" as const
+          };
+          
+                    setUserProfile(updatedProfile);
+          setIsAuthenticated(true);
           setShowAuthModal(false);
           if (authAccountType === "freelancer" && authMode === "signup") {
             setShowVettingModal(true);
           }
+          setIsAuthLoading(false);
+          
           confetti({
             particleCount: 150,
             spread: 70,
             origin: { y: 0.6 }
           });
-        } catch (err) {
-          console.error(`${provider} sign-in failed:`, err);
-          setAuthError(`${provider === "github" ? "GitHub" : "LinkedIn"} sign-in failed. Please try again.`);
-        } finally {
-          setIsAuthLoading(false);
         }
       }
     };
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, [authAccountType, authMode]);
+  }, [userProfile]);
 
   // Firestore Syncing Wrappers
   const handleUpdateProfile = async (updatedProfile: UserProfile) => {
@@ -417,7 +423,8 @@ export default function App() {
     }
   };
 
-  const handleUpdatePosts = async (updatedPosts: ActivityPost[]) => {
+  const handleUpdatePosts = async (updatedPosts: 
+ActivityPost[]) => {
     setPosts(updatedPosts);
     // Sync added/updated items
     const currentMap = new Map(posts.map(item => [item.id, item]));
@@ -467,7 +474,7 @@ export default function App() {
     }
   };
 
-  const handleUpdateTasks = async (updatedTasks: ProjectTask[]) => {
+  const handleUpdateTasks = async (updatedTasks: ConsultancyTask[]) => {
     const currentUser = auth.currentUser;
     const userEmail = currentUser?.email?.toLowerCase().trim();
     const isNewUser = currentUser && userEmail !== "chinedu@estarrapp.com";
@@ -528,7 +535,7 @@ export default function App() {
 
   const cycleTaskStatus = (e: React.MouseEvent, taskId: string, currentStatus: string) => {
     e.stopPropagation();
-    const statusFlow: Record<string, ProjectTask["status"]> = {
+    const statusFlow: Record<string, ConsultancyTask["status"]> = {
       todo: "inprogress",
       inprogress: "review",
       review: "done",
@@ -580,7 +587,14 @@ export default function App() {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         // Fetch custom user profile from Firestore or load fallback profile
-        const profile = await getUserProfile(user.uid, user.email || undefined, user.displayName || undefined);
+        let profile = await getUserProfile(user.uid, user.email || undefined, user.displayName || undefined);
+        
+        // Fix: Reset wallet balance to 0 for accounts that got the old default balance
+        if (profile.walletBalance === 842500) {
+          profile = { ...profile, walletBalance: 0, history: [] };
+          await saveUserProfile(user.uid, profile);
+        }
+        
         setUserProfile(profile);
         setIsAuthenticated(true);
         
@@ -594,7 +608,8 @@ export default function App() {
 
         // Load collaborative lists from Firestore
         try {
-          const fetchedPosts = await getCollectionData<ActivityPost>("posts", initialPosts);
+          const fetchedPosts = await getCollectionData<
+ActivityPost>("posts", initialPosts);
           setPosts(fetchedPosts);
 
                     const fetchedCourses = await getCollectionData<Course>("courses", initialCourses);
@@ -616,7 +631,7 @@ export default function App() {
           });
           setCampaigns(validCampaigns);
 
-          const fetchedTasks = await getCollectionData<ProjectTask>("tasks", []);
+          const fetchedTasks = await getCollectionData<ConsultancyTask>("tasks", []);
           
           // Cleanup mock tasks
           const mockTaskTitles = ["Distributed System Migration", "AI Agent Orchestration Pipeline", "Cloud Native Security Audit", "TikTok Meme Ad", "Instagram Reels", "UGC Styling"];
@@ -654,6 +669,7 @@ export default function App() {
 
   // ESTARR AI Drawer State
   const [isAiOpen, setIsAiOpen] = useState(false);
+  const [showAiFloat, setShowAiFloat] = useState(true);
   const [aiPrompt, setAiPrompt] = useState("");
   const [aiContext, setAiContext] = useState("general");
 
@@ -707,12 +723,14 @@ export default function App() {
               const userCredential = await createUserWithEmailAndPassword(auth, authEmail, authPassword);
               const user = userCredential.user;
               await saveUserProfile(user.uid, {
-                name: authName || authEmail.split("@")[0],
-                email: authEmail,
-                birthdate: authBirthdate || "1998-07-06",
-                accountType: authAccountType,
-                profession: authAccountType === "creator" ? "Creator" : authAccountType === "academyLearner" ? "Certified Creator" : authAccountType === "freelancer" ? (applyingAs ? `${applyingAs} Specialist` : "Professional Freelancer") : (selectedRoleType ? `Hiring: ${selectedRoleType}` : "Job Provider / Owner"),
-              });
+            name: authName || authEmail.split("@")[0],
+            email: authEmail,
+            birthdate: authBirthdate || "1998-07-06",
+            accountType: authAccountType,
+            profession: authAccountType === "freelancer" ? (applyingAs ? `${applyingAs} Specialist` : "Professional Freelancer") : (selectedRoleType ? `Hiring: ${selectedRoleType}` : "Job Provider / Client"),
+            walletBalance: 0,
+            history: [],
+          });
               // Send signup welcome email
               try {
                 fetch("/api/send-welcome", {
@@ -746,7 +764,9 @@ export default function App() {
             email: authEmail,
             birthdate: authBirthdate || "1998-07-06",
             accountType: authAccountType,
-            profession: authAccountType === "creator" ? "Creator" : authAccountType === "academyLearner" ? "Certified Creator" : authAccountType === "freelancer" ? (applyingAs ? `${applyingAs} Specialist` : "Professional Freelancer") : (selectedRoleType ? `Hiring: ${selectedRoleType}` : "Job Provider / Owner"),
+            profession: authAccountType === "freelancer" ? (applyingAs ? `${applyingAs} Specialist` : "Professional Freelancer") : (selectedRoleType ? `Hiring: ${selectedRoleType}` : "Job Provider / Client"),
+            walletBalance: 0,
+            history: [],
           });
           // Send signup welcome email
           try {
@@ -807,7 +827,48 @@ export default function App() {
     }
   };
 
-  const isSidebarHidden = false;
+  const [isSidebarHidden, setIsSidebarHidden] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const navSections = [
+    {
+      title: "Intelligence & Insights Hub",
+      items: [
+        { id: "home", label: "Home", desc: "Digital ecosystem overview", icon: Home },
+        { id: "ai-lab", label: "ESTARR AI Lab", desc: "Train, Validate & Evaluate Models", icon: BrainCircuit },
+        { id: "portfolio", label: "Talent Portfolios", desc: "Showcase skills & consultancy", icon: Briefcase },
+      ]
+    },
+    {
+      title: "Gig Market & Escrow Services",
+      items: [
+        { id: "gigs", label: "AI Gig Builder", desc: "Draft & list your services", icon: Sparkles },
+        { id: "careers", label: "Jobs Board", desc: "Full-time & remote roles", icon: Compass },
+        { id: "marketplace", label: "Brand Campaigns", desc: "Exclusive high-ticket sponsorships", icon: ShoppingCart },
+      ]
+    },
+    {
+      title: "Network & Social Ecosystem",
+      items: [
+        { id: "connect", label: "Peer Connect", desc: "Professional network & peers", icon: Users },
+        { id: "community", label: "Creator Community", desc: "Cohorts & discussion boards", icon: Heart },
+        { id: "events", label: "Live Events", desc: "Masterclasses & ticketing", icon: Calendar },
+      ]
+    },
+    {
+      title: "Wallet & Rewards Utility",
+      items: [
+        { id: "payments", label: "Digital Wallet", desc: "Transfers & distributions", icon: CreditCard },
+        { id: "rewards", label: "Ambassadors", desc: "Earn Points & Rewards", icon: Gift }
+      ]
+    },
+    ...(isAdmin ? [{
+      title: "Admin Controls",
+      items: [
+        { id: "admin", label: "Admin Dashboard", desc: "System settings & metrics", icon: ShieldCheck }
+      ]
+    }] : [])
+  ];
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans antialiased selection:bg-purple-600 selection:text-white relative overflow-hidden">
@@ -932,29 +993,7 @@ export default function App() {
                           : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"
                       }`}
                     >
-                      Owner
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setAuthAccountType("creator")}
-                      className={`flex-1 py-1.5 px-3 rounded-full border text-xs font-bold tracking-tight transition-all cursor-pointer ${
-                        authAccountType === "creator"
-                          ? "bg-purple-50 border-purple-500 text-purple-600 shadow-xs"
-                          : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"
-                      }`}
-                    >
-                      Creator
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setAuthAccountType("academyLearner")}
-                      className={`flex-1 py-1.5 px-3 rounded-full border text-xs font-bold tracking-tight transition-all cursor-pointer ${
-                        authAccountType === "academyLearner"
-                          ? "bg-purple-50 border-purple-500 text-purple-600 shadow-xs"
-                          : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"
-                      }`}
-                    >
-                      Learner
+                            Client
                     </button>
                   </div>
                 </div>
@@ -994,9 +1033,9 @@ export default function App() {
                       icon: <LineChart className="w-5 h-5 text-emerald-500" />
                     },
                     {
-                      id: "Project Manager",
-                      title: "Project Manager",
-                      desc: "Digital Project Manager, IT Project Manager, Scrum Master, Agile Coach...",
+                      id: "Consultancy Manager",
+                      title: "Consultancy Manager",
+                      desc: "Digital Consultancy Manager, IT Consultancy Manager, Scrum Master, Agile Coach...",
                       icon: <Briefcase className="w-5 h-5 text-amber-500" />
                     }
                   ].map((option) => (
@@ -1057,7 +1096,7 @@ export default function App() {
                     </svg>
                     <div>
                       <h1 className="font-display font-black text-lg tracking-tight text-slate-900 leading-none">ESTARR</h1>
-                      <p className="text-[10px] text-purple-600 font-bold tracking-wide mt-0.5">Talent Network</p>
+                      <p className="text-[10px] text-purple-600 font-bold tracking-wide mt-0.5">Talent Networks</p>
                     </div>
                   </div>
 
@@ -1114,7 +1153,7 @@ export default function App() {
                             }}
                             className="flex-1 py-1.5 px-2 rounded-full border text-[10px] font-bold tracking-tight transition-all bg-white border-slate-200 text-slate-500 hover:border-slate-300 cursor-pointer"
                           >
-                            Owner
+                            Client
                           </button>
                         </div>
                       </div>
@@ -1132,7 +1171,7 @@ export default function App() {
                           <option value="Developer">Developer</option>
                           <option value="Designer">Designer</option>
                           <option value="Marketing Expert">Marketing Expert</option>
-                          <option value="Project Manager">Project Manager</option>
+                          <option value="Consultancy Manager">Consultancy Manager</option>
                           <option value="Product Manager">Product Manager</option>
                         </select>
                       </div>
@@ -1244,37 +1283,21 @@ export default function App() {
                     Work with top companies
                   </h4>
                   
-                  <div className="flex flex-col gap-6 items-center md:items-start opacity-65">
+                  <div className="flex flex-col gap-8 items-center md:items-start">
                     {/* Microsoft Logo */}
-                    <div className="flex items-center gap-2 text-slate-800">
-                      <div className="grid grid-cols-2 gap-0.5 w-4 h-4">
-                        <div className="bg-[#F25022] w-1.5 h-1.5"></div>
-                        <div className="bg-[#7FBA00] w-1.5 h-1.5"></div>
-                        <div className="bg-[#00A4EF] w-1.5 h-1.5"></div>
-                        <div className="bg-[#FFB900] w-1.5 h-1.5"></div>
-                      </div>
-                      <span className="font-sans font-semibold tracking-tight text-sm text-slate-700">Microsoft</span>
-                    </div>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/9/96/Microsoft_logo_%282012%29.svg" alt="Microsoft" className="h-5 object-contain mix-blend-multiply" referrerPolicy="no-referrer" />
 
                     {/* Salesforce Logo */}
-                    <div className="text-[#00A1E0] font-sans font-black tracking-tighter text-sm">
-                      salesforce
-                    </div>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/f/f9/Salesforce.com_logo.svg" alt="Salesforce" className="h-9 object-contain -ml-1 mix-blend-multiply" referrerPolicy="no-referrer" />
 
                     {/* Airbnb Logo */}
-                    <div className="flex items-center gap-1.5 text-slate-800">
-                      <span className="font-display font-extrabold text-sm text-[#FF5A5F] tracking-tight">airbnb</span>
-                    </div>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/6/69/Airbnb_Logo_B%C3%A9lo.svg" alt="Airbnb" className="h-6 object-contain mix-blend-multiply" referrerPolicy="no-referrer" />
 
                     {/* Shopify Logo */}
-                    <div className="flex items-center gap-1 text-[#96BF48] font-sans font-bold text-sm">
-                      <span>shopify</span>
-                    </div>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/0/0e/Shopify_logo_2018.svg" alt="Shopify" className="h-7 object-contain mix-blend-multiply" referrerPolicy="no-referrer" />
 
                     {/* Netflix Logo */}
-                    <div className="font-display font-black tracking-widest text-[#E50914] text-sm italic">
-                      NETFLIX
-                    </div>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" alt="Netflix" className="h-5 object-contain mix-blend-multiply" referrerPolicy="no-referrer" />
                   </div>
                 </div>
               </div>
@@ -1295,8 +1318,7 @@ export default function App() {
                     </svg>
                   </div>
                   <h1 className="font-display font-bold text-xl tracking-tight mt-2 text-slate-900">ESTARR</h1>
-                  <p className="text-[11px] text-purple-600 font-bold tracking-wide mt-0.5">Empowering Creators & Pros</p>
-                  <p className="text-[10px] text-slate-400">Connect • Learn • Build • Work • Grow</p>
+                  <p className="text-[11px] text-purple-600 font-bold tracking-wide mt-0.5">Talent Networks</p>
                 </div>
 
                 {authAccountType === "jobOwner" && authMode === "signup" && hireWizardStep === 2 && (
@@ -1365,31 +1387,7 @@ export default function App() {
                                   : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"
                               }`}
                             >
-                              Owner
-                            </button>
-                            <button
-                              type="button"
-                              disabled={isAuthLoading}
-                              onClick={() => setAuthAccountType("creator")}
-                              className={`flex-1 py-1.5 px-2 rounded-full border text-[10px] font-bold tracking-tight transition-all disabled:opacity-60 cursor-pointer ${
-                                authAccountType === "creator"
-                                  ? "bg-purple-50 border-purple-500 text-purple-600"
-                                  : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"
-                              }`}
-                            >
-                              Creator
-                            </button>
-                            <button
-                              type="button"
-                              disabled={isAuthLoading}
-                              onClick={() => setAuthAccountType("academyLearner")}
-                              className={`flex-1 py-1.5 px-2 rounded-full border text-[10px] font-bold tracking-tight transition-all disabled:opacity-60 cursor-pointer ${
-                                authAccountType === "academyLearner"
-                                  ? "bg-purple-50 border-purple-500 text-purple-600"
-                                  : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"
-                              }`}
-                            >
-                              Learner
+                            Client
                             </button>
                           </div>
                         </div>
@@ -1531,6 +1529,18 @@ export default function App() {
                     </p>
                   )}
                 </div>
+
+                <div className="mt-6 pt-5 border-t border-slate-100 flex gap-3 items-start text-[10px] text-slate-500 bg-slate-50/50 -mx-6 px-6 -mb-6 rounded-b-xl pb-6">
+                  <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="font-bold text-slate-900 uppercase tracking-tight">ESTARR 100% Escrow Protection Guard</h4>
+                    <p className="text-slate-500 mt-1 leading-relaxed">
+                      Your money stays securely locked in escrow until the supplier
+                      delivers your items or completes the service. Upon verification, the
+                      escrow automatically pays out. Absolutely risk-free!
+                    </p>
+                  </div>
+                </div>
               </>
             )}
           </div>
@@ -1539,8 +1549,15 @@ export default function App() {
 
       {/* Dynamic Header */}
       <header className="sticky top-0 bg-black border-b border-slate-800 z-40 px-6 py-4 flex justify-between items-center shadow-lg">
-        <button onClick={() => setActiveTab("home")} className="flex items-center gap-3 text-left cursor-pointer hover:opacity-90">
-          <div className="group relative w-11 h-11 flex items-center justify-center transition-all duration-500 hover:-translate-y-0.5">
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="lg:hidden text-white hover:text-purple-400 p-2 cursor-pointer transition-colors"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+          <button onClick={() => setActiveTab("home")} className="flex items-center gap-3 text-left cursor-pointer hover:opacity-90">
+            <div className="group relative w-11 h-11 flex items-center justify-center transition-all duration-500 hover:-translate-y-0.5">
             <svg width="44" height="44" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-11 h-11 drop-shadow-md">
               <defs>
                 <linearGradient id="brand-grad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -1558,6 +1575,7 @@ export default function App() {
           </div>
         </button>
 
+        </div>
         {/* Global Navigation Buttons in the Middle of Header */}
         <nav className="hidden md:flex items-center gap-1 bg-slate-950 border border-slate-800/80 px-2.5 py-1.5 rounded-full shadow-inner">
           <button
@@ -1578,27 +1596,6 @@ export default function App() {
                 setAuthMode("signup");
                 setShowAuthModal(true);
               } else {
-                setActiveTab("projects");
-              }
-            }}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold transition-all uppercase tracking-wider cursor-pointer ${
-              activeTab === "projects"
-                ? "bg-purple-600 text-white shadow-md shadow-purple-500/20"
-                : "text-slate-400 hover:text-white hover:bg-slate-900/40"
-            }`}
-          >
-            <Layers className="w-3 h-3" />
-            <span className="flex items-center gap-1">
-              Projects
-            </span>
-          </button>
-
-          <button
-            onClick={() => {
-              if (!isAuthenticated) {
-                setAuthMode("signup");
-                setShowAuthModal(true);
-              } else {
                 setActiveTab("connect");
               }
             }}
@@ -1613,25 +1610,24 @@ export default function App() {
               Connect
             </span>
           </button>
-
           <button
             onClick={() => {
               if (!isAuthenticated) {
                 setAuthMode("signup");
                 setShowAuthModal(true);
               } else {
-                setActiveTab("academy");
+                setActiveTab("ai-lab");
               }
             }}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold transition-all uppercase tracking-wider cursor-pointer ${
-              activeTab === "academy"
+              activeTab === "ai-lab"
                 ? "bg-purple-600 text-white shadow-md shadow-purple-500/20"
                 : "text-slate-400 hover:text-white hover:bg-slate-900/40"
             }`}
           >
-            <Award className="w-3 h-3" />
+            <BrainCircuit className="w-3 h-3" />
             <span className="flex items-center gap-1">
-              Work Certification
+              ESTARR AI Lab
             </span>
           </button>
 
@@ -1655,6 +1651,7 @@ export default function App() {
               Storefront
             </span>
           </button>
+
         </nav>
 
         {/* Global User Profile Indicator */}
@@ -1803,7 +1800,7 @@ export default function App() {
                   {/* Hover-only desktop tooltip */}
                   <div className="hidden sm:block absolute right-0 top-full mt-2.5 w-60 p-3 rounded-lg shadow-xl border border-slate-800 bg-slate-950 text-white text-[11px] text-left transition-all duration-200 z-50 scale-95 opacity-0 pointer-events-none group-hover:scale-100 group-hover:opacity-100 group-hover:pointer-events-auto">
                     <div className="absolute top-0 right-3.5 -mt-1.5 w-3 h-3 bg-slate-950 rotate-45 border-l border-t border-slate-800" />
-                    <p className="font-bold text-purple-400 mb-1">For Job Owners</p>
+                    <p className="font-bold text-purple-400 mb-1">For Clients</p>
                     <p className="text-slate-300 leading-relaxed">
                       This feature allows clients and creators to browse, filter, and recruit top professionals from our verified expert network.
                     </p>
@@ -1831,7 +1828,7 @@ export default function App() {
                           >
                             <X className="w-4 h-4" />
                           </button>
-                          <p className="font-display font-extrabold text-[10px] text-purple-400 uppercase tracking-wider mb-2">For Job Owners</p>
+                          <p className="font-display font-extrabold text-[10px] text-purple-400 uppercase tracking-wider mb-2">For Clients</p>
                           <h3 className="font-display font-black text-sm text-white mb-2">Browse & Hire Experts</h3>
                           <p className="text-slate-300 text-xs leading-relaxed mb-4">
                             This feature is designed for clients, brands, and creators to browse, filter, and recruit top professionals from our verified expert network.
@@ -1857,7 +1854,7 @@ export default function App() {
                       >
                         <div className="absolute top-0 right-3.5 -mt-1.5 w-3 h-3 bg-slate-950 rotate-45 border-l border-t border-slate-800" />
                         <div className="flex items-center justify-between mb-1.5">
-                          <p className="font-bold text-purple-400">For Job Owners</p>
+                          <p className="font-bold text-purple-400">For Clients</p>
                           <button 
                             type="button"
                             onClick={() => setShowHireTooltip(false)}
@@ -1882,7 +1879,7 @@ export default function App() {
       {/* Main Container Layout */}
       <div className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 relative z-10">
         {/* Navigation Rail Sidebar */}
-        {!isSidebarHidden && (<nav className={`lg:col-span-3 flex flex-col gap-4 p-4 h-fit shadow-xs rounded-xl transition-all duration-300 ${sidebarStyles[sidebarTheme].navClass}`}>
+        {!isSidebarHidden && (<nav className={`hidden lg:flex lg:col-span-3 flex-col gap-4 p-4 h-fit shadow-xs rounded-xl transition-all duration-300 ${sidebarStyles[sidebarTheme].navClass}`}>
           <div className={`flex flex-col gap-2 border-b pb-3 mb-1 ${sidebarStyles[sidebarTheme].borderClass}`}>
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-mono font-bold uppercase tracking-widest">
@@ -1895,47 +1892,7 @@ export default function App() {
             
             {/* Theme Swatches Picker removed since it can be controlled from the admin panel */}
           </div>
-
-          {[
-            {
-              title: "Core Hub & Insights",
-              items: [
-                { id: "home", label: "Home", desc: "Editorial ecosystem overview", icon: Home },
-                { id: "academy", label: "Work Certification", desc: "Professional playbooks & licenses", icon: Award },
-                { id: "portfolio", label: "Professional Portfolio", desc: "Showcase skills & projects", icon: Briefcase },
-              ]
-            },
-            {
-              title: "Escrow & Professional Trade",
-              items: [
-                { id: "projects", label: "Escrow Hub", desc: "Paid milestones & escrow", icon: CheckSquare },
-                { id: "careers", label: "Jobs Board", desc: "Full-time & freelance opportunities", icon: Compass },
-                { id: "gigs", label: "Gigs", desc: "Escrow gig market", icon: Laptop },
-                { id: "marketplace", label: "Brand Campaigns", desc: "Exclusive high-ticket sponsorships", icon: ShoppingCart },
-              ]
-            },
-            {
-              title: "Network & Social",
-              items: [
-                { id: "connect", label: "Connect", desc: "Professional network & peers", icon: Users },
-                { id: "community", label: "Community", desc: "Cohorts & discussion boards", icon: Heart },
-                { id: "events", label: "Events", desc: "Live streams & ticketing", icon: Calendar },
-              ]
-            },
-            {
-              title: "Fintech & App Utilities",
-              items: [
-                { id: "payments", label: "Payments", desc: "Digital wallets & transfers", icon: CreditCard },
-                { id: "rewards", label: "Ambassadors", desc: "Earn Points & Rewards", icon: Gift }
-              ]
-            },
-            ...(isAdmin ? [{
-              title: "Admin Controls",
-              items: [
-                { id: "admin", label: "Admin Dashboard", desc: "System settings & metrics", icon: ShieldCheck }
-              ]
-            }] : [])
-          ].map((section) => {
+          {navSections.map((section) => {
             const isCollapsed = collapsedNavSections[section.title];
             const hasActiveItem = section.items.some(item => item.id === activeTab);
             
@@ -2013,10 +1970,18 @@ export default function App() {
         <main className={`${isSidebarHidden ? "lg:col-span-12" : "lg:col-span-9"} flex flex-col gap-6 min-h-[500px]`}>
           {activeTab === "home" && (
             <div className="flex flex-col gap-6 animate-fade-in">
-              {/* Main Hero Area */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 border border-slate-200 bg-slate-50 shadow-sm hover:shadow-md transition-shadow rounded-xl">
+              {isAuthenticated ? (
+                <UserDashboard 
+                  userProfile={userProfile} 
+                  tasks={tasks}
+                  onNavigate={setActiveTab} 
+                />
+              ) : (
+                <>
+                  {/* Main Hero Area */}
+                  <div className="grid grid-cols-1 lg:grid-cols-12 border border-slate-200 bg-slate-50 shadow-sm hover:shadow-md transition-shadow rounded-xl">
                 {/* Hero Left: Typography Focus */}
-<div className="lg:col-span-7 p-6 md:p-10 flex flex-col border-b lg:border-b-0 lg:border-r-2 border-slate-200 bg-white rounded-xl relative overflow-hidden min-h-[420px]">
+<div className="lg:col-span-12 p-8 md:p-24 flex flex-col items-center text-center border-slate-200 bg-white rounded-xl relative overflow-hidden min-h-[650px]">
                   {/* Background Video Loop with Tech Grid & Glow Fallbacks */}
                   <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none z-0" />
                   <video
@@ -2063,235 +2028,68 @@ export default function App() {
                     </svg>
                   </div>
 
-                  <div className="relative z-10 flex flex-col h-full">
-                    <div>
-                      <span className="px-3 py-1 bg-purple-600 text-white border border-transparent rounded-full text-[10px] font-bold tracking-wide mb-8 inline-block uppercase shadow-sm hover:shadow-md transition-all">
-                        Elite Talent Network
-                      </span>
-                      <h1 className="text-5xl md:text-6xl lg:text-7xl leading-none font-bold tracking-tight mb-4 text-slate-900">
-                        Top 3%<br />
-                        <span className="text-purple-500 relative inline-block">
+                                    <div className="relative z-10 flex flex-col items-center h-full w-full max-w-6xl">
+                    <motion.div
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.8, ease: "easeOut" }}
+                      className="flex flex-col items-center"
+                    >
+                      <div className="inline-flex items-center gap-3 px-5 py-2 bg-slate-900/5 backdrop-blur-md border border-slate-200 rounded-full text-[11px] font-black tracking-[0.2em] mb-12 uppercase text-purple-600">
+                        <ShieldCheck className="w-4 h-4" />
+                        <span>Elite Talent Network</span>
+                      </div>
+                      <h1 className="text-5xl md:text-7xl lg:text-8xl leading-tight font-black tracking-tighter mb-12 text-slate-900 uppercase font-display">
+                        Top 3% <br />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600">
                           Talent Pool
-                          <div className="absolute -left-4 -bottom-2 text-rose-300/10 pointer-events-none -rotate-[15deg] -z-10 mix-blend-multiply hidden md:block">
-                            <svg width="60" height="60" viewBox="0 0 100 100" fill="currentColor">
-                              <polygon points="50,10 90,90 10,90" />
-                            </svg>
-                          </div>
-                        </span>.
+                        </span>
                       </h1>
-                    </div>
+                    </motion.div>
                     
-                    <div className="mt-4 max-w-md font-sans">
-                      <p className="text-lg md:text-xl leading-relaxed text-slate-600 font-medium">
+                    <motion.div 
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.6, delay: 0.2 }}
+                      className="max-w-3xl"
+                    >
+                      <p className="text-2xl md:text-3xl leading-relaxed text-slate-500 font-medium tracking-tight">
                         Build your verified remote portfolio, match with premium global contracts, and coordinate under strict milestone escrows.
                       </p>
-                    </div>
+                    </motion.div>
 
-                    <div className="mt-auto pt-8">
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 border-t border-slate-100 pt-6">
-                        <div>
-                          <p className="text-2xl font-black text-slate-900 tracking-tighter">Elite 3%</p>
-                          <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mt-1 font-mono">Global Vetting</p>
+                    <div className="mt-auto w-full pt-16 border-t border-slate-100">
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-16 justify-items-center">
+                        <div className="flex flex-col items-center">
+                          <div className="flex items-center gap-4 mb-3 text-purple-600">
+                            <Cpu className="w-8 h-8" />
+                            <p className="text-5xl font-black text-slate-900 tracking-tighter tabular-nums">128+</p>
+                          </div>
+                          <p className="text-xs uppercase font-black tracking-[0.2em] text-slate-400 font-mono">Infrastructure Nodes</p>
                         </div>
-                        <div>
-                          <p className="text-2xl font-black text-slate-900 tracking-tighter">100%</p>
-                          <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mt-1 font-mono">Escrow Secured</p>
+                        <div className="flex flex-col items-center">
+                          <div className="flex items-center gap-4 mb-3 text-emerald-600">
+                            <
+  Activity className="w-8 h-8" />
+                            <p className="text-5xl font-black text-slate-900 tracking-tighter tabular-nums">0.04ms</p>
+                          </div>
+                          <p className="text-xs uppercase font-black tracking-[0.2em] text-slate-400 font-mono">Contract Velocity</p>
                         </div>
-                        <div className="hidden md:block">
-                          <p className="text-2xl font-black text-purple-500 tracking-tighter">Zero-Risk</p>
-                          <p className="text-[10px] uppercase font-bold tracking-widest text-slate-500 mt-1 font-mono">Contracting</p>
+                        <div className="hidden md:flex flex-col items-center">
+                          <div className="flex items-center gap-4 mb-3 text-indigo-600">
+                            <ShieldCheck className="w-8 h-8" />
+                            <p className="text-5xl font-black text-slate-900 tracking-tighter tabular-nums">$4.2M+</p>
+                          </div>
+                          <p className="text-xs uppercase font-black tracking-[0.2em] text-slate-400 font-mono">Escrow Protected</p>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
                 
-                {/* Hero Right: Featured & AI */}
-                <div className="lg:col-span-5 flex flex-col rounded-xl">
-                  {/* Stream */}
-                  <div className="flex-1 p-6 md:p-8 bg-[#FDFDF9] border border-[#EFEBE3] text-slate-900 shadow-sm flex flex-col justify-between min-h-[220px] rounded-xl">
-                    <div>
-                      <div className="flex items-center justify-between mb-8">
-                        <h2 className="text-[13px] uppercase tracking-wide font-bold text-[#b441f7]">{translations[globalLanguage].activeEscrow}</h2>
-                        <span className="text-[11px] bg-[#f4e6ff] text-[#911fdf] px-3.5 py-1.5 rounded-full font-bold">
-                          {translations[globalLanguage].secure}
-                        </span>
-                      </div>
-                      <div className="space-y-0">
-                        {(tasks && tasks.length > 0 ? tasks : homeDemoTasks).slice(0, 3).map((task, index) => {
-                          // Parse budget and client
-                          let budget = formatCurrency(150000);
-                          let client = task.assignee || "Client";
-                          if (task.desc.includes("||")) {
-                            const parts = task.desc.split("||");
-                            if (parts.length >= 2) {
-                              budget = formatCurrency(parts[0].trim());
-                              client = parts[1].trim();
-                            }
-                          } else {
-                            if (task.id === "t1") budget = formatCurrency(250000);
-                            else if (task.id === "t2") budget = formatCurrency(180000);
-                            else if (task.id === "t3") budget = formatCurrency(120000);
-                          }
-                          let percentage = 8;
-                          let statusText = "LOCKED";
-                          let statusColor = "text-[#b441f7]";
-                          let borderColor = "via-amber-400";
-                          let strokeColor = "stroke-amber-500";
 
-                          if (task.status === "inprogress") {
-                            percentage = 67;
-                            statusText = "IN PROGRESS";
-                            statusColor = "text-[#b441f7]";
-                            borderColor = "via-[#b441f7]";
-                            strokeColor = "stroke-[#b441f7]";
-                          } else if (task.status === "review") {
-                            percentage = 92;
-                            statusText = "IN REVIEW";
-                            statusColor = "text-[#03a96b]";
-                            borderColor = "via-amber-300"; // Based on screenshot
-                            strokeColor = "stroke-[#03a96b]";
-                          } else if (task.status === "done") {
-                            percentage = 100;
-                            statusText = "RELEASED";
-                            statusColor = "text-blue-600";
-                            borderColor = "via-blue-400";
-                            strokeColor = "stroke-blue-500";
-                          }
-                          
-                          if (index === 0) {
-                             borderColor = "via-[#b441f7]";
-                             strokeColor = "stroke-[#b441f7]";
-                          } else if (index === 1) {
-                             borderColor = "via-amber-300";
-                             strokeColor = "stroke-amber-500";
-                             statusColor = "text-[#b441f7]";
-                          } else {
-                             borderColor = "via-amber-300";
-                             strokeColor = "stroke-[#03a96b]";
-                             statusColor = "text-[#03a96b]";
-                          }
-
-                          // SVG parameters for 40px circular indicator
-                          const size = 44;
-                          const strokeWidth = 4;
-                          const center = size / 2;
-                          const radius = center - strokeWidth;
-                          const circumference = 2 * Math.PI * radius;
-                          const strokeDashoffset = circumference - (percentage / 100) * circumference;
-
-                          const isDueSoon = task.dueDate && task.status !== "done" ? (new Date(task.dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60) <= 48 : false;
-                          const categoryColors: Record<string, string> = {
-                            marketing: "bg-pink-100 text-[#d61c77]",
-                            dev: "bg-cyan-100 text-[#099abf]",
-                            design: "bg-[#f4e6ff] text-[#911fdf]",
-                          };
-                          const defaultCatColor = "bg-slate-100 text-slate-500";
-                          const categoryClass = task.category ? categoryColors[task.category] || defaultCatColor : "";
-
-
-                          return (
-                            <React.Fragment key={task.id}>
-                              <div 
-                                onClick={() => {
-                                  if (!isAuthenticated) {
-                                    setAuthMode("signup");
-                                    setShowAuthModal(true);
-                                  } else {
-                                    setActiveTab("projects");
-                                  }
-                                }} 
-                                className={`group cursor-pointer p-5 -mx-5 rounded-2xl hover:bg-white/50 transition-all duration-300 flex justify-between items-center gap-4`}
-                              >
-                                <div className="flex-1 min-w-0">
-                                  <h3 className="text-[17px] font-bold italic tracking-tight text-slate-900 group-hover:text-purple-600 transition-colors truncate">
-                                    {task.title}
-                                  </h3>
-                                  <div className="mt-3 flex items-center gap-3">
-                                    <span className={`text-[10px] font-mono font-bold uppercase tracking-widest shrink-0 ${statusColor}`}>
-                                      {statusText}
-                                    </span>
-                                    
-                                    {task.category && (
-                                      <span className={`text-[10px] font-mono font-bold uppercase px-2.5 py-1 rounded-full ${categoryClass}`}>
-                                        {task.category}
-                                      </span>
-                                    )}
-
-                                    {isDueSoon && (
-                                      <span className="flex items-center gap-1.5 text-[10px] font-mono font-bold text-[#f93e6c] bg-[#ffe4ec] px-2.5 py-1 rounded-full">
-                                        <Clock className="w-3 h-3" /> Due Soon
-                                      </span>
-                                    )}
-                                  </div>
-                                </div>
-
-                                <div className="flex items-center gap-3 shrink-0">
-                                  {/* Quick Cycle Button */}
-                                  <button 
-                                    onClick={(e) => cycleTaskStatus(e, task.id, task.status)}
-                                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-200 text-[#9ca3af] hover:text-[#6b7280] transition-colors border border-transparent"
-                                    title="Cycle Status"
-                                  >
-                                    <FastForward className="w-4 h-4" />
-                                  </button>
-                                  
-                                  {/* Circular Progress Indicator */}
-                                  <div className="relative flex items-center justify-center shrink-0" style={{ width: size, height: size }}>
-                                    <svg width={size} height={size} className="transform -rotate-90">
-                                      {/* Background Track */}
-                                      <circle
-                                        cx={center}
-                                        cy={center}
-                                        r={radius}
-                                        className="stroke-[#EFEBE3] fill-none"
-                                        strokeWidth={strokeWidth}
-                                      />
-                                      {/* Animated Progress Circle */}
-                                      <circle
-                                        cx={center}
-                                        cy={center}
-                                        r={radius}
-                                        className={`fill-none transition-all duration-500 ${strokeColor}`}
-                                        strokeWidth={strokeWidth}
-                                        strokeDasharray={circumference}
-                                        strokeDashoffset={strokeDashoffset}
-                                        strokeLinecap="round"
-                                      />
-                                    </svg>
-                                    <span className="absolute text-[10px] font-bold text-slate-900 tracking-tighter">
-                                      {percentage}%
-                                    </span>
-                                  </div>
-                                </div>
-                              </div>
-                              {index < 2 && (
-                                <div className={`h-[2px] w-full bg-gradient-to-r from-transparent ${borderColor} to-transparent opacity-40`} />
-                              )}
-                            </React.Fragment>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* AI Quick Copilot card */}
-                  <div className="bg-purple-600 p-6 text-white border-t border-slate-800 relative flex flex-col justify-between rounded-xl">
-                    <div>
-                      <div className="text-[9px] font-semibold tracking-wide text-purple-200 mb-1">{translations[globalLanguage].intelligence}</div>
-                      <p className="font-bold text-xs leading-tight mb-4 text-white">
-                        "I've analyzed your portfolio. You are 12% away from qualifying for 'Senior Content Creator' roles in the Jobs Board."
-                      </p>
-                    </div>
-                    <button 
-                      onClick={() => handleOpenAi("Help me close the 12% gap to qualify as a Senior Content Creator in the Jobs Board.", "general")}
-                      className="flex justify-between items-center w-full bg-slate-950 hover:bg-slate-800 text-white p-2.5 border border-slate-800 transition-all cursor-pointer font-bold text-[10px] uppercase tracking-wider rounded-xl"
-                    >
-                      <span>{translations[globalLanguage].askAi}</span>
-                      <span className="w-5 h-5 rounded-full bg-white text-purple-600 flex items-center justify-center font-bold">?</span>
-                    </button>
-                  </div>
-                </div>
               </div>
 
               {/* Bottom Interactive Grid */}
@@ -2315,13 +2113,22 @@ export default function App() {
                   }
                 }} 
                 onStartCollabing={() => {
-                  setActiveTab("projects");
+                  setActiveTab("consultancy");
+                  if (!isAuthenticated) {
+                    setAuthMode("signup");
+                    setShowAuthModal(true);
+                  }
+                }}
+                onNavigate={(tabId) => {
+                  setActiveTab(tabId as any);
                   if (!isAuthenticated) {
                     setAuthMode("signup");
                     setShowAuthModal(true);
                   }
                 }}
               />
+                </>
+              )}
             </div>
           )}
 
@@ -2334,15 +2141,8 @@ export default function App() {
               initialSubTab={connectSubTab}
             />
           )}
-
-          {activeTab === "academy" && (
-            <AcademySection
-              userProfile={userProfile}
-              courses={courses}
-              onUpdateCourses={handleUpdateCourses}
-              onUpdateProfile={handleUpdateProfile}
-              onOpenAiChat={handleOpenAi}
-            />
+          {activeTab === "ai-lab" && (
+            <AILabSection userProfile={userProfile} />
           )}
 
           {activeTab === "marketplace" && (
@@ -2354,8 +2154,8 @@ export default function App() {
             />
           )}
 
-          {activeTab === "projects" && (
-            <ProjectsSection
+          {activeTab === "consultancy" && (
+            <ConsultancySection
               userProfile={userProfile}
               tasks={tasks}
               onUpdateTasks={handleUpdateTasks}
@@ -2413,6 +2213,103 @@ export default function App() {
           {activeTab === "how-it-works" && <HowItWorksSection />}
         </main>
       </div>
+
+      {/* Mobile Menu Drawer */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-50 flex lg:hidden">
+          <div 
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+          <nav className={`relative w-80 max-w-[80vw] h-full overflow-y-auto flex flex-col gap-4 p-4 shadow-2xl transition-all duration-300 ${sidebarStyles[sidebarTheme].navClass}`}>
+            <div className={`flex flex-col gap-2 border-b pb-3 mb-1 ${sidebarStyles[sidebarTheme].borderClass}`}>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-mono font-bold uppercase tracking-widest">
+                  ESTARR ECOSYSTEM
+                </span>
+                <button 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="p-1 rounded-md hover:bg-slate-200/50 cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+            
+            {navSections.map((section) => {
+              const isCollapsed = collapsedNavSections[section.title];
+              const hasActiveItem = section.items.some(item => item.id === activeTab);
+              
+              return (
+                <div key={section.title} className="flex flex-col gap-1.5">
+                  <div 
+                    onClick={() => toggleNavSection(section.title)}
+                    className={`flex items-center justify-between text-[10px] font-mono font-bold hover:opacity-80 tracking-wider cursor-pointer uppercase py-1 select-none transition-colors group ${sidebarStyles[sidebarTheme].sectionHeaderClass}`}
+                  >
+                    <span className="flex items-center gap-1.5">
+                      {hasActiveItem && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
+                      )}
+                      {section.title}
+                    </span>
+                    <div className="flex items-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
+                      <span className="text-[8px] font-normal">({section.items.length})</span>
+                      {isCollapsed ? (
+                        <ChevronRight className="w-3 h-3" />
+                      ) : (
+                        <ChevronDown className="w-3 h-3" />
+                      )}
+                    </div>
+                  </div>
+                  {!isCollapsed && (
+                    <div className={`flex flex-col gap-1 pl-1 border-l ${sidebarStyles[sidebarTheme].borderClass}`}>
+                      {section.items.map((item) => {
+                        const Icon = item.icon;
+                        const isActive = activeTab === item.id;
+                        const isPublic = ["home", "about", "how-it-works", "teams"].includes(item.id);
+                        const isLocked = !isAuthenticated && !isPublic;
+                        return (
+                          <button
+                            key={item.id}
+                            id={`btn-nav-tab-${item.id}`}
+                            onClick={() => {
+                              if (isLocked) {
+                                setIsMobileMenuOpen(false);
+                                setAuthMode("signup");
+                                setShowAuthModal(true);
+                              } else {
+                                setActiveTab(item.id as any);
+                                setIsMobileMenuOpen(false);
+                              }
+                            }}
+                            className={`w-full text-left p-2 transition-all duration-200 cursor-pointer rounded-xl border relative ${
+                              isActive
+                                ? sidebarStyles[sidebarTheme].activeItemClass
+                                : sidebarStyles[sidebarTheme].inactiveItemClass
+                            }`}
+                          >
+                            <div className="flex items-start gap-3">
+                              <Icon className={`w-4 h-4 shrink-0 mt-0.5 transition-colors ${isActive ? "text-white" : "text-slate-500"}`} />
+                              <div className="flex-1 min-w-0 pr-4">
+                                <span className="text-xs font-bold uppercase tracking-tight flex items-center gap-1.5 leading-tight">
+                                  {item.label}
+                                </span>
+                                <span className={`text-[9px] block leading-tight mt-0.5 font-medium transition-colors truncate ${isActive ? sidebarStyles[sidebarTheme].activeDescClass : sidebarStyles[sidebarTheme].descClass}`}>
+                                  {item.desc}
+                                </span>
+                              </div>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </nav>
+        </div>
+      )}
 
       {/* Notifications Drawer */}
       <NotificationsDrawer isOpen={isNotificationsOpen} onClose={() => setIsNotificationsOpen(false)} />
@@ -2539,13 +2436,27 @@ export default function App() {
       )}
 
       {/* Floating Persistant AI trigger button (mobile layout helper) */}
-      <button
-        id="btn-ai-float"
-        onClick={() => handleOpenAi("", "general")}
-        className="fixed bottom-12 right-12 bg-gradient-to-r from-violet-600 via-indigo-500 to-emerald-500 text-white p-4 rounded-full shadow-sm hover:shadow-md transition-shadow border border-slate-200 hover:opacity-95 transition-all cursor-pointer z-40 flex items-center justify-center animate-bounce"
-      >
-        <Sparkles className="w-5 h-5" />
-      </button>
+      {showAiFloat && (
+        <div className="fixed bottom-12 right-12 z-40 animate-bounce">
+          <button
+            id="btn-ai-float"
+            onClick={() => handleOpenAi("", "general")}
+            className="bg-gradient-to-r from-violet-600 via-indigo-500 to-emerald-500 text-white p-4 rounded-full shadow-sm hover:shadow-md transition-shadow border border-slate-200 hover:opacity-95 transition-all cursor-pointer flex items-center justify-center"
+          >
+            <Sparkles className="w-5 h-5" />
+          </button>
+          <button 
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowAiFloat(false);
+            }}
+            className="absolute -top-1 -right-1 bg-slate-900/80 backdrop-blur-sm text-white p-1 rounded-full border border-slate-700 shadow-xl hover:bg-slate-800 transition-colors cursor-pointer"
+            title="Dismiss Assistant"
+          >
+            <X className="w-3 h-3" />
+          </button>
+        </div>
+      )}
 
       {/* AI Drawer assistant */}
       <ChatDrawer
@@ -2562,6 +2473,7 @@ export default function App() {
             <button onClick={() => setActiveTab("about")} className="hover:text-indigo-400 transition-colors uppercase cursor-pointer">About Us</button>
             <button onClick={() => setActiveTab("how-it-works")} className="hover:text-indigo-400 transition-colors uppercase cursor-pointer">How It Works</button>
             <button onClick={() => setActiveTab("teams")} className="hover:text-indigo-400 transition-colors uppercase cursor-pointer">Teams</button>
+            <button onClick={() => setActiveTab("consultancy")} className="hover:text-indigo-400 transition-colors uppercase cursor-pointer">Consultancy & Services</button>
             <button onClick={() => setActiveTab("careers")} className="hover:text-indigo-400 transition-colors uppercase cursor-pointer">Jobs</button>
           </div>
           <div className="text-[10px] text-center md:text-right font-mono tracking-widest uppercase opacity-50">

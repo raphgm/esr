@@ -14,6 +14,8 @@ import {
   Gift,
   Laptop,
   Compass,
+  Briefcase,
+  Cpu
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -26,72 +28,99 @@ export function ServicesCarousel({ onSelect }: ServicesCarouselProps) {
 
   const services = [
     {
-      id: "projects",
+      id: "consultancy",
       label: "Escrow Hub",
-      desc: "Secure milestones, fund verification, and bulletproof project contracts.",
+      desc: "Every job created is linked to an independent escrow contract. Funds are held securely until validation.",
       icon: CheckSquare,
-      badge: "100% ESCROW-PROTECTED",
+      badge: "SECURE ESCROW PIPELINE",
       color: "bg-purple-50 text-purple-600 border-purple-100 group-hover:bg-purple-600 group-hover:text-white",
-      stats: "$1.2M+ Secured"
+      stats: "148 Active Contracts"
     },
     {
       id: "gigs",
-      label: "Gigs Market",
-      desc: "Micro-service marketplace with structured escrow protection.",
-      icon: Laptop,
-      badge: "STARTING AT $15",
+      label: "AI Gig Builder",
+      desc: "Draft your gig instantly. Type your core skill and let the AI draft your listing structure and description.",
+      icon: Sparkles,
+      badge: "DRAFT GIG INSTANTLY",
       color: "bg-indigo-50 text-indigo-600 border-indigo-100 group-hover:bg-indigo-600 group-hover:text-white",
-      stats: "1,240 Gigs Live"
+      stats: "AI-Powered Drafting"
     },
     {
-      id: "payments",
-      label: "Payments",
-      desc: "Secure off-chain digital wallet transactions & point transfers.",
-      icon: CreditCard,
-      badge: "INSTANT TRANSFERS",
+      id: "gigs",
+      label: "Train AI",
+      desc: "Source elite experts for RLHF, high-precision data labeling, and model fine-tuning across 100+ dialects.",
+      icon: Cpu,
+      badge: "ELITE AI TRAINING",
+      color: "bg-teal-50 text-teal-600 border-teal-100 group-hover:bg-teal-600 group-hover:text-white",
+      stats: "40k+ Data Experts"
+    },
+    {
+      id: "gigs",
+      label: "Build AI",
+      desc: "Hire specialized engineers to build custom LLM applications, RAG pipelines, and autonomous AI agents for your enterprise.",
+      icon: Sparkles,
+      badge: "CUSTOM AI SOLUTIONS",
+      color: "bg-violet-50 text-violet-600 border-violet-100 group-hover:bg-violet-600 group-hover:text-white",
+      stats: "Verified AI Architects"
+    },
+    {
+      id: "gigs",
+      label: "Creative Operations",
+      desc: "Connect with elite enterprise creative squads for high-retention cinematic assets, brand narratives, and viral production pipelines.",
+      icon: Laptop,
+      badge: "ENTERPRISE NODES",
+      color: "bg-rose-50 text-rose-600 border-rose-100 group-hover:bg-rose-600 group-hover:text-white",
+      stats: "Global Deployment Network"
+    },
+    {
+      id: "gigs",
+      label: "Infrastructure & DevOps",
+      desc: "Deploy certified IT pros for high-throughput WhatsApp commerce, cloud architecture, and automated talent infrastructure.",
+      icon: Cpu,
+      badge: "CLOUD ARCHITECTURE NODES",
       color: "bg-emerald-50 text-emerald-600 border-emerald-100 group-hover:bg-emerald-600 group-hover:text-white",
-      stats: "0% Deposit Fees"
+      stats: "Enterprise Node Network"
+    },
+    {
+      id: "gigs",
+      label: "Talent Systems",
+      desc: "Deploy autonomous talent modules, intelligent commerce pipelines, and standardized escrow infrastructure.",
+      icon: Briefcase,
+      badge: "TALENT INFRASTRUCTURE",
+      color: "bg-amber-50 text-amber-600 border-amber-100 group-hover:bg-amber-600 group-hover:text-white",
+      stats: "Autonomous Nodes"
     },
     {
       id: "academy",
-      label: "Academy",
-      desc: "Practical professional courses, expert classes, and skill quizzes.",
+      label: "AI Training Space",
+      desc: "Professional playbooks, expert classes, and skill licenses for IT pros and creative talent.",
       icon: Award,
       badge: "42 CLASSES LIVE",
-      color: "bg-rose-50 text-rose-600 border-rose-100 group-hover:bg-rose-600 group-hover:text-white",
-      stats: "2.4K+ Students"
-    },
-    {
-      id: "analytics",
-      label: "IT & Creator Analytics",
-      desc: "Analyze GitHub commits, TikTok, & Instagram metrics to generate verified professional media kits.",
-      icon: LineChart,
-      badge: "VERIFIED METRICS",
-      color: "bg-violet-50 text-violet-600 border-violet-100 group-hover:bg-violet-600 group-hover:text-white",
-      stats: "Audited Insights"
+      color: "bg-blue-50 text-blue-600 border-blue-100 group-hover:bg-blue-600 group-hover:text-white",
+      stats: "ESTARR Certified"
     },
     {
       id: "marketplace",
-      label: "Marketplace",
-      desc: "Decentralized trade, verified storefronts, and product sales.",
+      label: "Brand Campaigns",
+      desc: "Exclusive high-ticket sponsorships, direct partner pitching, and exclusive digital IP marketplace.",
       icon: ShoppingCart,
-      badge: "SECURED STOREFRONTS",
+      badge: "EXCLUSIVE SPONSORS",
       color: "bg-sky-50 text-sky-600 border-sky-100 group-hover:bg-sky-600 group-hover:text-white",
-      stats: "380+ Trusted Sellers"
+      stats: "Brand Partner Hub"
     },
     {
-      id: "careers",
-      label: "Jobs Board",
-      desc: "Explore high-paying full-time and freelance digital opportunities.",
-      icon: Compass,
-      badge: "18 NEW JOBS TODAY",
-      color: "bg-teal-50 text-teal-600 border-teal-100 group-hover:bg-teal-600 group-hover:text-white",
-      stats: "Remote & Hybrid"
+      id: "payments",
+      label: "Wallet & Transfers",
+      desc: "Secure off-chain digital wallet transactions, peer-to-peer transfers, and escrow disbursements.",
+      icon: CreditCard,
+      badge: "INSTANT TRANSFERS",
+      color: "bg-cyan-50 text-cyan-600 border-cyan-100 group-hover:bg-cyan-600 group-hover:text-white",
+      stats: "$4.2M Funded Value"
     },
     {
       id: "connect",
       label: "Connect Network",
-      desc: "Build your professional network and peer connections securely.",
+      desc: "Professional networking and instant matches with top-tier skilled pros for tech and content setup.",
       icon: Users,
       badge: "1.2K ONLINE NOW",
       color: "bg-fuchsia-50 text-fuchsia-600 border-fuchsia-100 group-hover:bg-fuchsia-600 group-hover:text-white",
@@ -99,39 +128,12 @@ export function ServicesCarousel({ onSelect }: ServicesCarouselProps) {
     },
     {
       id: "community",
-      label: "Community",
-      desc: "Collaborative learning cohorts, group chats, and discussion boards.",
+      label: "Creator Community",
+      desc: "Collaborative learning cohorts, group boards, and peer discussion hubs for scaling talent.",
       icon: Heart,
       badge: "COHORTS IN SESSION",
       color: "bg-pink-50 text-pink-600 border-pink-100 group-hover:bg-pink-600 group-hover:text-white",
       stats: "24 Active Circles"
-    },
-    {
-      id: "events",
-      label: "Events Hub",
-      desc: "Host live streams, virtual ticketing, and professional masterclasses.",
-      icon: Calendar,
-      badge: "TICKETS IN-APP",
-      color: "bg-cyan-50 text-cyan-600 border-cyan-100 group-hover:bg-cyan-600 group-hover:text-white",
-      stats: "Next: July 12th"
-    },
-    {
-      id: "mobile",
-      label: "Companion App",
-      desc: "Download our native mobile application for on-the-go notifications.",
-      icon: Smartphone,
-      badge: "COMPANION APP v2.4",
-      color: "bg-slate-50 text-slate-600 border-slate-100 group-hover:bg-slate-800 group-hover:text-white",
-      stats: "iOS & Android"
-    },
-    {
-      id: "rewards",
-      label: "Ambassadors",
-      desc: "Refer partners, promote the platform, and earn points and rewards.",
-      icon: Gift,
-      badge: "500 ESTARR BONUS",
-      color: "bg-yellow-50 text-yellow-600 border-yellow-100 group-hover:bg-yellow-600 group-hover:text-white",
-      stats: "Level up your Rank"
     }
   ];
 
@@ -190,11 +192,11 @@ export function ServicesCarousel({ onSelect }: ServicesCarouselProps) {
         className="flex overflow-x-auto gap-4 snap-x snap-mandatory pb-8 pt-2 px-2 hide-scrollbar"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
-        {services.map((service) => {
+        {services.map((service, idx) => {
           const Icon = service.icon;
           return (
             <div
-              key={service.id}
+              key={`${service.id}-${idx}`}
               className="w-full sm:w-[280px] flex-shrink-0 snap-start"
             >
               <div
@@ -280,11 +282,11 @@ export function ServicesCarousel({ onSelect }: ServicesCarouselProps) {
               
               <div className="space-y-4 mb-8">
                 <p className="text-slate-600 text-xs leading-relaxed">
-                  Welcome to the <strong>{selectedService.label}</strong> workspace. 
-                  {selectedService.desc} Establish high-yield digital transactions, configure protected smart micro-agreements, and trace milestones securely under the peer ecosystem.
+                  Access the <strong>{selectedService.label}</strong> enterprise environment. 
+                  {selectedService.desc} Orchestrate high-yield digital workflows, configure protected smart micro-agreements, and trace global milestones securely within the node ecosystem.
                 </p>
                 <div className="bg-slate-50 p-3.5 border border-slate-200 rounded-xl flex justify-between items-center text-xs">
-                  <span className="font-mono text-slate-400">Current Ecosystem Metric</span>
+                  <span className="font-mono text-slate-400">Node Ecosystem Metric</span>
                   <span className="font-mono font-black text-purple-600">{selectedService.stats}</span>
                 </div>
               </div>

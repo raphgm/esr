@@ -1,0 +1,49 @@
+        <div className="bg-[#111622] p-6 rounded-3xl text-white shadow-xl shadow-slate-900/20 relative overflow-hidden flex flex-col">
+           <div className="absolute top-0 right-0 p-4 opacity-10">
+             <Server className="w-32 h-32" />
+           </div>
+           
+           <div className="relative z-10 flex items-start justify-between mb-8 gap-2">
+             <div className="flex items-center gap-3">
+               <Activity className="w-6 h-6 text-emerald-400" />
+               <h3 className="font-bold text-xl leading-tight">
+                 Active<br />Training
+               </h3>
+             </div>
+             <div className="bg-slate-800/50 border border-slate-700 text-slate-300 text-[10px] font-mono p-2 px-2.5 rounded-lg flex-shrink-1 truncate">
+               ESTARR-Vision-v2
+             </div>
+           </div>
+           
+           <div className="relative z-10 flex flex-col gap-5 flex-grow">
+              <div>
+                <div className="flex justify-between items-end mb-2">
+                  <div className="text-slate-400 font-mono text-xs">Epoch <span className="text-slate-300">42/100</span></div>
+                  <div className="text-emerald-400 font-mono text-sm font-bold">42%</div>
+                </div>
+                <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+                  <div className="h-full bg-emerald-400 w-[42%] rounded-full shadow-[0_0_10px_rgba(52,211,153,0.5)]"></div>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-3 mt-2">
+                <div className="bg-slate-800/40 p-4 rounded-xl border border-slate-700/50 flex flex-col justify-center">
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Loss</p>
+                  <p className="text-xl font-mono font-bold text-white flex items-center gap-1">
+                    0.2415 <span className="text-emerald-400 text-xs">↓</span>
+                  </p>
+                </div>
+                <div className="bg-slate-800/40 p-4 rounded-xl border border-slate-700/50 flex flex-col justify-center">
+                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">GPU Util</p>
+                  <p className="text-xl font-mono font-bold text-white flex items-baseline gap-1">
+                    94% <span className="text-slate-500 text-[10px] font-sans">A100x8</span>
+                  </p>
+                </div>
+              </div>
+              
+              <div className="mt-auto pt-2 flex gap-3">
+                 <button className="flex-1 bg-white text-slate-900 py-2.5 rounded-lg text-sm font-bold hover:bg-slate-200 transition-colors cursor-pointer shadow-sm">Logs</button>
+                 <button className="flex-1 bg-slate-800 text-white py-2.5 rounded-lg text-sm font-bold border border-slate-700 hover:bg-slate-700 transition-colors cursor-pointer shadow-sm">Stop</button>
+              </div>
+           </div>
+        </div>

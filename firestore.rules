@@ -132,6 +132,22 @@ service cloud.firestore {
       allow read, write: if true;
     }
 
+    // --- AI Lab ---
+    match /models/{modelId} {
+      allow read, write: if isSignedIn();
+    }
+    match /validation_tasks/{taskId} {
+      allow read, write: if isSignedIn();
+    }
+    match /datasets/{datasetId} {
+      allow read, write: if isSignedIn();
+    }
+
+    // --- Surveys ---
+    match /surveys/{surveyId} {
+      allow read, write: if isSignedIn();
+    }
+
     // --- Djinni Pitches & Offers ---
     match /djinni_pitches/{pitchId} {
       allow read, write: if true;

@@ -1,0 +1,3 @@
+          {activeTab === "ai-validation" && (
+            <AITrainAndValidateSection userProfile={userProfile} />
+          )}

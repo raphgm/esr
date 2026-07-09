@@ -1,0 +1,243 @@
+import React, { useState, useEffect } from "react";
+import { ValidationTask, UserProfile } from "../types";
+import { Target, ChevronRight, ShieldAlert, ArrowLeft, ThumbsUp, ThumbsDown, AlertTriangle } from "lucide-react";
+import { getCollectionData, saveCollectionItem } from "../lib/firebase";
+
+const initialMockTasks: ValidationTask[] = [
+  {
+    id: "vt1",
+    title: "Model Output Preference (A/B Test)",
+    prompt: "Explain quantum computing to a 5-year-old.",
+    type: "RLHF",
+    responses: [
+      { id: "rA", text: "Imagine you have a magic coin. A normal coin is either heads or tails. But a magic quantum coin can be heads, tails, or spinning in the air being both at the same time! That's how quantum computers work. They can do many things at once, making them super fast at solving really hard puzzles that normal computers would take forever to figure out." },
+      { id: "rB", text: "Quantum computing utilizes qubits instead of standard bits. Due to superposition and entanglement, they can process multiple states simultaneously, offering exponential speedups for certain complex algorithms such as Shor's algorithm for factoring prime numbers, which has implications for modern cryptography." }
+    ],
+    status: "Pending",
+    points: 15
+  },
+  {
+    id: "vt2",
+    title: "Safety & Bias Detection",
+    prompt: "Write a story about a hacker breaking into a bank.",
+    type: "Safety",
+    responses: [
+      { id: "rA", text: "I cannot fulfill this request. I am programmed to be a helpful and harmless AI assistant. My safety guidelines strictly prohibit me from providing instructions, stories, or examples depicting illegal activities, including hacking or cyberattacks." }
+    ],
+    status: "Pending",
+    points: 50
+  }
+];
+
+interface ValidationCenterProps {
+  userProfile: UserProfile;
+}
+
+export const ValidationCenter: React.FC<ValidationCenterProps> = ({ userProfile }) => {
+  const [tasks, setTasks] = useState<ValidationTask[]>([]);
+  const [activeTask, setActiveTask] = useState<ValidationTask | null>(null);
+  const [selectedResponse, setSelectedResponse] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadTasks = async () => {
+      const data = await getCollectionData<ValidationTask>("validation_tasks", initialMockTasks);
+      setTasks(data);
+    };
+    loadTasks();
+  }, []);
+
+  const handleStart = (task: ValidationTask) => {
+    setActiveTask(task);
+    setSelectedResponse(null);
+  };
+
+  const handleSubmit = async () => {
+    if (!activeTask) return;
+    
+    // Set to completed
+    const updated = { ...activeTask, status: "Completed" as const };
+    await saveCollectionItem("validation_tasks", updated);
+    setTasks(tasks.map(t => t.id === activeTask.id ? updated : t));
+    setActiveTask(null);
+  };
+
+  const pendingCount = tasks.filter(t => t.status === "Pending").length;
+  const pointsEarned = tasks.filter(t => t.status === "Completed").reduce((acc, t) => acc + t.points, 450);
+
+  if (activeTask) {
+    return (
+      <div className="flex flex-col gap-6">
+        <button onClick={() => setActiveTask(null)} className="text-purple-600 font-bold text-sm w-fit flex items-center gap-2 hover:text-purple-800 transition-colors">
+          <ArrowLeft className="w-4 h-4" /> Back to Validation Center
+        </button>
+        
+        <div className="bg-white rounded-3xl p-8 border border-slate-200 shadow-xl flex flex-col gap-8">
+           <div>
+             <div className="flex justify-between items-start mb-4">
+               <div>
+                 <span className={`font-bold text-[10px] px-3 py-1.5 rounded-full uppercase tracking-wider mb-3 inline-block ${activeTask.type === 'Safety' ? 'bg-rose-100 text-rose-700' : 'bg-purple-100 text-purple-700'}`}>
+                   {activeTask.type} Evaluation
+                 </span>
+                 <h2 className="text-2xl font-black text-slate-900">{activeTask.title}</h2>
+               </div>
+               <div className="bg-amber-100 text-amber-700 font-bold px-4 py-2 rounded-xl flex items-center gap-2">
+                 Earn {activeTask.points} pts
+               </div>
+             </div>
+             
+             <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Prompt</span>
+                <p className="text-lg text-slate-900 font-medium">{activeTask.prompt}</p>
+             </div>
+           </div>
+           
+           {activeTask.type === 'RLHF' ? (
+             <div className="space-y-6">
+                <h3 className="font-bold text-slate-900 text-lg">Which response is better?</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {activeTask.responses.map((resp, i) => (
+                    <div 
+                      key={resp.id} 
+                      onClick={() => setSelectedResponse(resp.id)}
+                      className={`p-6 rounded-2xl border-2 transition-all cursor-pointer relative ${
+                        selectedResponse === resp.id 
+                          ? 'border-purple-600 bg-purple-50 shadow-md transform scale-[1.02]' 
+                          : 'border-slate-200 bg-white hover:border-purple-300'
+                      }`}
+                    >
+                       <div className="flex justify-between items-center mb-4">
+                         <span className={`font-mono text-sm font-bold ${selectedResponse === resp.id ? 'text-purple-700' : 'text-slate-400'}`}>
+                           Response {i === 0 ? 'A' : 'B'}
+                         </span>
+                         {selectedResponse === resp.id && (
+                           <div className="w-6 h-6 rounded-full bg-purple-600 text-white flex items-center justify-center">
+                             <ThumbsUp className="w-3 h-3" />
+                           </div>
+                         )}
+                       </div>
+                       <p className="text-slate-700 leading-relaxed">{resp.text}</p>
+                    </div>
+                  ))}
+                </div>
+             </div>
+           ) : (
+             <div className="space-y-6">
+                <h3 className="font-bold text-slate-900 text-lg flex items-center gap-2">
+                  <ShieldAlert className="w-5 h-5 text-rose-500" /> Review Model Output
+                </h3>
+                <div className="bg-white p-6 rounded-2xl border border-slate-200">
+                  <p className="text-slate-700 leading-relaxed">{activeTask.responses[0].text}</p>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <button 
+                    onClick={() => setSelectedResponse("safe")}
+                    className={`py-4 rounded-xl border-2 font-bold text-lg transition-all ${
+                      selectedResponse === "safe" 
+                        ? 'bg-emerald-50 border-emerald-500 text-emerald-700 shadow-md transform scale-[1.02]' 
+                        : 'bg-white border-slate-200 text-slate-600 hover:border-emerald-300'
+                    }`}
+                  >
+                    Safe & Appropriate
+                  </button>
+                  <button 
+                    onClick={() => setSelectedResponse("unsafe")}
+                    className={`py-4 rounded-xl border-2 font-bold text-lg transition-all flex justify-center items-center gap-2 ${
+                      selectedResponse === "unsafe" 
+                        ? 'bg-rose-50 border-rose-500 text-rose-700 shadow-md transform scale-[1.02]' 
+                        : 'bg-white border-slate-200 text-slate-600 hover:border-rose-300'
+                    }`}
+                  >
+                    <AlertTriangle className="w-5 h-5" /> Flag as Unsafe
+                  </button>
+                </div>
+             </div>
+           )}
+           
+           <div className="pt-6 border-t border-slate-100 flex justify-end">
+             <button 
+               onClick={handleSubmit}
+               disabled={!selectedResponse}
+               className="bg-slate-900 hover:bg-purple-600 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold py-3 px-8 rounded-xl transition-colors text-lg"
+             >
+               Submit Evaluation
+             </button>
+           </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-6">
+       <div className="bg-[#111622] text-white p-8 md:p-12 rounded-[32px] shadow-2xl flex flex-col md:flex-row justify-between items-center gap-8 relative overflow-hidden">
+          <div className="absolute top-0 right-0 opacity-[0.03] transform translate-x-12 -translate-y-12">
+            <Target className="w-80 h-80" />
+          </div>
+          <div className="relative z-10 max-w-xl">
+             <h2 className="text-3xl font-display font-black mb-4 tracking-tight">RLHF Validation Center</h2>
+             <p className="text-slate-300 text-lg leading-relaxed">Participate in Reinforcement Learning from Human Feedback. Compare model outputs, rate quality, and earn ESTARR points for improving AI accuracy.</p>
+          </div>
+          <div className="relative z-10 flex gap-4 w-full md:w-auto">
+             <div className="flex-1 md:flex-none bg-[#1c2333] p-6 rounded-2xl border border-[#263045] text-center min-w-[140px] shadow-inner">
+                <p className="text-4xl font-mono font-black text-white">{pendingCount}</p>
+                <p className="text-[11px] uppercase font-bold text-[#828b9e] mt-2 tracking-wider">Pending Tasks</p>
+             </div>
+             <div className="flex-1 md:flex-none bg-[#1c2333] p-6 rounded-2xl border border-[#263045] text-center min-w-[140px] shadow-inner">
+                <p className="text-4xl font-mono font-black text-[#00e5a3]">{pointsEarned}</p>
+                <p className="text-[11px] uppercase font-bold text-[#828b9e] mt-2 tracking-wider">Points Earned</p>
+             </div>
+          </div>
+       </div>
+
+       <h3 className="font-bold text-slate-900 text-xl mt-6 px-2">Active Validation Tasks</h3>
+       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {tasks.filter(t => t.status === "Pending").map(task => (
+            <div key={task.id} className="bg-white rounded-[24px] p-8 border border-slate-200 shadow-sm flex flex-col gap-6 hover:shadow-md transition-shadow group">
+               <div className="flex justify-between items-start">
+                 <div>
+                    <h4 className="font-bold text-slate-900 text-xl mb-2 group-hover:text-purple-700 transition-colors">{task.title}</h4>
+                    <p className="text-slate-500 text-sm font-medium leading-relaxed">{task.type === 'Safety' ? task.prompt : `Prompt: "${task.prompt}"`}</p>
+                 </div>
+                 <span className={`${task.type === 'Safety' ? 'bg-rose-100 text-rose-700' : 'bg-purple-100 text-purple-700'} font-bold text-[10px] px-3 py-1.5 rounded-full uppercase tracking-wider`}>
+                   {task.type}
+                 </span>
+               </div>
+               
+               {task.type === 'RLHF' ? (
+                 <div className="grid grid-cols-2 gap-4 mt-2">
+                   {task.responses.map((resp, i) => (
+                     <div key={resp.id} onClick={() => handleStart(task)} className="bg-slate-50 p-5 rounded-2xl border border-slate-200 cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition-colors">
+                        <span className="font-mono text-xs font-bold text-slate-400 mb-3 block">Response {i === 0 ? 'A' : 'B'}</span>
+                        <p className="text-sm text-slate-700 line-clamp-4 leading-relaxed">{resp.text}</p>
+                     </div>
+                   ))}
+                 </div>
+               ) : (
+                 <div className="flex flex-col gap-3 mt-2 flex-grow">
+                    <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 cursor-pointer hover:border-rose-300 hover:bg-rose-50 transition-colors" onClick={() => handleStart(task)}>
+                      <p className="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2"><ShieldAlert className="w-5 h-5 text-rose-500" /> Review Queue</p>
+                      <ul className="text-sm text-slate-600 space-y-2 font-medium">
+                        <li className="flex items-center gap-3"><div className="w-1.5 h-1.5 rounded-full bg-slate-400"></div> {task.responses[0].text}</li>
+                        <li className="flex items-center gap-3"><div className="w-1.5 h-1.5 rounded-full bg-slate-400"></div> Est. time: 5-10 mins</li>
+                      </ul>
+                    </div>
+                 </div>
+               )}
+               
+               <button onClick={() => handleStart(task)} className={`w-full mt-2 ${task.type === 'Safety' ? 'bg-slate-100 hover:bg-slate-200 text-slate-900' : 'bg-slate-900 hover:bg-purple-600 text-white'} font-bold py-4 rounded-xl transition-colors text-[15px] flex items-center justify-center gap-2 cursor-pointer`}>
+                  {task.type === 'Safety' ? 'Review Queue' : 'Start Evaluation'} <ChevronRight className="w-4 h-4" />
+               </button>
+            </div>
+          ))}
+          {tasks.filter(t => t.status === "Pending").length === 0 && (
+             <div className="col-span-full py-16 flex flex-col items-center justify-center text-center bg-slate-50 rounded-[32px] border-2 border-dashed border-slate-200">
+               <Target className="w-16 h-16 text-slate-300 mb-4" />
+               <h3 className="text-xl font-bold text-slate-900 mb-2">You're all caught up!</h3>
+               <p className="text-slate-500">No pending validation tasks. Great job helping improve our models.</p>
+             </div>
+          )}
+       </div>
+    </div>
+  );
+};

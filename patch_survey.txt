@@ -1,0 +1,16 @@
+  useEffect(() => {
+    const loadSurveys = async () => {
+      const data = await getCollectionData<Survey>("surveys", initialMockSurveys);
+      setSurveys(data);
+
+      const params = new URLSearchParams(window.location.search);
+      const surveyId = params.get("survey");
+      if (surveyId) {
+        const found = data.find(s => s.id === surveyId);
+        if (found) {
+          setViewingSurvey(found);
+        }
+      }
+    };
+    loadSurveys();
+  }, []);

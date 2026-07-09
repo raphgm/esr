@@ -13,7 +13,7 @@ export function AboutSection() {
               ESTARR is dedicated to empowering professional growth through practical digital ecosystems. We build bridges between learning and earning, transforming theoretical knowledge into sustainable professional success.
             </p>
             <p className="text-sm font-medium leading-relaxed text-slate-700">
-              Our vision is to cultivate a trusted network of verified professionals, merchants, and learners, facilitating secure commerce and enterprise-level project coordination globally.
+              Our vision is to cultivate a trusted network of verified professionals, merchants, and learners, facilitating secure commerce and enterprise-level consultancy coordination globally.
             </p>
           </div>
           <div className="bg-slate-50 p-6 border border-slate-200 flex flex-col justify-center">

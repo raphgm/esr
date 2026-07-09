@@ -30,18 +30,27 @@ import {
   FileText,
   Calculator,
   TrendingUp,
-  Percent
+  Percent,
+  Cpu,
+  Activity,
+  BrainCircuit,
+  Cuboid
 } from "lucide-react";
+import { motion } from "motion/react";
 import confetti from "canvas-confetti";
 import { db } from "../lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
+import { PlatformTools } from "./PlatformTools";
+
 export function HomeMarketing({
   onStartEarning,
   onStartCollabing,
+  onNavigate,
 }: {
   onStartEarning?: () => void;
   onStartCollabing?: () => void;
+  onNavigate?: (id: string) => void;
 }) {
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
@@ -78,7 +87,7 @@ export function HomeMarketing({
         clientName: quoteName,
         clientEmail: quoteEmail,
         budgetRange: quoteBudget,
-        projectBrief: quoteBrief,
+        consultancyBrief: quoteBrief,
         createdAt: serverTimestamp()
       });
 
@@ -170,14 +179,15 @@ export function HomeMarketing({
   const expertVerticals = [
     {
       id: "developers",
-      label: "Developers",
-      title: "Elite Software Engineers & Architects",
-      desc: "Top 3% specialists in full-stack web, mobile applications, cloud devops, and secure smart contract architectures.",
-      skills: ["React/TypeScript", "Node.js & Go", "AWS & CloudNative", "Solidity & Web3", "Python & ML Ops"],
+      label: "IT & Tech Pros",
+      title: "Elite Software Engineers & IT Architects",
+      desc: "Top 3% specialists in full-stack web, cloud infrastructure, WhatsApp business automation, and secure technical deployments.",
+      skills: ["Cloud & DevOps", "WhatsApp Stores", "GitHub Workflows", "React/TypeScript", "Python & Automation"],
       metrics: "Matched in < 24 Hours",
       rating: "4.95/5 Client Rating",
-      popularProject: "Scale high-performance SaaS infrastructure & complex API design",
-      icon: Code,
+      popularConsultancy: "Scale high-performance cloud infrastructure & WhatsApp commerce automation",
+      icon: Cuboid,
+      animationType: "float",
       accentColor: "from-blue-500 to-indigo-600",
       bgLight: "bg-blue-50/50",
       borderColor: "border-blue-100",
@@ -193,46 +203,73 @@ export function HomeMarketing({
       }
     },
     {
-      id: "designers",
-      label: "Designers",
-      title: "UI/UX & Brand Identity Architects",
-      desc: "World-class visual storytellers, graphic designers, interaction experts, and meticulous Figma design system masters.",
-      skills: ["UI/UX Design", "Figma Systems", "Brand Strategy", "Motion Graphics", "Mobile Interaction"],
-      metrics: "Matched in < 48 Hours",
-      rating: "4.98/5 Client Rating",
-      popularProject: "Complete digital product redesign & high-fidelity prototype crafting",
-      icon: Sparkles,
-      accentColor: "from-pink-500 to-rose-600",
-      bgLight: "bg-rose-50/50",
-      borderColor: "border-rose-100",
-      textColor: "text-rose-600",
+      id: "ai-training",
+      label: "Train AI",
+      title: "Elite AI Training & Data Experts",
+      desc: "Top specialists in RLHF, high-precision data labeling, and model fine-tuning across 100+ dialects to build unbiased, high-performance LLMs.",
+      skills: ["RLHF / SFT", "Data Labeling", "Multi-dialect Annotation", "Model Benchmarking", "Ethical AI"],
+      metrics: "Assembled in 48 Hours",
+      rating: "5.00/5 Data Precision",
+      popularConsultancy: "Custom SFT dataset curation for specialized regional language models",
+      icon: Activity,
+      animationType: "rotate",
+      accentColor: "from-teal-500 to-emerald-600",
+      bgLight: "bg-teal-50/50",
+      borderColor: "border-teal-100",
+      textColor: "text-teal-600",
       expert: {
-        name: "Amara Diallo",
-        role: "Lead Interactive Designer",
-        stats: "Red Dot Award Winner • ex-Figma",
-        location: "Dakar, Senegal",
-        avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
-        bio: "Creates breathtaking user journeys, high-fidelity prototypes, and robust design systems that scale effortlessly.",
-        avail: "Available Next Week"
+        name: "Fatima Al-Sudais",
+        role: "Lead AI Training Specialist",
+        stats: "Linguistics Expert • ex-DeepMind Contractor",
+        location: "Khartoum, Sudan",
+        avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80",
+        bio: "Specializes in high-fidelity RLHF pipelines and curating specialized datasets for low-resource languages.",
+        avail: "Available Now"
+      }
+    },
+    {
+      id: "ai-build",
+      label: "Build AI",
+      title: "AI Architects & Agent Engineers",
+      desc: "Specialized engineers building custom LLM applications, RAG pipelines, and autonomous AI agents for high-scale enterprise orchestration.",
+      skills: ["RAG Architecture", "AI Agentic Workflows", "Vector Databases", "LangChain / LlamaIndex", "Model Quantization"],
+      metrics: "Matched in < 24 Hours",
+      rating: "4.97/5 Deployment Score",
+      popularConsultancy: "Autonomous customer support agent with RAG integration for enterprise CRM",
+      icon: Sparkles,
+      animationType: "pulse",
+      accentColor: "from-violet-500 to-purple-600",
+      bgLight: "bg-purple-50/50",
+      borderColor: "border-purple-100",
+      textColor: "text-purple-600",
+      expert: {
+        name: "Kwame Asante",
+        role: "Principal AI Architect",
+        stats: "Cloud Native Expert • 12+ Years Exp",
+        location: "Accra, Ghana",
+        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
+        bio: "Builds production-grade AI agents and robust RAG systems that integrate seamlessly into existing enterprise clouds.",
+        avail: "Available for Q3 Booking"
       }
     },
     {
       id: "product",
-      label: "Product & PMs",
-      title: "Strategic Product & Project Leaders",
-      desc: "Scrum masters, Agile practitioners, and product managers specializing in roadmaps, feature spec drafting, and seamless execution.",
-      skills: ["Agile/Scrum", "Product Roadmap", "Risk Mitigation", "Jira & Linear Systems", "Cross-functional Align"],
+      label: "Consultancy Leads",
+      title: "Strategic Consultancy & Ops Managers",
+      desc: "Scrum masters and operations managers specializing in consultancy roadmaps, feature spec drafting, and seamless escrow execution.",
+      skills: ["Agile/Scrum", "Ops Management", "Escrow Logistics", "Jira & Linear Systems", "Cross-functional Align"],
       metrics: "Immediate Onboarding",
       rating: "4.92/5 Client Rating",
-      popularProject: "Aligning multi-disciplinary engineering squads & agile sprint dispatch",
-      icon: Briefcase,
+      popularConsultancy: "Aligning multi-disciplinary creative squads & agile milestone dispatch",
+      icon: Cuboid,
+      animationType: "tilt",
       accentColor: "from-amber-500 to-orange-600",
       bgLight: "bg-amber-50/50",
       borderColor: "border-amber-100",
       textColor: "text-amber-600",
       expert: {
         name: "Kofi Boateng",
-        role: "Principal Product Specialist",
+        role: "Principal Operations Specialist",
         stats: "Certified Scrum Leader • ex-Andela",
         location: "Accra, Ghana",
         avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&auto=format&fit=crop&q=80",
@@ -242,57 +279,37 @@ export function HomeMarketing({
     },
     {
       id: "finance",
-      label: "Finance Experts",
-      title: "Fractional CFOs & Valuation Analysts",
-      desc: "Strategic modelers, corporate venture experts, tokenomics advisors, and fractional CFOs to secure funding & model growth.",
-      skills: ["Financial Modeling", "Fundraising Consulting", "Fractional CFO", "Tokenomics Planning", "Risk Analytics"],
-      metrics: "Matched in < 3 Days",
+      label: "Talent Systems",
+      title: "Commerce & Talent Infrastructure Architects",
+      desc: "Specialists in autonomous talent systems, intelligent commerce pipelines, and standardized escrow infrastructure for high-scale digital commerce.",
+      skills: ["Escrow Systems", "Smart Contracts", "Talent Logistics", "Commerce Ops", "Infrastructure Design"],
+      metrics: "Matched in < 24 Hours",
       rating: "4.96/5 Client Rating",
-      popularProject: "Series-A venture fundraising modeling & custom escrow structure design",
-      icon: DollarSign,
+      popularConsultancy: "Scaling high-performance talent platforms & automated commerce infrastructure",
+      icon: Cuboid,
+      animationType: "bounce",
       accentColor: "from-emerald-500 to-teal-600",
       bgLight: "bg-emerald-50/50",
       borderColor: "border-emerald-100",
       textColor: "text-emerald-600",
       expert: {
         name: "Chidi Nwachukwu",
-        role: "Fractional CFO & Valuation Lead",
-        stats: "Chartered Financial Analyst • ex-KPMG",
+        role: "Lead Commerce Infrastructure Engineer",
+        stats: "Talent Ops Specialist • 10+ Years Exp",
         location: "Nairobi, Kenya",
         avatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80",
-        bio: "Designs sophisticated financial projection models, conducts rigorous risk audits, and structures corporate fundraising rounds.",
+        bio: "Architects sophisticated talent deployment models and automated commerce management systems for high-throughput digital markets.",
         avail: "Available Now"
-      }
-    },
-    {
-      id: "teams",
-      label: "Cohesive Teams",
-      title: "Cross-Functional Cohesive Squads",
-      desc: "Pre-assembled, highly collaborative squads consisting of an Agile PM, elite developer, and lead designer, operational on day one.",
-      skills: ["End-to-End Delivery", "Squad Assembly", "Instant Integration", "Product Launch Sprint", "Turnkey Solutions"],
-      metrics: "Assembled in 72 Hours",
-      rating: "5.00/5 Performance Score",
-      popularProject: "MVP design-to-launch in under 4 weeks with dedicated daily standups",
-      icon: Users,
-      accentColor: "from-purple-500 to-violet-600",
-      bgLight: "bg-purple-50/50",
-      borderColor: "border-purple-100",
-      textColor: "text-purple-600",
-      expert: {
-        name: "Apollo Tech Squad",
-        role: "3-Person Turnkey MVP Squad",
-        stats: "Agile PM + Senior Dev + UI/UX Designer",
-        location: "Remote (Global)",
-        avatar: "https://images.unsplash.com/photo-1543269865-cbf427effbad?w=150&auto=format&fit=crop&q=80",
-        bio: "A battle-tested, high-performance squad of experts ready to take raw specifications and deliver an enterprise-grade web app.",
-        avail: "2 Squads Open for Booking"
-      }
     }
+      }
+
   ];
 
   // Mock Open Jobs Board data
   const jobPositions = [
     { id: "job1", title: "Senior Full-Stack Developer (React & Node)", category: "Engineering", location: "Remote (Global)", type: "Contract (Escrow)", rate: "$95/hr", skills: ["React", "TypeScript", "Node.js", "Express"] },
+    { id: "job-ai-1", title: "RLHF Data Trainer (Hausa/Swahili Dialects)", category: "AI Services", location: "Remote (Africa)", type: "Contract", rate: "$45/hr", skills: ["RLHF", "Data Labeling", "Linguistics"] },
+    { id: "job-ai-2", title: "AI Agent Engineer (LangChain & Pinecone)", category: "Engineering", location: "Remote (Global)", type: "Full-Time", rate: "$120/hr", skills: ["Python", "LangChain", "Vector DBs", "RAG"] },
     { id: "job2", title: "UGC Video Content Specialist & Editor", category: "Creative", location: "Remote (UK/US)", type: "Freelance", rate: "$70/hr", skills: ["CapCut", "Video Editing", "UGC", "Mobile Production"] },
     { id: "job3", title: "Lead Cloud Architect (AWS S3 & CloudFront)", category: "Engineering", location: "Remote (Europe)", type: "Full-Time", rate: "$140/hr", skills: ["AWS", "Docker", "S3", "Kubernetes", "CloudFront"] },
     { id: "job4", title: "Social Commerce Growth Funnel Lead", category: "Marketing", location: "Remote (Nigeria/Africa)", type: "Contract (Escrow)", rate: "$50/hr", skills: ["WhatsApp Selling", "CRM", "Copywriting"] },
@@ -300,7 +317,7 @@ export function HomeMarketing({
     { id: "job6", title: "TikTok & Reels Micro-Video Specialist", category: "Creative", location: "Remote (Global)", type: "Contract", rate: "$65/hr", skills: ["Video Optimization", "Sponsorship Outreach", "Reels"] },
   ];
 
-  const categories = ["All", "Engineering", "Creative", "Marketing", "Design"];
+  const categories = ["All", "Engineering", "Creative", "Marketing", "Design", "AI Services"];
 
   // Filtered jobs
   const filteredJobs = jobPositions.filter((job) => {
@@ -338,7 +355,7 @@ export function HomeMarketing({
       ]
     },
     {
-      question: "Which describes your project execution ownership?",
+      question: "Which describes your consultancy execution ownership?",
       options: [
         { label: "I deliver precise tasks under management", value: "task", score: 5 },
         { label: "I can take product specifications and build independently", value: "independent", score: 15 },
@@ -446,7 +463,7 @@ export function HomeMarketing({
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           
           {/* Pillar 1 */}
           <div className="p-6 bg-white border border-slate-200 hover:border-purple-300 transition-all rounded-2xl group flex flex-col justify-between shadow-xs">
@@ -490,21 +507,39 @@ export function HomeMarketing({
           <div className="p-6 bg-white border border-slate-200 hover:border-purple-300 transition-all rounded-2xl group flex flex-col justify-between shadow-xs">
             <div>
               <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-100 mb-4 group-hover:bg-purple-600 group-hover:text-white transition-colors">
-                <Globe className="w-5 h-5" />
+                <ShieldCheck className="w-5 h-5" />
               </div>
               <h3 className="font-bold text-base text-slate-900 uppercase tracking-wide">
-                World-Class Remote Freedom
+                Anonymous Tech Market
               </h3>
               <p className="text-slate-500 text-xs mt-2 leading-relaxed">
-                Work from anywhere on high-impact projects with premier global brands. Access custom-matched contracts, asynchronous flexibility, and a world-class network of elite builders.
+                Hire or get hired completely anonymously based strictly on verified skill metrics. Bypass bias and evaluate true technical capabilities before revealing identities.
               </p>
             </div>
             <div className="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center text-[10px] font-mono font-bold text-slate-400">
-              <span>WORK FROM ANYWHERE</span>
-              <span className="text-purple-600">Elite Freedom</span>
+              <span>ZERO BIAS MATCHING</span>
+              <span className="text-purple-600">Anonymous Protocol</span>
             </div>
           </div>
 
+          {/* Pillar 4 */}
+          <div className="p-6 bg-white border border-slate-200 hover:border-purple-300 transition-all rounded-2xl group flex flex-col justify-between shadow-xs">
+            <div>
+              <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-100 mb-4 group-hover:bg-purple-600 group-hover:text-white transition-colors">
+                <BrainCircuit className="w-5 h-5" />
+              </div>
+              <h3 className="font-bold text-base text-slate-900 uppercase tracking-wide">
+                ESTARR AI Lab
+              </h3>
+              <p className="text-slate-500 text-xs mt-2 leading-relaxed">
+                Collaboratively train, evaluate, and validate models through RLHF tasks. Contribute to collaborative datasets and earn rewards for shaping the future of AI.
+              </p>
+            </div>
+            <div className="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center text-[10px] font-mono font-bold text-slate-400">
+              <span>EARN VIA RLHF</span>
+              <span className="text-purple-600">AI Lab</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -515,13 +550,13 @@ export function HomeMarketing({
         
         <div className="text-center max-w-2xl mx-auto mb-10">
           <span className="text-[10px] font-mono font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full uppercase tracking-widest inline-block">
-            ✨ Expert Talent Pool
+            ✨ Universal Service Catalog
           </span>
           <h2 className="text-3xl md:text-4xl font-black tracking-tight text-slate-900 mt-3 uppercase font-display">
-            Specialized Expert Networks
+            The Integrated Talent Ecosystem
           </h2>
           <p className="text-slate-600 text-xs md:text-sm mt-2 leading-relaxed">
-            Direct access to Africa's top 3% of vocational, tech, and creative masterminds. Find individual specialists or spin up custom cohesive delivery squads in under 24 hours.
+            Direct access to Africa's top 3% of IT Pros and AI specialists. Leverage our <strong>Standardized Golden Paths</strong> to access elite talent in under 24 hours.
           </p>
         </div>
 
@@ -533,10 +568,10 @@ export function HomeMarketing({
               <button
                 key={vert.id}
                 onClick={() => setActiveVertical(vert.id)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer border active:scale-90 active:shadow-inner hover:-translate-y-0.5 ${
                   activeVertical === vert.id
-                    ? "bg-slate-950 border-slate-950 text-white shadow-md active:scale-95"
-                    : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300"
+                    ? "bg-slate-950 border-slate-950 text-white shadow-md hover:shadow-lg"
+                    : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 shadow-sm hover:shadow"
                 }`}
               >
                 <IconComponent className={`w-3.5 h-3.5 ${activeVertical === vert.id ? "text-purple-400 animate-pulse" : "text-slate-400"}`} />
@@ -550,6 +585,18 @@ export function HomeMarketing({
         {expertVerticals.map((vert) => {
           if (vert.id !== activeVertical) return null;
           const IconComponent = vert.icon;
+          
+          // Animation config mapping
+          const animations = {
+            float: { y: [0, -8, 0], transition: { duration: 3, repeat: Infinity, ease: "easeInOut" } },
+            rotate: { rotateY: [0, 360], transition: { duration: 10, repeat: Infinity, ease: "linear" } },
+            pulse: { scale: [1, 1.1, 1], transition: { duration: 2, repeat: Infinity, ease: "easeInOut" } },
+            tilt: { rotateX: [0, 15, 0], rotateY: [0, 15, 0], transition: { duration: 4, repeat: Infinity, ease: "easeInOut" } },
+            bounce: { y: [0, -5, 0], scale: [1, 1.05, 1], transition: { duration: 2.5, repeat: Infinity, ease: "easeInOut" } }
+          };
+
+          const activeAnim = animations[vert.animationType as keyof typeof animations] || animations.float;
+
           return (
             <div 
               key={vert.id} 
@@ -559,9 +606,22 @@ export function HomeMarketing({
               <div className="lg:col-span-7 flex flex-col justify-between bg-white rounded-2xl p-6 md:p-8 border border-slate-200 shadow-xs relative overflow-hidden">
                 <div>
                   <div className="flex items-center gap-3 mb-4">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-tr ${vert.accentColor} text-white flex items-center justify-center shadow-md`}>
-                      <IconComponent className="w-6 h-6" />
-                    </div>
+                    {/* Isometric Cube Icon Container */}
+                    <motion.div 
+                      animate={activeAnim}
+                      style={{ perspective: "1000px" }}
+                      className="relative w-14 h-14"
+                    >
+                      {/* Top Face */}
+                      <div className={`absolute top-0 left-2 w-10 h-3 bg-gradient-to-r ${vert.accentColor} opacity-30 skew-x-[45deg] rounded-t-sm`} />
+                      {/* Side Face */}
+                      <div className={`absolute top-2 right-0 w-3 h-10 bg-gradient-to-b ${vert.accentColor} opacity-50 skew-y-[45deg] rounded-r-sm`} />
+                      {/* Main Front Face */}
+                      <div className={`absolute top-1.5 left-0 w-11 h-11 rounded-lg bg-gradient-to-tr ${vert.accentColor} text-white flex items-center justify-center shadow-lg border border-white/20`}>
+                        <IconComponent className="w-6 h-6" />
+                      </div>
+                    </motion.div>
+                    
                     <div>
                       <p className="text-[10px] font-mono font-bold tracking-widest text-slate-400 uppercase">Expert Vertical</p>
                       <h3 className="font-display font-black text-lg md:text-xl text-slate-900 leading-tight sm:whitespace-nowrap">
@@ -591,16 +651,16 @@ export function HomeMarketing({
                     </div>
                   </div>
 
-                  {/* Typical Projects */}
+                  {/* Typical Consultancy */}
                   <div className="mb-6 p-4 bg-slate-50 border border-slate-150 rounded-xl">
                     <div className="flex items-start gap-2.5">
                       <div className="w-5 h-5 rounded-md bg-purple-50 flex items-center justify-center border border-purple-100 mt-0.5 shrink-0">
                         <CheckSquare className="w-3.5 h-3.5 text-purple-600" />
                       </div>
                       <div>
-                        <p className="text-[10px] font-mono font-bold uppercase text-slate-400">Popular Assignment Scope</p>
+                        <p className="text-[10px] font-mono font-bold uppercase text-slate-400">Consultancy Scope</p>
                         <p className="text-slate-800 text-xs font-semibold leading-snug mt-0.5">
-                          {vert.popularProject}
+                          {vert.popularConsultancy}
                         </p>
                       </div>
                     </div>
@@ -709,6 +769,8 @@ export function HomeMarketing({
           );
         })}
       </div>
+
+      <PlatformTools onNavigate={onNavigate} />
 
       {/* SECTION 3: INTERACTIVE ELITE SELF-ASSESSMENT WIZARD */}
       <div className="bg-slate-950 border border-slate-800 rounded-3xl p-6 md:p-10 text-white relative overflow-hidden">
@@ -1265,7 +1327,7 @@ export function HomeMarketing({
             <div className="p-6 pb-4 border-b border-slate-800 flex justify-between items-start">
               <div>
                 <span className="text-[9px] font-mono font-bold tracking-widest text-purple-400 bg-purple-950/60 border border-purple-900/40 px-2.5 py-0.5 rounded-full uppercase">
-                  Project Brief Submission
+                  Consultancy Brief Submission
                 </span>
                 <h3 className="text-xl font-black font-display tracking-tight mt-2 text-slate-100">
                   Request Quote from {selectedExpert.name}
@@ -1291,7 +1353,7 @@ export function HomeMarketing({
                     <Check className="w-7 h-7 stroke-[2.5]" />
                   </div>
                   <div>
-                    <h4 className="text-lg font-bold text-slate-100 font-display uppercase tracking-tight">Project Brief Sent Successfully!</h4>
+                    <h4 className="text-lg font-bold text-slate-100 font-display uppercase tracking-tight">Consultancy Brief Sent Successfully!</h4>
                     <p className="text-xs text-slate-400 max-w-sm mx-auto mt-2 leading-relaxed">
                       Your proposal has been routed to <strong>{selectedExpert.name}</strong>. They will review your requirements and reach out to you within 2-4 business hours.
                     </p>
@@ -1368,14 +1430,14 @@ export function HomeMarketing({
 
                   <div>
                     <label className="block text-[10px] font-mono uppercase text-slate-400 font-bold mb-1">
-                      Project Brief / Deliverables Scope
+                      Consultancy Brief / Deliverables Scope
                     </label>
                     <textarea
                       required
                       rows={4}
                       value={quoteBrief}
                       onChange={(e) => setQuoteBrief(e.target.value)}
-                      placeholder="Describe your project scope, core features required, and desired timeline..."
+                      placeholder="Describe your consultancy scope, core features required, and desired timeline..."
                       className="w-full bg-slate-950 border border-slate-800 focus:border-purple-500 text-white placeholder-slate-600 text-xs px-3.5 py-2.5 rounded-xl focus:outline-none transition-all font-medium resize-none leading-relaxed"
                     />
                   </div>

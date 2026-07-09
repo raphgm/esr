@@ -1,0 +1,3 @@
+      {activeTab === "models" && <ModelsWorkspace userProfile={userProfile} />}
+      {activeTab === "validation" && <ValidationCenter userProfile={userProfile} />}
+      {activeTab === "datasets" && <CollaborativeDatasets userProfile={userProfile} />}

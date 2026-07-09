@@ -115,7 +115,7 @@ export default function CompanionAppDownload() {
             </h2>
             
             <p className="text-base text-slate-600 font-medium max-w-md mb-8 leading-relaxed">
-              Sync your mobile device using our secure QR handshake. Monitor active off-chain escrow gigs, track direct project milestones, and learn offline with zero data consumption.
+              Sync your mobile device using our secure QR handshake. Monitor active off-chain escrow gigs, track direct consultancy milestones, and learn offline with zero data consumption.
             </p>
 
             {/* Simulated Scanner State Status Board */}

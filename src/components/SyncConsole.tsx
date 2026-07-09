@@ -131,7 +131,7 @@ export const SyncConsole: React.FC = () => {
           </div>
 
           <p className="text-sm text-slate-600 leading-relaxed mb-8">
-            Sync your mobile device using our secure QR handshake. Monitor active off-chain escrow gigs, track direct project milestones, and learn offline with zero data consumption.
+            Sync your mobile device using our secure QR handshake. Monitor active off-chain escrow gigs, track direct consultancy milestones, and learn offline with zero data consumption.
           </p>
 
           <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100">

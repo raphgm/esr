@@ -1,7 +1,7 @@
 import { PageBanner } from "./PageBanner";
 import React, { useState } from "react";
 import confetti from "canvas-confetti";
-import { ProjectTask, UserProfile, BrandCampaign } from "../types";
+import { ConsultancyTask, UserProfile, BrandCampaign } from "../types";
 import {
   Plus,
   Search,
@@ -26,10 +26,10 @@ import { motion, AnimatePresence } from "motion/react";
 import { VoiceRecorder, AudioPlayer } from "./VoiceRecorder";
 import { MessageSquare } from "lucide-react";
 
-interface ProjectsSectionProps {
+interface ConsultancySectionProps {
   userProfile: UserProfile;
-  tasks: ProjectTask[];
-  onUpdateTasks: (tasks: ProjectTask[]) => void;
+  tasks: ConsultancyTask[];
+  onUpdateTasks: (tasks: ConsultancyTask[]) => void;
   onOpenAiChat: (prompt: string, context: string) => void;
   onNavigate?: (tab: string) => void;
   campaigns?: BrandCampaign[];
@@ -44,7 +44,7 @@ const initialEscrowFeed = [
 ];
 
 // Helper to extract rich contract details from a task object
-function parseTaskDetails(task: ProjectTask) {
+function parseTaskDetails(task: ConsultancyTask) {
   let budget = 150000; // default 150k Dollars
   let client = task.assignee || "External Client";
   let cleanDesc = task.desc;
@@ -73,14 +73,14 @@ function parseTaskDetails(task: ProjectTask) {
   return { budget, client, cleanDesc };
 }
 
-export default function ProjectsSection({
+export default function ConsultancySection({
   userProfile,
   tasks,
   onUpdateTasks,
   onOpenAiChat,
   onNavigate,
   campaigns,
-}: ProjectsSectionProps) {
+}: ConsultancySectionProps) {
   const [activeTab, setActiveTab] = useState<"board" | "deal-builder" | "escrow-feed" >("board");
   
   // States for contract creation
@@ -121,7 +121,7 @@ export default function ProjectsSection({
     // Serialize budget and client into description to maintain type safety with Parent
     const serializedDesc = `$${formattedBudget.toLocaleString()} || ${newClient} || ${newDesc || "Milestone deliverable details."}`;
 
-    const newTask: ProjectTask = {
+    const newTask: ConsultancyTask = {
       id: `task-${Date.now()}`,
       title: newTitle,
       desc: serializedDesc,
@@ -139,7 +139,7 @@ export default function ProjectsSection({
     setIsAddingTask(false);
   };
 
-  const moveTask = (taskId: string, newStatus: ProjectTask["status"]) => {
+  const moveTask = (taskId: string, newStatus: ConsultancyTask["status"]) => {
     const updated = tasks.map((t) => {
       if (t.id === taskId) {
         return { ...t, status: newStatus };
@@ -150,7 +150,7 @@ export default function ProjectsSection({
   };
 
   // Simulate client approving milestones and disbursing actual funds to the wallet
-  const handleApproveAndRelease = (e: React.MouseEvent, task: ProjectTask, budget: number) => {
+  const handleApproveAndRelease = (e: React.MouseEvent, task: ConsultancyTask, budget: number) => {
     // 1. Play celebration
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     confetti({
@@ -301,7 +301,7 @@ export default function ProjectsSection({
   );
 
   return (
-    <div id="projects-section" className="flex flex-col gap-6">
+    <div id="consultancy-section" className="flex flex-col gap-6">
       
       {/* Payout Celebratory Animation Banner */}
       <AnimatePresence>
@@ -337,12 +337,12 @@ export default function ProjectsSection({
       </AnimatePresence>
 
       <PageBanner
-        title="Escrow Hub & Paid Milestones"
-        subtitle="SECURE ESCROW PIPELINE"
+        title="Consultancy & Milestone Management"
+        subtitle="ENTERPRISE CONSULTANCY"
         description={
           <div className="flex flex-col gap-3">
             <p>
-              Draft secure milestone offers, view live funds locked in ESTARR escrow, submit deliverables, and trigger secure bank disbursements upon approval.
+              Draft secure consultancy contracts, view live funds locked in ESTARR escrow, submit deliverables, and trigger secure bank disbursements upon milestone approval.
             </p>
           </div>
         }
@@ -359,6 +359,17 @@ export default function ProjectsSection({
           </div>
         }
       />
+
+      {/* Escrow Banner */}
+      <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 flex gap-3 items-start text-xs text-emerald-400">
+        <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+        <div>
+          <h4 className="font-bold text-slate-900">ESTARR 100% Escrow Protection Guard</h4>
+          <p className="text-slate-600 mt-0.5">
+            Your money stays securely locked in escrow until the supplier delivers your items or completes the service. Upon verification, the escrow automatically pays out. Absolutely risk-free!
+          </p>
+        </div>
+      </div>
 
       {/* Financial Escrow Metrics Bar */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-slate-900 text-white rounded-3xl p-6 border-2 border-slate-800 shadow-sm">
@@ -540,11 +551,9 @@ export default function ProjectsSection({
                     key={camp.id || i}
                     className="bg-slate-50 border border-slate-100 rounded-xl overflow-hidden flex flex-col hover:border-purple-600 transition-colors"
                   >
-                    {camp.image && (
-                      <div className="w-full h-32 overflow-hidden bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
-                        <Sparkles className="w-8 h-8 text-white/30" />
-                      </div>
-                    )}
+                    <div className={`w-full h-32 overflow-hidden bg-gradient-to-br ${camp.color || "from-purple-500 to-indigo-600"} flex items-center justify-center`}>
+                      <Sparkles className="w-8 h-8 text-white/30" />
+                    </div>
                     <div className="p-4 flex flex-col gap-2">
                       <div className="flex justify-between items-start">
                         <span className="text-[10px] font-bold text-purple-500 uppercase">{camp.brand}</span>
@@ -617,12 +626,12 @@ export default function ProjectsSection({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1 text-xs">
                     <label className="font-bold text-slate-500">
-                      Project Contract Title *
+                      Consultancy Contract Title *
                     </label>
                     <input
                       type="text"
                       required
-                      placeholder="e.g. TikTok UGC Video Integration"
+                      placeholder="e.g. Enterprise AI Implementation"
                       value={newTitle}
                       onChange={(e) => setNewTitle(e.target.value)}
                       className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-slate-800 focus:outline-none focus:bg-white transition-colors"
@@ -635,7 +644,7 @@ export default function ProjectsSection({
                     <input
                       type="text"
                       required
-                      placeholder="e.g. PiggyVest Nigeria"
+                      placeholder="e.g. Flutterwave Nigeria"
                       value={newClient}
                       onChange={(e) => setNewClient(e.target.value)}
                       className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-slate-800 focus:outline-none focus:bg-white transition-colors"
@@ -659,7 +668,7 @@ export default function ProjectsSection({
                   </div>
                   <div className="flex flex-col gap-1 text-xs">
                     <label className="font-bold text-slate-500">
-                      Project Delivery Deadline *
+                      Consultancy Delivery Deadline *
                     </label>
                     <input
                       type="date"
@@ -676,6 +685,7 @@ export default function ProjectsSection({
                     Milestone Breakdowns & Description
                   </label>
                   <textarea
+                    required
                     placeholder="Describe specific milestones. e.g. Milestone 1: Sourcing, Milestone 2: Delivery..."
                     value={newDesc}
                     onChange={(e) => setNewDesc(e.target.value)}
@@ -710,16 +720,16 @@ export default function ProjectsSection({
                 <div className="absolute inset-0 bg-purple-400/10 rounded-full blur-xl animate-pulse"></div>
                 <CheckSquare className="w-10 h-10 relative z-10" />
               </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-2 font-display">No active projects</h3>
+              <h3 className="text-xl font-bold text-slate-900 mb-2 font-display">No active consultancy engagements</h3>
               <p className="text-slate-500 mb-6 max-w-sm text-sm">
-                Your escrow pipeline is currently empty. Create a new milestone contract to get started.
+                Your consultancy pipeline is currently empty. Create a new milestone contract to get started.
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <button 
                   onClick={() => setActiveTab("deal-builder")}
                   className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer flex items-center gap-2 justify-center"
                 >
-                  <Plus className="w-4 h-4" /> Create First Project
+                  <Plus className="w-4 h-4" /> Start New Consultancy Engagement
                 </button>
               </div>
             </div>
@@ -727,7 +737,7 @@ export default function ProjectsSection({
           <div className="flex flex-col gap-4">
           <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex items-center gap-3">
              <Search className="w-4 h-4 text-slate-9000" />
-             <input type="text" placeholder="Search projects by title or assignee..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full text-xs bg-transparent border-none focus:outline-none text-slate-700" />
+             <input type="text" placeholder="Search consultancy engagements by title or assignee..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full text-xs bg-transparent border-none focus:outline-none text-slate-700" />
           </div>
           <div className="flex flex-col md:flex-row gap-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
             {(["todo", "inprogress", "review", "done"] as const).map((status) => {
@@ -898,7 +908,7 @@ export default function ProjectsSection({
                                 onClick={() =>
                                   onOpenAiChat(
                                     `Draft a professional completion certificate and positive review for my contract with ${client} regarding the work: ${task.title}.`,
-                                    "projects"
+                                    "consultancy"
                                   )
                                 }
                                 className="w-full bg-slate-50 hover:bg-slate-100 text-slate-500 text-[9px] font-bold py-1.5 rounded-xl text-center cursor-pointer transition-all"

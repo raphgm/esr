@@ -114,7 +114,7 @@ export default function AcademySection({
   // Course Creator Form States
   const [newCourseTitle, setNewCourseTitle] = useState("");
   const [newCoursePrice, setNewCoursePrice] = useState("0");
-  const [newCourseCategory, setNewCourseCategory] = useState<"AI & ML" | "Web3" | "Cloud DevOps" | "Data Science" | "Software Eng." | "Cybersecurity" | "Product Design">("Trades");
+  const [newCourseCategory, setNewCourseCategory] = useState<"AI & ML" | "Web3" | "Cloud DevOps" | "Data Science" | "Software Eng." | "Cybersecurity" | "Product Design" | "Vocational">("Vocational");
   const [newCourseDescription, setNewCourseDescription] = useState("");
   const [newCourseLessons, setNewCourseLessons] = useState<{ id: string; title: string; duration: string; completed?: boolean }[]>([
     { id: "mod1", title: "Introduction & Tool Setup", duration: "10 mins", completed: false }
@@ -154,7 +154,7 @@ export default function AcademySection({
       authorRole: "AI Engineer",
       courseTitle: "Google AI Masterclass: Gemini API & Agents",
       content: "Just deployed my first autonomous math agent using the Antigravity framework! Managed to integrate it with the Gemini tool-calling API to handle complex differential equations. The system prompt optimization made a huge difference.",
-      image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=300",
+      image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=300",
       likes: 24,
       hasLiked: false,
       comments: [
@@ -185,7 +185,7 @@ export default function AcademySection({
       authorName: "Alex K.",
       authorAvatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150",
       authorRole: "DevOps Specialist",
-      courseTitle: "AWS CloudNative Architect Certification",
+      courseTitle: "Advanced AI Agent Deployment Architecture",
       content: "Successfully provisioned a highly available EKS cluster using Terraform. Configured the HorizontalPodAutoscaler to handle traffic spikes. Next step: setting up ArgoCD for GitOps deployments!",
       likes: 34,
       hasLiked: false,
@@ -266,8 +266,8 @@ export default function AcademySection({
     setAiFeedbackText("");
   }, [activeLesson]);
 
-  // Hands-on Project Submission and Simulated AI Grading
-  const handleProjectSubmit = (courseId: string, missionId: string, e: React.FormEvent) => {
+  // Hands-on Consultancy Submission and Simulated AI Grading
+  const handleConsultancySubmit = (courseId: string, missionId: string, e: React.FormEvent) => {
     e.preventDefault();
     const submissionText = missionSubmissions[missionId];
     if (!submissionText || !submissionText.trim()) return;
@@ -345,7 +345,7 @@ export default function AcademySection({
         recommends: userProfile.recommends + pointsGain,
         certifications: [
           ...userProfile.certifications.filter((cert) => !cert.includes(selectedCourse!.title)),
-          `Certification: Completed ${selectedCourse!.title} Practical Mission (${new Date().getFullYear()})`,
+          `AI Training: Completed ${selectedCourse!.title} Practical Mission (${new Date().getFullYear()})`,
         ]
       });
     }, 2200);
@@ -364,7 +364,7 @@ export default function AcademySection({
     setQuizSubmitted(true);
 
     if (score === course.quizzes.length) {
-      // Full marks: Completed course certificate unlocked!
+      // Full marks: Completed AI Credential unlocked!
       const currentCerts = userProfile.certifications.filter((cert) => !cert.includes(course.title));
       
       onUpdateProfile({
@@ -377,7 +377,7 @@ export default function AcademySection({
     }
   };
 
-  const claimCertificate = async (course: Course) => {
+  const claimAICredential = async (course: Course) => {
     try {
       if (!userProfile.certifications.includes(course.title)) {
         const updatedCerts = [...userProfile.certifications, course.title];
@@ -389,7 +389,7 @@ export default function AcademySection({
         alert(`Congratulations! You've earned your professional license for ${course.title}. Check your Credentials tab!`);
       }
     } catch (err) {
-      console.error("Certificate error:", err);
+      console.error("Credential error:", err);
     }
   };
 
@@ -529,7 +529,7 @@ export default function AcademySection({
       rating: 5.0,
       students: 0,
       image: newCourseCategory === "Cloud DevOps" 
-        ? "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&q=80&w=300"
+        ? "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=300"
         : newCourseCategory === "AI & ML"
         ? "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?auto=format&fit=crop&q=80&w=300"
         : "https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?auto=format&fit=crop&q=80&w=300",
@@ -586,14 +586,14 @@ export default function AcademySection({
                                     <div className="relative z-10 max-w-2xl">
               <div className="flex items-center gap-2 mb-4">
                 <span className="bg-emerald-500/20 text-emerald-400 text-[10px] font-bold font-mono px-3 py-1 rounded-full uppercase tracking-widest border border-emerald-500/30">
-                  Reference Material
+                  AI Training Space
                 </span>
               </div>
               <h1 className="text-2xl lg:text-3xl font-black text-white tracking-tight mb-3 whitespace-nowrap">
-                Reference <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-200">Material</span>
+                AI Training <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-200">Space</span>
               </h1>
               <p className="text-sm lg:text-base text-slate-400 leading-relaxed max-w-xl">
-                Prove your skills and earn professional-worthy certifications on your ESTARR profile for free.
+                Master the latest artificial intelligence models, tools, and deployment strategies. Train your skills and earn verified AI capabilities for your ESTARR profile.
               </p>
             </div>
 
@@ -606,8 +606,8 @@ export default function AcademySection({
                   </div>
                 </div>
                 <div>
-                  <span className="text-[10px] text-slate-400 font-mono uppercase tracking-wider block mb-1">Estarr Recognised</span>
-                  <span className="text-lg font-black text-white leading-tight">Interview Ready Certifications</span>
+                  <span className="text-[10px] text-slate-400 font-mono uppercase tracking-wider block mb-1">Estarr AI Verified</span>
+                  <span className="text-lg font-black text-white leading-tight">Advanced AI Training</span>
                 </div>
               </div>
 
@@ -650,7 +650,7 @@ export default function AcademySection({
               }`}
             >
               <TrendingUp className="w-4 h-4 text-emerald-500 animate-pulse" />
-              🌐 Project Submissions Feed
+              🌐 Consultancy Submissions Feed
             </button>
             <button
               id="tab-credentials"
@@ -723,10 +723,11 @@ export default function AcademySection({
                       <div className="relative h-44 overflow-hidden">
                         <div className={`w-full h-full bg-gradient-to-br ${
                           course.category === "AI & ML" ? "from-indigo-600 to-purple-700" :
-                          course.category === "Web3" ? "from-amber-500 to-orange-600" :
-                          course.category === "Cloud DevOps" ? "from-cyan-600 to-blue-700" :
+                          course.category === "Web3" ? "from-emerald-600 to-teal-700" :
+                          course.category === "Cloud DevOps" ? "from-blue-600 to-indigo-700" :
                           course.category === "Cybersecurity" ? "from-rose-600 to-red-700" :
-                          "from-slate-700 to-slate-800"
+                          course.category === "Software Eng." ? "from-slate-700 to-slate-900" :
+                          "from-emerald-700 to-emerald-900"
                         } group-hover:scale-105 transition-transform duration-500 flex items-center justify-center`}>
                           <div className="relative z-10 flex flex-col items-center gap-2">
                             <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center backdrop-blur-md shadow-lg">
@@ -734,7 +735,8 @@ export default function AcademySection({
                               {course.category === "Web3" && <ShieldCheck className="w-8 h-8 text-white/80" />}
                               {course.category === "Cloud DevOps" && <Tv className="w-8 h-8 text-white/80" />}
                               {course.category === "Cybersecurity" && <Lock className="w-8 h-8 text-white/80" />}
-                              {!["AI & ML", "Web3", "Cloud DevOps", "Cybersecurity"].includes(course.category) && <BookOpen className="w-8 h-8 text-white/80" />}
+                              {course.category === "Software Eng." && <Briefcase className="w-8 h-8 text-white/80" />}
+                              {!["AI & ML", "Web3", "Cloud DevOps", "Cybersecurity", "Software Eng."].includes(course.category) && <BookOpen className="w-8 h-8 text-white/80" />}
                             </div>
                           </div>
                         </div>
@@ -898,7 +900,7 @@ export default function AcademySection({
                       <textarea
                         required
                         rows={2}
-                        placeholder="Share a draft, photo, script, or snippet, architecture diagram, or deployment log from your current certification course..."
+                        placeholder="Share a draft, photo, script, or snippet, architecture diagram, or deployment log from your current AI training module..."
                         value={newPostContent}
                         onChange={(e) => setNewPostContent(e.target.value)}
                         className="bg-slate-50 border border-slate-100 rounded-xl p-3 text-xs text-slate-800 focus:outline-none focus:bg-white focus:border-emerald-500 transition-colors w-full resize-none"
@@ -923,7 +925,7 @@ export default function AcademySection({
                           className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer transition-all"
                         >
                           <Send className="w-3.5 h-3.5" />
-                          <span>Publish Project</span>
+                          <span>Publish Consultancy</span>
                         </button>
                       </div>
                     </div>
@@ -953,7 +955,7 @@ export default function AcademySection({
                               </h4>
                               {post.verifiedWork && (
                                 <span className="bg-emerald-100 text-emerald-800 text-[9px] font-bold font-mono px-2 py-0.5 rounded-full flex items-center gap-0.5">
-                                  <UserCheck className="w-2.5 h-2.5" /> Project Approved
+                                  <UserCheck className="w-2.5 h-2.5" /> Consultancy Approved
                                 </span>
                               )}
                             </div>
@@ -976,7 +978,7 @@ export default function AcademySection({
                         <div className="rounded-xl overflow-hidden max-h-60 bg-slate-900 border border-slate-100">
                           <img
                             src={post.image}
-                            alt="Project snapshot"
+                            alt="Consultancy snapshot"
                             referrerPolicy="no-referrer"
                             className="w-full h-full object-cover"
                           />
@@ -1128,7 +1130,7 @@ export default function AcademySection({
                       <Award className="w-6 h-6 text-emerald-400" /> AI & Engineering Credentials Wallet
                     </h3>
                     <p className="text-sm text-slate-400 mt-2 max-w-lg">
-                      Your immutable proof of technical competency. Share these verified engineering certificates on your profile to unlock premium enterprise tech roles instantly.
+                      Your immutable proof of technical competency. Share these verified AI credentials on your profile to unlock premium enterprise tech roles instantly.
                     </p>
                   </div>
                   <div className="bg-slate-950 border border-slate-800 rounded-2xl p-4 shrink-0 flex items-center gap-4">
@@ -1160,7 +1162,7 @@ export default function AcademySection({
                       <div className="relative z-10">
                         <div className="flex justify-between items-start mb-6">
                           <span className="text-[10px] bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-3 py-1 rounded-full font-mono font-bold tracking-widest uppercase">
-                            Verified Technical Certification
+                            Verified AI Credential
                           </span>
                           <div className="w-8 h-8 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center shadow-inner">
                             <Award className="w-4 h-4 text-emerald-400" />
@@ -1184,7 +1186,7 @@ export default function AcademySection({
                           <span>Verified Node</span>
                         </div>
                         <button
-                          onClick={() => alert(`Sharing certificate serial with your ESTARR network!`)}
+                          onClick={() => alert(`Sharing credential serial with your ESTARR network!`)}
                           className="bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 cursor-pointer transition-colors border border-slate-800"
                         >
                           <Share2 className="w-3 h-3" /> Share
@@ -1199,7 +1201,7 @@ export default function AcademySection({
                     </div>
                     <h4 className="font-black text-lg text-white mb-2">No Professional Licenses Unlocked Yet</h4>
                     <p className="text-sm text-slate-400 max-w-md mx-auto">
-                      Enter any course classroom, perfect the Competency Evaluation, and pass the hands-on project to earn your license!
+                      Enter any course classroom, perfect the Competency Evaluation, and pass the hands-on consultancy to earn your license!
                     </p>
                   </div>
                 )}
@@ -1267,7 +1269,7 @@ export default function AcademySection({
               onClick={() => setSelectedCourse(null)}
               className="text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1 cursor-pointer transition-colors"
             >
-              &larr; Back to Certifications Catalog
+              &larr; Back to AI Training Catalog
             </button>
 
             <div>
@@ -1356,7 +1358,7 @@ export default function AcademySection({
                     <span>CBT Competency Quiz</span>
                   </div>
                   <span className="text-[9px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-full font-mono uppercase font-bold shrink-0">
-                    {quizSubmitted && quizScore === selectedCourse.quizzes.length ? "Passed ✓" : "Unlock Cert"}
+                    {quizSubmitted && quizScore === selectedCourse.quizzes.length ? "Passed ✓" : "Unlock Credential"}
                   </span>
                 </button>
 
@@ -1364,11 +1366,11 @@ export default function AcademySection({
                   <motion.button
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    onClick={() => claimCertificate(selectedCourse)}
+                    onClick={() => claimAICredential(selectedCourse)}
                     className="w-full bg-gradient-to-r from-amber-500 to-amber-600 text-white p-4 rounded-xl text-xs font-black uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 hover:scale-[1.02] transition-all"
                   >
                     <Award className="w-4 h-4" />
-                    Claim Professional Certificate
+                    Claim AI Credential
                   </motion.button>
                 )}
               </div>
@@ -1411,7 +1413,7 @@ export default function AcademySection({
                     CBT Classroom Competency Quiz
                   </h3>
                   <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                    Score a flawless 100% on the theoretical evaluation to instantly earn and showcase your official tech certificate on ESTARR!
+                    Score a flawless 100% on the theoretical evaluation to instantly earn and showcase your official AI credential on ESTARR!
                   </p>
                 </div>
 
@@ -1461,7 +1463,7 @@ export default function AcademySection({
                     ) : (
                       <div className="flex flex-col gap-1">
                         <span>You scored {quizScore}/{selectedCourse.quizzes.length} correct answers.</span>
-                        <span className="font-normal text-slate-500">Please review the syllabus video modules and try again! All answers must be correct to satisfy certification requirements.</span>
+                        <span className="font-normal text-slate-500">Please review the syllabus video modules and try again! All answers must be correct to satisfy AI training requirements.</span>
                       </div>
                     )}
                   </div>
@@ -1562,7 +1564,7 @@ export default function AcademySection({
                           Course Practical Missions
                         </h3>
                         <p className="text-xs text-slate-400 mt-1.5 leading-relaxed">
-                          Do the actual task described below, submit your written draft or project url, and get instant verified grading with bonus point payouts.
+                          Do the actual task described below, submit your written draft or consultancy url, and get instant verified grading with bonus point payouts.
                         </p>
                       </div>
 
@@ -1595,7 +1597,7 @@ export default function AcademySection({
                                     <span>Mission Submitted & Passed Verified Peer Review!</span>
                                   </div>
                                   <button
-                                    onClick={() => alert("Project is locked for edit once reviewed and approved!")}
+                                    onClick={() => alert("Consultancy is locked for edit once reviewed and approved!")}
                                     className="text-[10px] text-slate-400 font-mono hover:text-white uppercase tracking-wider underline underline-offset-4"
                                   >
                                     View Submission
@@ -1603,7 +1605,7 @@ export default function AcademySection({
                                 </div>
                               ) : (
                                 <form
-                                  onSubmit={(e) => handleProjectSubmit(selectedCourse.id, mission.id, e)}
+                                  onSubmit={(e) => handleConsultancySubmit(selectedCourse.id, mission.id, e)}
                                   className="flex flex-col gap-4"
                                 >
                                   <textarea
@@ -1623,7 +1625,7 @@ export default function AcademySection({
                                   {isGrading && (
                                     <div className="flex items-center gap-2 text-xs font-medium text-emerald-400 bg-emerald-500/10 p-3 rounded-xl border border-emerald-500/20">
                                       <span className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-ping" />
-                                      <span>ESTARR AI Grader is evaluating your project layout...</span>
+                                      <span>ESTARR AI Grader is evaluating your consultancy layout...</span>
                                     </div>
                                   )}
 

@@ -1,0 +1,74 @@
+      {activeTab === "validation" && (
+        <div className="flex flex-col gap-6">
+           <div className="bg-purple-900 text-white p-8 rounded-2xl shadow-xl flex flex-col md:flex-row justify-between items-center gap-6 relative overflow-hidden">
+              <div className="absolute top-0 right-0 opacity-10 transform translate-x-4 -translate-y-4">
+                <Target className="w-64 h-64" />
+              </div>
+              <div className="relative z-10 max-w-xl">
+                 <h2 className="text-2xl font-black mb-2">RLHF Validation Center</h2>
+                 <p className="text-purple-200">Participate in Reinforcement Learning from Human Feedback. Compare model outputs, rate quality, and earn ESTARR points for improving AI accuracy.</p>
+              </div>
+              <div className="relative z-10 flex gap-4">
+                 <div className="bg-purple-800/50 p-4 rounded-xl border border-purple-700/50 text-center min-w-[120px]">
+                    <p className="text-3xl font-black text-white">14</p>
+                    <p className="text-[10px] uppercase font-bold text-purple-300 mt-1">Pending Tasks</p>
+                 </div>
+                 <div className="bg-purple-800/50 p-4 rounded-xl border border-purple-700/50 text-center min-w-[120px]">
+                    <p className="text-3xl font-black text-emerald-400">450</p>
+                    <p className="text-[10px] uppercase font-bold text-purple-300 mt-1">Points Earned</p>
+                 </div>
+              </div>
+           </div>
+
+           <h3 className="font-bold text-slate-900 text-lg mt-4">Active Validation Tasks</h3>
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col gap-4">
+                 <div className="flex justify-between items-start">
+                   <div>
+                      <h4 className="font-bold text-slate-900 text-lg">Model Output Preference (A/B Test)</h4>
+                      <p className="text-slate-500 text-xs mt-1 font-medium">Prompt: "Explain quantum computing to a 5-year-old."</p>
+                   </div>
+                   <span className="bg-purple-100 text-purple-700 font-bold text-[10px] px-2 py-1 rounded-full uppercase tracking-wider">RLHF</span>
+                 </div>
+                 
+                 <div className="grid grid-cols-2 gap-4 mt-2">
+                   <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition-colors">
+                      <span className="font-mono text-xs font-bold text-slate-400 mb-2 block">Response A</span>
+                      <p className="text-sm text-slate-700 line-clamp-4">Imagine you have a magic coin. A normal coin is either heads or tails. But a magic quantum coin can be heads, tails, or spinning in the air being both at the same time! That's how quantum computers work...</p>
+                   </div>
+                   <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition-colors">
+                      <span className="font-mono text-xs font-bold text-slate-400 mb-2 block">Response B</span>
+                      <p className="text-sm text-slate-700 line-clamp-4">Quantum computing utilizes qubits instead of standard bits. Due to superposition and entanglement, they can process multiple states simultaneously, offering exponential speedups for certain complex algorithms...</p>
+                   </div>
+                 </div>
+                 <button className="w-full mt-2 bg-slate-900 hover:bg-purple-600 text-white font-bold py-3 rounded-xl transition-colors text-sm flex items-center justify-center gap-2 cursor-pointer">
+                    Start Evaluation <ChevronRight className="w-4 h-4" />
+                 </button>
+              </div>
+
+              <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col gap-4">
+                 <div className="flex justify-between items-start">
+                   <div>
+                      <h4 className="font-bold text-slate-900 text-lg">Safety & Bias Detection</h4>
+                      <p className="text-slate-500 text-xs mt-1 font-medium">Review potentially unsafe outputs generated during adversarial testing.</p>
+                   </div>
+                   <span className="bg-rose-100 text-rose-700 font-bold text-[10px] px-2 py-1 rounded-full uppercase tracking-wider">Safety</span>
+                 </div>
+                 
+                 <div className="flex flex-col gap-3 mt-2 flex-grow">
+                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                      <p className="text-sm font-bold text-slate-900 mb-2 flex items-center gap-2"><ShieldAlert className="w-4 h-4 text-rose-500" /> Review Queue</p>
+                      <ul className="text-sm text-slate-600 space-y-2">
+                        <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-slate-300"></div> 12 items pending review</li>
+                        <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 rounded-full bg-slate-300"></div> Est. time: 5-10 mins</li>
+                      </ul>
+                    </div>
+                 </div>
+                 <button className="w-full mt-2 bg-slate-100 hover:bg-slate-200 text-slate-900 font-bold py-3 rounded-xl transition-colors text-sm flex items-center justify-center gap-2 cursor-pointer">
+                    Review Queue
+                 </button>
+              </div>
+           </div>
+        </div>
+      )}
+

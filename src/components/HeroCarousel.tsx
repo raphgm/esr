@@ -5,21 +5,22 @@ export function HeroCarousel() {
     {
       title: (
         <>
-          Learn
+          Scale
           <br />
-          <span className="text-purple-500">To</span> Earning.
+          <span className="text-purple-500">Intelligence</span>.
         </>
       ),
-      desc: "Africa's leading digital ecosystem where practical skills transform into sustainable professional growth.",
+      desc: "Deploy elite AI engineering and visual narrative systems to automate your enterprise output and scale global presence.",
     },
     {
       title: (
         <>
-          Connect &<br />
-          <span className="text-purple-500">Showcase</span>.
+          Global
+          <br />
+          <span className="text-purple-500">Orchestration</span>.
         </>
       ),
-      desc: "Build your professional portfolio, connect with peers, and verify your credentials on-chain.",
+      desc: "Connect with the top 3% of pre-vetted AI architects, infrastructure nodes, and creative operations squads.",
     },
   ];
 

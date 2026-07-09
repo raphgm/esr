@@ -6,7 +6,7 @@ export const MOCK_AUDIO_TRACKS = [
   { id: "none", name: "No Audio (Original Sound)", artist: "" },
   { id: "afrobeat", name: "Trending Afrobeat Beat 🥁", artist: "Yusuf S. Beats", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" },
   { id: "lofi", name: "Focus Lofi Work Chill ☕", artist: "ESTARR Audio", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3" },
-  { id: "startup", name: "Energetic Trades Pitch ⚡", artist: "Startup Hype", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" },
+  { id: "startup", name: "Energetic Talent Pitch ⚡", artist: "Startup Hype", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" },
   { id: "acoustic", name: "Calm Acoustic Strings 🎸", artist: "Folklore Duo", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" },
 ];
 

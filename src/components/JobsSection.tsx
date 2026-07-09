@@ -14,7 +14,7 @@ interface JobsSectionProps {
 
 export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile }: JobsSectionProps) {
   const [showPostJob, setShowPostJob] = useState(false);
-  const [viewMode, setViewMode] = useState<"listings" | "proof-of-skills" | "djinni-anonymous">("listings");
+  const [viewMode, setViewMode] = useState<"listings" | "proof-of-skills" | "anonymous-market">("listings");
   const [activeCategory, setActiveCategory] = useState<"All" | "Apprenticeship" | "Freelance" | "Full-time">("All");
 
   // Dynamic Matcher Skill selector tags
@@ -31,7 +31,7 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile }
     "software-architect": {
       name: "Software Architect",
       skills: ["Advanced React Architecture", "Distributed Systems", "Off-chain State Channels", "Vite & Build Tooling"],
-      certification: "skill-sch.com: Certified Software Architect (2026)"
+      certification: "skill-sch.com: Certified AI Architect (2026)"
     },
     "smart-contract-developer": {
       name: "Smart Contract Developer",
@@ -46,7 +46,7 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile }
     "digital-marketing": {
       name: "Digital Marketing Specialist",
       skills: ["TikTok Ads & Campaigns", "Instagram Outreach Metrics", "Canva Styling", "UGC Asset Production"],
-      certification: "skill-sch.com: Certified E-commerce Marketer (2026)"
+      certification: "skill-sch.com: Certified AI Marketer (2026)"
     }
   };
 
@@ -70,8 +70,8 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile }
           const profileData = skillSchProfiles[selectedProfile as keyof typeof skillSchProfiles];
           
           // Merge unique skills
-          const currentFormal = userProfile.formalSkills || [];
-          const updatedFormal = Array.from(new Set([...currentFormal, ...profileData.skills]));
+          const currentSkills = userProfile.skills || [];
+          const updatedSkills = Array.from(new Set([...currentSkills, ...profileData.skills]));
           
           // Merge unique certifications
           const currentCerts = userProfile.certifications || [];
@@ -80,7 +80,7 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile }
           if (onUpdateProfile) {
             onUpdateProfile({
               ...userProfile,
-              formalSkills: updatedFormal,
+              skills: updatedSkills,
               certifications: updatedCerts
             });
           }
@@ -181,7 +181,7 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile }
     setTimeout(() => {
       setIsGeneratingPitch(false);
       setGeneratedPitch(
-        `Hi ${job.company} Team,\n\nI'm very interested in the ${job.title} role. Although I'm relatively new to this field, I have recently completed rigorous practical training in the ESTARR Academy, including hands-on projects directly related to ${job.skillsRequired?.[0] || 'the required skills'}.\n\nI am highly motivated, eager to learn, and ready to deliver value immediately through my strong work ethic and foundational knowledge. Please find my ESTARR 'Proof of Work' portfolio attached for a sample of my capabilities.\n\nLooking forward to the opportunity to grow with your team!\n\nBest regards,\n${userProfile.name}`
+        `Hi ${job.company} Team,\n\nI'm very interested in the ${job.title} role. Although I'm relatively new to this field, I have recently completed rigorous practical training in the ESTARR Academy, including hands-on consultancy directly related to ${job.skillsRequired?.[0] || 'the required skills'}.\n\nI am highly motivated, eager to learn, and ready to deliver value immediately through my strong work ethic and foundational knowledge. Please find my ESTARR 'Proof of Work' portfolio attached for a sample of my capabilities.\n\nLooking forward to the opportunity to grow with your team!\n\nBest regards,\n${userProfile.name}`
       );
     }, 1500);
   };
@@ -207,7 +207,7 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile }
       <PageBanner
         title="Job Board"
         subtitle="CAREER OPPORTUNITIES & TALENT MATCHING"
-        description="Find your next role or hire verified talent based on real-world capstone projects, not just resumes."
+        description="Find your next role or hire verified talent based on real-world capstone consultancy, not just resumes."
         icon={Briefcase}
         actions={
           userProfile.accountType === "jobOwner" && (
@@ -238,11 +238,11 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile }
             {userProfile.accountType === "jobOwner" ? "Hire by Proof-of-Skill" : "My Skill Match Score"}
           </button>
           <button
-            onClick={() => setViewMode("djinni-anonymous")}
-            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${viewMode === "djinni-anonymous" ? "bg-white shadow-sm text-purple-600" : "text-slate-500 hover:text-slate-700"}`}
+            onClick={() => setViewMode("anonymous-market")}
+            className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${viewMode === "anonymous-market" ? "bg-white shadow-sm text-purple-600" : "text-slate-500 hover:text-slate-700"}`}
           >
             <ShieldCheck className="w-3.5 h-3.5 text-blue-500" />
-            Djinni Anonymous Market
+            Anonymous Market
           </button>
         </div>
 
@@ -313,7 +313,7 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile }
             </div>
             <div>
               <h3 className="text-xl font-bold font-display text-slate-900">AI-Powered Proof-of-Skills Matcher</h3>
-              <p className="text-sm text-slate-500">Evaluate and hire talent based on real projects, not resumes. Features formal skills from skill-sch.com and creator skills from ESTARR.</p>
+              <p className="text-sm text-slate-500">Evaluate and hire talent based on real consultancy, not resumes. Features formal skills from skill-sch.com and creator skills from ESTARR.</p>
             </div>
           </div>
           
@@ -340,7 +340,7 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile }
                   <button 
                     onClick={(e) => {
                       e.stopPropagation();
-                      alert(`Invite sent to ${talent.name} for an interview based on their capstone project.`);
+                      alert(`Invite sent to ${talent.name} for an interview based on their capstone consultancy.`);
                     }}
                     className="bg-purple-100 hover:bg-purple-200 text-purple-700 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors"
                   >
@@ -354,7 +354,7 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile }
       )}
 
       {viewMode === "proof-of-skills" && userProfile.accountType !== "jobOwner" && (() => {
-        const hasSyncedSkills = userProfile.formalSkills && userProfile.formalSkills.length > 3;
+        const hasSyncedSkills = userProfile.skills && userProfile.skills.length > 3;
         const matchScore = hasSyncedSkills ? 95 : 65;
 
         // live matcher compatibility calculator
@@ -450,7 +450,7 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile }
               
               <div className="flex gap-3 mt-6 relative z-10">
                 <button className="bg-white text-purple-700 px-6 py-2.5 rounded-xl text-xs font-bold shadow-sm hover:bg-purple-50 transition-colors">
-                  Start Missing Capstone Project
+                  Start Missing Capstone Consultancy
                 </button>
                 {hasSyncedSkills && (
                   <div className="bg-purple-500/20 text-purple-300 border border-purple-500/30 text-xs px-4 py-2.5 rounded-xl flex items-center gap-1 font-mono font-bold">
@@ -571,17 +571,17 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile }
               </div>
               <div className="flex-1 flex flex-col gap-1.5">
                 <label className="text-[10px] font-bold text-slate-900 uppercase tracking-wide">Location</label>
-                <input type="text" value={newLocation} onChange={e => setNewLocation(e.target.value)} placeholder="e.g. Lagos, Nigeria or Remote" className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-sm focus:outline-none focus:border-purple-500" />
+                <input required type="text" value={newLocation} onChange={e => setNewLocation(e.target.value)} placeholder="e.g. Lagos, Nigeria or Remote" className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-sm focus:outline-none focus:border-purple-500" />
               </div>
               <div className="flex-1 flex flex-col gap-1.5">
                 <label className="text-[10px] font-bold text-slate-900 uppercase tracking-wide">Salary / Budget</label>
-                <input type="text" value={newSalary} onChange={e => setNewSalary(e.target.value)} placeholder="e.g. $3k - $5k/mo" className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-sm focus:outline-none focus:border-purple-500" />
+                <input required type="text" value={newSalary} onChange={e => setNewSalary(e.target.value)} placeholder="e.g. $3k - $5k/mo" className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-sm focus:outline-none focus:border-purple-500" />
               </div>
             </div>
             
             <div className="flex flex-col gap-1.5">
                 <label className="text-[10px] font-bold text-slate-900 uppercase tracking-wide">Description</label>
-                <textarea rows={4} value={newDesc} onChange={e => setNewDesc(e.target.value)} placeholder="Describe the responsibilities and requirements..." className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-sm focus:outline-none focus:border-purple-500 resize-none" />
+                <textarea required rows={4} value={newDesc} onChange={e => setNewDesc(e.target.value)} placeholder="Describe the responsibilities and requirements..." className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-sm focus:outline-none focus:border-purple-500 resize-none" />
             </div>
             <button type="submit" className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold w-fit mt-2 cursor-pointer transition-colors shadow-sm">
               Publish Job
@@ -701,7 +701,7 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile }
             </div>
           ))}
         </div>
-      ) : viewMode === "djinni-anonymous" ? (
+      ) : viewMode === "anonymous-market" ? (
         <DjinniAnonymousSection 
           userProfile={userProfile}
           jobs={jobs}

@@ -331,7 +331,7 @@ export const CreatorStudio: React.FC<CreatorStudioProps> = ({
                 >
                   <div className={`relative h-48 flex items-center justify-center bg-gradient-to-br ${
                     item.type === "video" ? "from-indigo-600 to-purple-700" :
-                    item.type === "slide" ? "from-cyan-600 to-blue-700" :
+                    item.type === "slide" ? "from-blue-600 to-indigo-700" :
                     "from-emerald-600 to-teal-700"
                   } overflow-hidden`}>
                     <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center backdrop-blur-md">
@@ -407,7 +407,7 @@ export const CreatorStudio: React.FC<CreatorStudioProps> = ({
                        onChange={(e) => setArchitectCategory(e.target.value)}
                        className="bg-slate-800 border border-slate-700 rounded-2xl p-4 text-sm font-bold text-white focus:outline-none focus:border-emerald-500 transition-all cursor-pointer"
                      >
-                        <option value="Trades">Trades & Crafts</option>
+                        <option value="Vocational">Vocational & Crafts</option>
                         <option value="Digital">Digital & Creator</option>
                         <option value="Business">Business & Sales</option>
                         <option value="Tech">Tech / AI</option>
@@ -505,7 +505,7 @@ export const CreatorStudio: React.FC<CreatorStudioProps> = ({
                 description: formData.get("description") as string,
                 rating: 5.0,
                 students: 0,
-                image: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&q=80&w=300",
+                image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=300",
                 lessons: [
                   { id: "l1", title: "Introduction", duration: "10 mins", completed: false }
                 ],
@@ -530,8 +530,8 @@ export const CreatorStudio: React.FC<CreatorStudioProps> = ({
               </div>
               <div className="flex flex-col gap-2">
                 <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Category</label>
-                <select name="category" className="bg-slate-50 border border-slate-100 rounded-2xl p-4 text-sm font-bold">
-                  <option value="Trades">Trades & Crafts</option>
+                <select name="category" required className="bg-slate-50 border border-slate-100 rounded-2xl p-4 text-sm font-bold">
+                  <option value="Vocational">Vocational & Crafts</option>
                   <option value="Digital">Digital & Creator</option>
                   <option value="Business">Business & Sales</option>
                   <option value="Tech">Tech / AI</option>
@@ -539,7 +539,7 @@ export const CreatorStudio: React.FC<CreatorStudioProps> = ({
               </div>
               <div className="flex flex-col gap-2">
                 <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Description</label>
-                <textarea name="description" rows={4} className="bg-slate-50 border border-slate-100 rounded-2xl p-4 text-sm font-bold resize-none" />
+                <textarea name="description" required rows={4} className="bg-slate-50 border border-slate-100 rounded-2xl p-4 text-sm font-bold resize-none" />
               </div>
               <button type="submit" className="bg-emerald-600 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-emerald-700 transition-all">
                 🚀 Launch Course
@@ -556,9 +556,11 @@ export const CreatorStudio: React.FC<CreatorStudioProps> = ({
                     <div key={course.id} className="flex gap-4 p-3 bg-slate-50 rounded-2xl border border-slate-100">
                       <div className={`w-16 h-16 rounded-xl shrink-0 flex items-center justify-center bg-gradient-to-br ${
                         course.category === "AI & ML" ? "from-indigo-600 to-purple-700" :
-                        course.category === "Web3" ? "from-amber-500 to-orange-600" :
-                        course.category === "Cloud DevOps" ? "from-cyan-600 to-blue-700" :
-                        "from-slate-700 to-slate-800"
+                        course.category === "Web3" ? "from-emerald-600 to-teal-700" :
+                        course.category === "Cloud DevOps" ? "from-blue-600 to-indigo-700" :
+                        course.category === "Cybersecurity" ? "from-rose-600 to-red-700" :
+                        course.category === "Software Eng." ? "from-slate-700 to-slate-900" :
+                        "from-emerald-700 to-emerald-900"
                       }`}>
                         {course.category === "AI & ML" && <Sparkles className="w-6 h-6 text-white/80" />}
                         {course.category === "Cloud DevOps" && <Tv className="w-6 h-6 text-white/80" />}

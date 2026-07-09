@@ -1,0 +1,15 @@
+                    <input
+                      list="niche-categories"
+                      value={newCategory}
+                      onChange={(e) => setNewCategory(e.target.value)}
+                      placeholder="Select or type..."
+                      className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-700 font-bold focus:outline-none focus:border-purple-500 w-full"
+                    />
+                    <datalist id="niche-categories">
+                      <option value="Creative Operations" />
+                      <option value="Writing & Content" />
+                      <option value="Tech & Platform" />
+                      <option value="Agric & Business" />
+                      <option value="Train AI" />
+                      <option value="Build AI" />
+                    </datalist>

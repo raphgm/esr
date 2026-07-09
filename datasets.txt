@@ -1,0 +1,59 @@
+      {activeTab === "datasets" && (
+        <div className="flex flex-col gap-6">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-black text-slate-900">Collaborative Datasets</h2>
+            <button className="bg-slate-900 hover:bg-purple-600 text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-colors cursor-pointer">
+              <Database className="w-4 h-4" /> Upload Dataset
+            </button>
+          </div>
+
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+             <table className="w-full text-left border-collapse">
+               <thead>
+                 <tr className="bg-slate-50 border-b border-slate-200 text-xs uppercase tracking-wider font-bold text-slate-500">
+                   <th className="p-4">Dataset Name</th>
+                   <th className="p-4">Type</th>
+                   <th className="p-4">Size</th>
+                   <th className="p-4">Rows/Items</th>
+                   <th className="p-4">Status</th>
+                   <th className="p-4"></th>
+                 </tr>
+               </thead>
+               <tbody className="divide-y divide-slate-100">
+                 {[
+                   { name: "Global-Tech-QA-v1", type: "Text / QA", size: "1.2 GB", items: "150,000", status: "Ready" },
+                   { name: "Medical-Images-Annotated", type: "Image", size: "45 GB", items: "85,000", status: "Annotating" },
+                   { name: "Customer-Support-Logs", type: "Text / Conversational", size: "4.5 GB", items: "2.1M", status: "Processing" },
+                   { name: "Code-Instruct-Python", type: "Code", size: "850 MB", items: "45,000", status: "Ready" }
+                 ].map((ds, idx) => (
+                   <tr key={idx} className="hover:bg-slate-50 transition-colors">
+                     <td className="p-4">
+                       <div className="flex items-center gap-3">
+                         <FileText className="w-5 h-5 text-purple-600" />
+                         <span className="font-bold text-slate-900">{ds.name}</span>
+                       </div>
+                     </td>
+                     <td className="p-4 text-sm text-slate-500">{ds.type}</td>
+                     <td className="p-4 text-sm font-mono text-slate-700">{ds.size}</td>
+                     <td className="p-4 text-sm font-mono text-slate-700">{ds.items}</td>
+                     <td className="p-4">
+                        <span className={`text-[10px] px-2 py-1 rounded-full uppercase tracking-wider font-bold ${
+                          ds.status === 'Ready' ? 'bg-emerald-100 text-emerald-700' :
+                          ds.status === 'Processing' ? 'bg-blue-100 text-blue-700 animate-pulse' : 'bg-amber-100 text-amber-700'
+                        }`}>
+                          {ds.status}
+                        </span>
+                     </td>
+                     <td className="p-4 text-right">
+                       <button className="text-slate-400 hover:text-purple-600 cursor-pointer">
+                         <Settings className="w-4 h-4" />
+                       </button>
+                     </td>
+                   </tr>
+                 ))}
+               </tbody>
+             </table>
+          </div>
+        </div>
+      )}
+

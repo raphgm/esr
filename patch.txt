@@ -1,0 +1,11 @@
+              items: [
+                { id: "home", label: "Home", desc: "Digital ecosystem overview", icon: Home },
+                { id: "academy", label: "AI Training Space", desc: "Professional playbooks & licenses", icon: Award },
+                { id: "ai-validation", label: "Train & Validate AI", desc: "Data tasks & polls", icon: Target },
+                { id: "portfolio", label: "Talent Portfolios", desc: "Showcase skills & consultancy", icon: Briefcase },
+              ]
+            },
+            {
+              title: "Gig Market & Escrow Services",
+              items: [
+                { id: "gigs", label: "AI Gig Builder", desc: "Draft & list your services", icon: Sparkles },

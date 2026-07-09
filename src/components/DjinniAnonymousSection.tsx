@@ -214,7 +214,7 @@ export function DjinniAnonymousSection({ userProfile, jobs, onUpdateProfile }: D
         employerEmail: userProfile.email || "partner@estarr.co",
         jobTitle,
         proposedSalary: proposedSalaryStr || "$95/hr",
-        message: pitchMessage || `Hi, we reviewed your anonymous profile on Djinni and would love to connect about the ${jobTitle} role!`,
+        message: pitchMessage || `Hi, we reviewed your anonymous profile on our Anonymous Board and would love to connect about the ${jobTitle} role!`,
         status: "pending",
         createdAt: new Date().toISOString()
       };
@@ -286,7 +286,7 @@ export function DjinniAnonymousSection({ userProfile, jobs, onUpdateProfile }: D
         <div>
           <div className="flex items-center gap-2 mb-1.5">
             <span className="bg-blue-500 text-white font-mono font-black text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-full shadow-md">
-              Djinni Integration
+              Anonymous Profile Integration
             </span>
             <span className="text-[10px] text-slate-400 font-mono flex items-center gap-1">
               <Lock className="w-3 h-3 text-emerald-400" /> Anonymous Recruitment Pipeline
@@ -296,7 +296,7 @@ export function DjinniAnonymousSection({ userProfile, jobs, onUpdateProfile }: D
             <ShieldCheck className="w-7 h-7 text-blue-500" /> Anonymous Tech Market
           </h2>
           <p className="text-slate-400 text-xs mt-1 max-w-xl">
-            Inspired by Djinni.co. Freelancers publish anonymous professional summaries & desired salaries. Employers initiate pitches first, protecting candidates from unsolicited outreach until they explicitly unlock contacts.
+            Freelancers publish anonymous professional summaries & desired salaries. Employers initiate pitches first, protecting candidates from unsolicited outreach until they explicitly unlock contacts.
           </p>
         </div>
 
@@ -517,6 +517,7 @@ export function DjinniAnonymousSection({ userProfile, jobs, onUpdateProfile }: D
               </label>
               <input
                 type="text"
+                required
                 value={formSkillsText}
                 onChange={(e) => setFormSkillsText(e.target.value)}
                 placeholder="React, TypeScript, GraphQL, AWS, Docker"
@@ -547,7 +548,7 @@ export function DjinniAnonymousSection({ userProfile, jobs, onUpdateProfile }: D
                 className="accent-blue-500 w-4 h-4 rounded cursor-pointer"
               />
               <label htmlFor="formIsActive" className="text-xs font-bold text-white cursor-pointer select-none">
-                Active & Visible to Employers on Djinni Anonymous Board
+                Active & Visible to Employers on Anonymous Board
               </label>
             </div>
 

@@ -1,5 +1,4 @@
 const fs = require('fs');
-let code = fs.readFileSync('src/App.tsx', 'utf8');
-
-code = code.replace(/        <\/div>\n      <\/div>\n      \)\}/g, '          )}');
-fs.writeFileSync('src/App.tsx', code);
+let code = fs.readFileSync('src/components/HomeMarketing.tsx', 'utf8');
+code = code.replace('<BrainCircuit,\n  Cuboid className="w-5 h-5" />', '<BrainCircuit className="w-5 h-5" />');
+fs.writeFileSync('src/components/HomeMarketing.tsx', code);

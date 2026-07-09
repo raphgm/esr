@@ -7,21 +7,20 @@ export const initialProfile = {
   bio: "Helping African startups build scalable infrastructure. Specializes in distributed systems, AI agent development, and enterprise cloud migrations.",
   location: "Lagos, Nigeria",
   avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150",
-  formalSkills: ["System Architecture", "Cloud Computing", "API Development", "CI/CD Pipelines"],
-  creatorSkills: ["Kubernetes", "Docker", "AWS", "Terraform"],
-  skills: ["Kubernetes", "Docker", "AWS", "Terraform"],
+  skills: ["System Architecture", "Cloud Computing", "API Development", "CI/CD Pipelines", "Kubernetes", "Docker", "AWS", "Terraform"],
   interests: ["Agriculture", "Digital Marketing", "E-commerce", "Logistics"],
   goals: ["Start a YouTube Channel", "Scale WhatsApp Store", "Learn Web Development"],
   certifications: [
-    "AWS Certified Solutions Architect (2025)",
+    "Advanced Prompt Engineering (2025)",
     "Google Cloud Professional Data Engineer (2025)",
-    "skill-sch.com: Certified Software Architect (2026)"
+    "estarr.ai: Autonomous Agents Engineer (2026)"
   ],
   recommends: 42,
   birthdate: "1998-07-06",
-  walletBalance: 12500,
+  walletBalance: 0,
   instructorEarnings: 154000,
   unlockedCourseIds: ["course-1"],
+  history: [],
   portfolio: [
     { id: "p-1", title: "Distributed Kubernetes Cluster Migration", url: "https://github.com/chinedu/k8s-cluster-migration", category: "Cloud Architecture", views: 45000, likes: 3200 },
     { id: "p-2", title: "Enterprise AI Agent Deployment", url: "https://github.com/chinedu/ai-agent-deployment", category: "AI Engineering", views: 125000, likes: 9800 },
@@ -37,7 +36,7 @@ export const initialPosts: ActivityPost[] = [
     role: "AI Researcher",
     content: "🎥 SHOWCASE: Check out my new LLM tuning tutorial! I recorded this video directly on the ESTARR app. Let me know what you think of this optimization technique! ✨🤖",
     video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-    poster: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&q=80&w=600",
+    poster: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=600",
     videoFilter: "none",
     audioTrack: "Cyberpunk Ambience - Aisha Yusuf Original",
     playbackSpeed: "1x",
@@ -183,7 +182,7 @@ export const initialCourses: Course[] = [
     id: "course-1",
     title: "Google AI Masterclass: Gemini API & Agents",
     category: "AI & ML",
-    description: "The official Google playbook for building scalable AI Agents and integrating the Gemini API. Pass this AI-graded certification to unlock $15k+ enterprise AI application contracts.",
+    description: "The official Google playbook for building scalable AI Agents and integrating the Gemini API. Pass this AI-graded training to unlock $15k+ enterprise AI application contracts.",
     rating: 4.9,
     students: 3140,
     image: "data:image/svg+xml,%3Csvg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 800 500\" width=\"100%\" height=\"100%\"%3E%3Cdefs%3E%3ClinearGradient id=\"bg1\" x1=\"0%25\" y1=\"0%25\" x2=\"100%25\" y2=\"100%25\"%3E%3Cstop offset=\"0%25\" stop-color=\"%23a855f7\"% /%3E%3Cstop offset=\"100%25\" stop-color=\"%23312e81\"% /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width=\"800\" height=\"500\" fill=\"url(%23bg1)\"/%3E%3C/svg%3E",
@@ -211,7 +210,7 @@ export const initialCourses: Course[] = [
     id: "course-2",
     title: "Web3 Smart Contract Security Audit",
     category: "Web3",
-    description: "Master Solidity security vulnerabilities. Certified auditors get direct access to premium Layer-2 protocol bounties and token presale escrow audits.",
+    description: "Master Solidity security vulnerabilities. Verified AI auditors get direct access to premium Layer-2 protocol bounties and token presale escrow audits.",
     rating: 4.8,
     students: 1842,
     image: "data:image/svg+xml,%3Csvg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 800 500\" width=\"100%\" height=\"100%\"%3E%3Cdefs%3E%3ClinearGradient id=\"bg2\" x1=\"0%25\" y1=\"0%25\" x2=\"100%25\" y2=\"100%25\"%3E%3Cstop offset=\"0%25\" stop-color=\"%2314b8a6\"% /%3E%3Cstop offset=\"100%25\" stop-color=\"%23064e3b\"% /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width=\"800\" height=\"500\" fill=\"url(%23bg2)\"/%3E%3C/svg%3E",
@@ -236,9 +235,9 @@ export const initialCourses: Course[] = [
   },
   {
     id: "course-3",
-    title: "AWS CloudNative Architect Certification",
+    title: "Autonomous AI Agents Credential",
     category: "Cloud DevOps",
-    description: "The definitive practical exam for deploying Kubernetes clusters and managing CI/CD pipelines at scale. Mandatory certification for executing AWS DevOps retainers on ESTARR.",
+    description: "The definitive practical exam for deploying Kubernetes clusters and managing CI/CD pipelines at scale. Mandatory credential for building enterprise AI pipelines on ESTARR.",
     rating: 5.0,
     students: 4100,
     image: "data:image/svg+xml,%3Csvg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 800 500\" width=\"100%\" height=\"100%\"%3E%3Cdefs%3E%3ClinearGradient id=\"bg3\" x1=\"0%25\" y1=\"0%25\" x2=\"100%25\" y2=\"100%25\"%3E%3Cstop offset=\"0%25\" stop-color=\"%233b82f6\"% /%3E%3Cstop offset=\"100%25\" stop-color=\"%231e3a8a\"% /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width=\"800\" height=\"500\" fill=\"url(%23bg3)\"/%3E%3C/svg%3E",
@@ -272,7 +271,7 @@ export const initialProducts: Product[] = [
     seller: "BlockForge Studios",
     sellerRating: 4.9,
     verified: true,
-    image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=600",
+    image: "", // Use color instead
     description: "Fully responsive React & Tailwind dashboard template with integrated charting and data visualization for FinTech applications. Includes dark mode and trading data components.",
     reviews: [
       { author: "FinTech Next", rating: 5, comment: "Saved us months of frontend development. Highly recommended." },
@@ -287,7 +286,7 @@ export const initialProducts: Product[] = [
     seller: "Apex Growth Marketing",
     sellerRating: 4.7,
     verified: true,
-    image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=600",
+    image: "", // Use color instead
     description: "Comprehensive 90-day technical SEO audit, backlink acquisition campaign, and content strategy for enterprise SaaS companies.",
     reviews: [
       { author: "CloudCorp", rating: 5, comment: "Traffic increased by 150% in the first two months." }
@@ -301,13 +300,50 @@ export const initialProducts: Product[] = [
     seller: "ChainAudit Labs",
     sellerRating: 4.8,
     verified: true,
-    image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=600",
+    image: "", // Use color instead
     description: "Production-ready Solidity smart contract for milestone-based multi-sig escrow. Fully audited by independent security researchers.",
     reviews: []
   }
 ];
 
-export const initialCampaigns: BrandCampaign[] = [];
+export const initialCampaigns: BrandCampaign[] = [
+  {
+    id: "camp-1",
+    title: "Eco-Friendly Packaging Launch",
+    brand: "Flutterwave",
+    budget: 500000,
+    status: "Open",
+    platform: "Instagram",
+    deliverables: ["3x Reels", "5x Stories"],
+    color: "from-blue-600 to-indigo-700",
+    applicationsCount: 12,
+    createdDate: "2026-07-01"
+  },
+  {
+    id: "camp-2",
+    title: "Youth Tech Literacy Drive",
+    brand: "MTN Nigeria",
+    budget: 750000,
+    status: "Open",
+    platform: "TikTok",
+    deliverables: ["5x TikTok Videos", "1x Live Stream"],
+    color: "from-yellow-400 to-amber-500",
+    applicationsCount: 45,
+    createdDate: "2026-07-05"
+  },
+  {
+    id: "camp-3",
+    title: "Sustainable Farming Initiative",
+    brand: "Amo Feed Mills",
+    budget: 300000,
+    status: "Open",
+    platform: "UGC",
+    deliverables: ["10x Product Photos", "2x Review Videos"],
+    color: "from-emerald-500 to-teal-600",
+    applicationsCount: 8,
+    createdDate: "2026-07-08"
+  }
+];
 
 export const initialJobs: Job[] = [
   {

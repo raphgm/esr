@@ -40,7 +40,7 @@ export default function PortfolioSection({ userProfile, isPublicView = false }: 
         <PageBanner
           title="My Professional Showcase"
           subtitle="PORTFOLIO & SKILLS"
-          description="This is your public-facing professional profile. It showcases your verified skills, project portfolio, and certifications to potential employers and brand partners."
+          description="This is your public-facing professional profile. It showcases your verified skills, consultancy portfolio, and AI credentials to potential employers and brand partners."
           icon={Briefcase}
           actions={
             <div className="flex gap-3 mt-4 md:mt-0">
@@ -93,7 +93,7 @@ export default function PortfolioSection({ userProfile, isPublicView = false }: 
                 <span className="font-mono font-black text-slate-900">{userProfile.recommends}</span>
               </div>
               <div className="flex items-center justify-between p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Certifications</span>
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">AI Credentials</span>
                 <span className="font-mono font-black text-slate-900">{userProfile.certifications.length}</span>
               </div>
             </div>
@@ -119,26 +119,13 @@ export default function PortfolioSection({ userProfile, isPublicView = false }: 
             </h3>
 
             <div className="flex flex-col gap-6">
-              {userProfile.formalSkills && userProfile.formalSkills.length > 0 && (
+              {userProfile.skills && userProfile.skills.length > 0 && (
                 <div>
-                  <span className="text-[10px] font-bold uppercase text-slate-400 tracking-widest block mb-3">Verified Technical</span>
+                  <span className="text-[10px] font-bold uppercase text-slate-400 tracking-widest block mb-3">Verified Skills & Expertise</span>
                   <div className="flex flex-wrap gap-2">
-                    {userProfile.formalSkills?.map((skill, idx) => (
-                      <span key={idx} className="px-3 py-1.5 bg-blue-50 text-blue-700 border border-blue-100 rounded-xl text-xs font-bold flex items-center gap-1.5">
-                        <ShieldCheck className="w-3.5 h-3.5 text-blue-500" />
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {userProfile.creatorSkills && userProfile.creatorSkills.length > 0 && (
-                <div>
-                  <span className="text-[10px] font-bold uppercase text-slate-400 tracking-widest block mb-3">Engineering & DevOps</span>
-                  <div className="flex flex-wrap gap-2">
-                    {userProfile.creatorSkills?.map((skill, idx) => (
-                      <span key={idx} className="px-3 py-1.5 bg-purple-50 text-purple-700 border border-purple-100 rounded-xl text-xs font-bold">
+                    {userProfile.skills?.map((skill, idx) => (
+                      <span key={idx} className="px-3 py-1.5 bg-purple-50 text-purple-700 border border-purple-100 rounded-xl text-xs font-bold flex items-center gap-1.5">
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
                         {skill}
                       </span>
                     ))}
@@ -149,14 +136,14 @@ export default function PortfolioSection({ userProfile, isPublicView = false }: 
           </div>
         </div>
 
-        {/* Right Column: Projects & Achievements */}
+        {/* Right Column: Consultancy & Achievements */}
         <div className="lg:col-span-8 flex flex-col gap-8">
-          {/* Projects Portfolio */}
+          {/* Consultancy Portfolio */}
           <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm">
             <div className="flex items-center justify-between mb-8">
               <h3 className="font-display font-bold text-xl text-slate-900 flex items-center gap-2">
                 <Globe className="w-6 h-6 text-emerald-500" />
-                Featured Projects
+                Consultancy Portfolio
               </h3>
               <span className="text-xs font-mono font-bold bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full uppercase tracking-wider">
                 {portfolioItems.length} Items
@@ -194,17 +181,17 @@ export default function PortfolioSection({ userProfile, isPublicView = false }: 
                   <div className="bg-slate-50 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Briefcase className="w-6 h-6 text-slate-300" />
                   </div>
-                  <p className="text-slate-400 text-sm">No projects added to portfolio yet.</p>
+                  <p className="text-slate-400 text-sm">No consultancy engagements added to portfolio yet.</p>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Certifications & Badges */}
+          {/* AI Credentials & Badges */}
           <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm">
             <h3 className="font-display font-bold text-xl text-slate-900 flex items-center gap-2 mb-8">
               <Award className="w-6 h-6 text-amber-500" />
-              Certifications & Badges
+              AI Credentials & Badges
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">

@@ -21,7 +21,9 @@ import {
   AlertCircle,
   BookOpen,
   Tv,
-  ShoppingBag
+  ShoppingBag,
+  Workflow,
+  Cpu
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { UserProfile } from "../types";
@@ -35,7 +37,7 @@ export interface Gig {
   sellerRating: number;
   deliveryDays: number;
   price: number; // in NGN
-  category: "Video & Design" | "Writing & Content" | "Tech & Setup" | "Agric & Business";
+  category: string;
   description: string;
   features: string[];
   reviewsCount: number;
@@ -80,7 +82,7 @@ export default function GigsSection({ userProfile, onOpenAiChat }: GigsSectionPr
       reviewsCount: 38,
       deliveryDays: 2,
       price: 15000,
-      category: "Video & Design",
+      category: "Creative Operations",
       description: "Get attention-grabbing hooks, retention-first text overlays, dynamic sound design, and custom timing optimized for short-form algorithms. I have edited videos pulling over 1M+ views in Nigeria and Ghana.",
       features: [
         "1x Up to 60-second edited video",
@@ -100,7 +102,7 @@ export default function GigsSection({ userProfile, onOpenAiChat }: GigsSectionPr
       reviewsCount: 14,
       deliveryDays: 3,
       price: 25000,
-      category: "Video & Design",
+      category: "Creative Operations",
       description: "Pitching your startup or looking for brand sponsorships? I'll design a customized, highly modern Canva deck. No dull templates. Bold Swiss-style layouts, clean data charts, and beautiful typography.",
       features: [
         "Up to 10 professionally formatted slides",
@@ -170,8 +172,76 @@ export default function GigsSection({ userProfile, onOpenAiChat }: GigsSectionPr
       ],
       image: "https://images.unsplash.com/photo-1548550023-2bdb3c5beed7?auto=format&fit=crop&q=80&w=600",
       verified: true
+    },
+    {
+      id: "gig-train-1",
+      title: "I will provide high-precision RLHF & SFT data for LLM training",
+      sellerName: "ESTARR AI Labs",
+      sellerAvatar: "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?auto=format&fit=crop&q=80&w=150",
+      sellerRating: 5.0,
+      reviewsCount: 412,
+      deliveryDays: 7,
+      price: 250000,
+      category: "Train AI",
+      description: "Get high-quality human-annotated data for supervised fine-tuning and reinforcement learning from human feedback. We specialize in code, logic, and multi-dialect African languages.",
+      features: [
+        "1000+ Human-verified prompt-response pairs",
+        "RLHF / SFT specialized pipelines",
+        "Multi-dialect support (Yoruba, Igbo, Swahili, etc.)",
+        "Detailed quality assurance reports"
+      ],
+      image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=600",
+      verified: true
+    },
+    {
+      id: "gig-build-1",
+      title: "I will build a custom RAG-based AI Agent for your enterprise",
+      sellerName: "Kwame Appiah",
+      sellerAvatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=150",
+      sellerRating: 4.9,
+      reviewsCount: 86,
+      deliveryDays: 14,
+      price: 1200000,
+      category: "Build AI",
+      description: "Complete end-to-end development of custom AI agents using Retrieval-Augmented Generation (RAG). Includes vector database setup, LLM integration, and API deployment.",
+      features: [
+        "Custom RAG Pipeline Architecture",
+        "Vector database integration (Pinecone/Weaviate)",
+        "LangChain or LlamaIndex implementation",
+        "REST API & Frontend integration"
+      ],
+      image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=600",
+      verified: true
     }
   ]);
+
+  // Golden Path Templates - Platform Engineering inspired
+  const gigTemplates = [
+    {
+      title: "Viral Short-Form Video Blueprint",
+      category: "Creative Operations",
+      price: 25000,
+      delivery: "2",
+      desc: "Standardized high-retention viral video editing. Optimized for TikTok, Reels, and YouTube Shorts. Includes hooks, captions, and sound design.",
+      features: "Hook development\nRetention-first captions\nSFX & Color Grading\n1x 60-second deliverable"
+    },
+    {
+      title: "Technical Cloud Infrastructure Setup",
+      category: "Technical & Platform Engineering",
+      price: 150000,
+      delivery: "5",
+      desc: "Production-ready AWS/GCP infrastructure deployment. Includes VPC setup, S3 buckets, and CI/CD pipeline automation.",
+      features: "Infrastructure as Code (Terraform)\nSecure VPC & IAM config\nGitHub Actions CI/CD\nPerformance monitoring"
+    },
+    {
+      title: "Corporate Brand Identity System",
+      category: "Creative Operations",
+      price: 75000,
+      delivery: "4",
+      desc: "Comprehensive visual identity design. Logo system, typography, color palette, and usage guidelines.",
+      features: "Logo Suite (SVG, PNG)\nColor System & Typography\nBrand Guidelines PDF\nSocial Media Kit"
+    }
+  ];
 
   // Applet state
   const [searchQuery, setSearchQuery] = useState("");
@@ -186,11 +256,20 @@ export default function GigsSection({ userProfile, onOpenAiChat }: GigsSectionPr
 
   // Create Gig states
   const [newTitle, setNewTitle] = useState("");
-  const [newCategory, setNewCategory] = useState<Gig["category"]>("Video & Design");
+  const [newCategory, setNewCategory] = useState<string>("Creative Operations");
   const [newPrice, setNewPrice] = useState("");
   const [newDelivery, setNewDelivery] = useState("2");
   const [newDesc, setNewDesc] = useState("");
   const [newFeatures, setNewFeatures] = useState("");
+
+  const applyTemplate = (template: typeof gigTemplates[0]) => {
+    setNewTitle(template.title);
+    setNewCategory(template.category as Gig["category"]);
+    setNewPrice(template.price.toString());
+    setNewDelivery(template.delivery);
+    setNewDesc(template.desc);
+    setNewFeatures(template.features);
+  };
 
   // AI Assistant inside Gigs Marketplace
   const [aiSkillInput, setAiSkillInput] = useState("");
@@ -199,7 +278,7 @@ export default function GigsSection({ userProfile, onOpenAiChat }: GigsSectionPr
   const [isAiLoading, setIsAiLoading] = useState(false);
 
   // Categories list
-  const categories = ["All", "Video & Design", "Writing & Content", "Tech & Setup", "Agric & Business"];
+  const categories = ["All", "Train AI", "Build AI", "Creative Operations", "Writing & Content", "Technical & Platform Engineering", "Agric & Business"];
 
   // Filter Gigs
   const filteredGigs = gigs.filter((gig) => {
@@ -293,8 +372,8 @@ export default function GigsSection({ userProfile, onOpenAiChat }: GigsSectionPr
   return (
     <div className="flex flex-col gap-6 animate-fade-in text-slate-800">
       <PageBanner
-        title="ESTARR Escrow Gig Marketplace"
-        subtitle="MICRO-SERVICE TRADE"
+        title="ESTARR AI & Creative Ops Marketplace"
+        subtitle="ELITE TALENT NODES"
         description="Hire skilled Gen Z creators and vocational experts, or sell your own skills as structured gigs. All orders are backed by ESTARR 100% Escrow Protection—payment stays safe until delivery is confirmed."
         icon={Briefcase}
         actions={
@@ -475,18 +554,20 @@ export default function GigsSection({ userProfile, onOpenAiChat }: GigsSectionPr
                   {/* Gig Header Cover */}
                   <div className="h-40 relative overflow-hidden">
                     <div className={`w-full h-full bg-gradient-to-br ${
-                      gig.category === "Video & Design" ? "from-indigo-600 to-purple-700" :
+                      gig.category === "Creative Operations" ? "from-indigo-600 to-purple-700" :
                       gig.category === "Writing & Content" ? "from-amber-500 to-orange-600" :
-                      gig.category === "Tech & Setup" ? "from-cyan-600 to-blue-700" :
+                      gig.category === "Technical & Platform Engineering" ? "from-cyan-600 to-blue-700" :
                       gig.category === "Agric & Business" ? "from-emerald-600 to-teal-700" :
                       "from-slate-700 to-slate-800"
                     } group-hover:scale-105 transition-transform duration-500 flex items-center justify-center`}>
                       <div className="w-12 h-12 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center backdrop-blur-md">
-                        {gig.category === "Video & Design" && <Sparkles className="w-6 h-6 text-white/80" />}
+                        {gig.category === "Creative Operations" && <Sparkles className="w-6 h-6 text-white/80" />}
                         {gig.category === "Writing & Content" && <BookOpen className="w-6 h-6 text-white/80" />}
-                        {gig.category === "Tech & Setup" && <Tv className="w-6 h-6 text-white/80" />}
+                        {gig.category === "Technical & Platform Engineering" && <Tv className="w-6 h-6 text-white/80" />}
                         {gig.category === "Agric & Business" && <Briefcase className="w-6 h-6 text-white/80" />}
-                        {!["Video & Design", "Writing & Content", "Tech & Setup", "Agric & Business"].includes(gig.category) && <Plus className="w-6 h-6 text-white/80" />}
+                        {gig.category === "Train AI" && <Cpu className="w-6 h-6 text-white/80" />}
+                        {gig.category === "Build AI" && <Workflow className="w-6 h-6 text-white/80" />}
+                        {!["Creative Operations", "Writing & Content", "Technical & Platform Engineering", "Agric & Business", "Train AI", "Build AI"].includes(gig.category) && <Plus className="w-6 h-6 text-white/80" />}
                       </div>
                     </div>
                     <div className="absolute top-3 left-3 bg-slate-950/80 backdrop-blur-md px-2.5 py-1 rounded-full text-[9px] font-mono font-bold text-purple-300 border border-slate-800">
@@ -596,6 +677,33 @@ export default function GigsSection({ userProfile, onOpenAiChat }: GigsSectionPr
                 </p>
               </div>
 
+              {/* Golden Path Templates */}
+              <div className="mb-8">
+                <div className="flex items-center gap-2 mb-3">
+                  <Workflow className="w-4 h-4 text-indigo-500" />
+                  <label className="font-mono text-[9px] font-bold text-slate-9000 uppercase tracking-widest">
+                    Quick Launch: Golden Path Templates
+                  </label>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                  {gigTemplates.map((template, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => applyTemplate(template)}
+                      className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-left hover:border-purple-500 hover:bg-purple-50 transition-all group"
+                    >
+                      <h4 className="text-[10px] font-black text-slate-900 uppercase leading-tight mb-1 group-hover:text-purple-600">
+                        {template.title}
+                      </h4>
+                      <p className="text-[9px] text-slate-500 line-clamp-1">
+                        {template.category}
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <form onSubmit={handleCreateGig} className="flex flex-col gap-4 text-xs">
                 {/* Title */}
                 <div className="flex flex-col gap-1">
@@ -618,16 +726,21 @@ export default function GigsSection({ userProfile, onOpenAiChat }: GigsSectionPr
                     <label className="font-mono text-[9px] font-bold text-slate-9000 uppercase">
                       Niche Category
                     </label>
-                    <select
+                    <input
+                      list="niche-categories"
                       value={newCategory}
-                      onChange={(e) => setNewCategory(e.target.value as any)}
-                      className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-700 font-bold focus:outline-none cursor-pointer"
-                    >
-                      <option>Video & Design</option>
-                      <option>Writing & Content</option>
-                      <option>Tech & Setup</option>
-                      <option>Agric & Business</option>
-                    </select>
+                      onChange={(e) => setNewCategory(e.target.value)}
+                      placeholder="Select or type..."
+                      className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-700 font-bold focus:outline-none focus:border-purple-500 w-full"
+                    />
+                    <datalist id="niche-categories">
+                      <option value="Creative Operations" />
+                      <option value="Writing & Content" />
+                      <option value="Tech & Platform" />
+                      <option value="Agric & Business" />
+                      <option value="Train AI" />
+                      <option value="Build AI" />
+                    </datalist>
                   </div>
 
                   {/* Price */}

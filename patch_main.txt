@@ -1,0 +1,3 @@
+          {activeTab === "ai-lab" && (
+            <AILabSection userProfile={userProfile} />
+          )}
