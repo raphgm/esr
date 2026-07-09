@@ -14,7 +14,7 @@ import {
   initialChannels
 } from "./mockData";
 import { auth, getUserProfile, saveUserProfile, getCollectionData, saveCollectionItem, deleteCollectionItem } from "./lib/firebase";
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as firebaseSignOut, onAuthStateChanged } from "firebase/auth";
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as firebaseSignOut, onAuthStateChanged, GithubAuthProvider, signInWithCredential, signInWithCustomToken } from "firebase/auth";
 
 // Components
 import ConnectSection from "./components/ConnectSection";
@@ -370,44 +370,44 @@ export default function App() {
 
   React.useEffect(() => {
     const handleMessage = async (event: MessageEvent) => {
-      // Validate origin if possible, but '*' is used in server res.send
       if (event.data?.type === "OAUTH_AUTH_SUCCESS") {
-        const { provider, user: oauthUser } = event.data;
-        
-        if (provider === "linkedin" || provider === "github") {
-          // For this environment, we simulate authentication by updating local state
-          // and optionally saving a placeholder profile if needed.
-          const email = oauthUser?.email || `${provider}_user@estarrapp.com`;
-          const name = oauthUser?.name || oauthUser?.login || "OAuth User";
-          
-          const updatedProfile = {
-            ...userProfile,
-            name: name,
-            email: email,
-            avatar: oauthUser?.picture || oauthUser?.avatar_url || userProfile.avatar,
-            profession: `${provider === "linkedin" ? "LinkedIn" : "GitHub"} Verified Professional`,
-            accountType: "freelancer" as const
-          };
-          
-                    setUserProfile(updatedProfile);
-          setIsAuthenticated(true);
+        const { provider, token, customToken } = event.data;
+
+        try {
+          if (provider === "github" && token) {
+            // Establishes a real Firebase Auth session from the GitHub access token.
+            // Requires GitHub to be enabled as a Sign-in provider in the Firebase console.
+            const credential = GithubAuthProvider.credential(token);
+            await signInWithCredential(auth, credential);
+          } else if (provider === "linkedin" && customToken) {
+            // Firebase has no native LinkedIn provider, so the server mints a custom token.
+            await signInWithCustomToken(auth, customToken);
+          } else {
+            throw new Error(`Missing credentials for ${provider} sign-in.`);
+          }
+
+          // onAuthStateChanged (below) picks up the new session, loads the Firestore
+          // profile, and sets isAuthenticated/isAdmin — nothing more to do here.
           setShowAuthModal(false);
           if (authAccountType === "freelancer" && authMode === "signup") {
             setShowVettingModal(true);
           }
-          setIsAuthLoading(false);
-          
           confetti({
             particleCount: 150,
             spread: 70,
             origin: { y: 0.6 }
           });
+        } catch (err) {
+          console.error(`${provider} sign-in failed:`, err);
+          setAuthError(`${provider === "github" ? "GitHub" : "LinkedIn"} sign-in failed. Please try again.`);
+        } finally {
+          setIsAuthLoading(false);
         }
       }
     };
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, [userProfile]);
+  }, [authAccountType, authMode]);
 
   // Firestore Syncing Wrappers
   const handleUpdateProfile = async (updatedProfile: UserProfile) => {
