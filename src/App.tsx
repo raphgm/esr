@@ -586,6 +586,16 @@ ActivityPost[]) => {
   React.useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
+        // Access restricted while ESTARR is in private preview: only the
+        // owner account may sign in. Everyone else is immediately signed out.
+        const signedInEmail = (user.email || "").trim().toLowerCase();
+        if (signedInEmail !== "rdgabmomoh@gmail.com") {
+          await firebaseSignOut(auth);
+          setIsAuthenticated(false);
+          setAuthError("ESTARR is currently in private preview. We're working hard to make this available soon — please check back!");
+          return;
+        }
+
         // Fetch custom user profile from Firestore or load fallback profile
         let profile = await getUserProfile(user.uid, user.email || undefined, user.displayName || undefined);
         
@@ -704,10 +714,11 @@ ActivityPost>("posts", initialPosts);
     e.preventDefault();
     if (!authEmail || !authPassword) return;
 
-    if (authMode === "signup" && authAccountType === "freelancer" && authPassword !== authConfirmPassword) {
-      setAuthError("Passwords do not match.");
+    if (authMode === "signup") {
+      setAuthError("New sign-ups are temporarily unavailable. We're working hard to make this available soon — please check back!");
       return;
     }
+
 
     setIsAuthLoading(true);
     setAuthError(null);
@@ -991,7 +1002,23 @@ ActivityPost>("posts", initialPosts);
             <button onClick={() => setShowAuthModal(false)} className="absolute top-4 right-4 text-slate-950 hover:text-purple-600 transition-colors cursor-pointer"><X className="w-5 h-5" /></button>
             
             {/* Conditional Render: Step 1 of the Hiring Wizard for Job Owners */}
-            {authAccountType === "jobOwner" && authMode === "signup" && hireWizardStep === 1 ? (
+            {authMode === "signup" ? (
+              <div className="flex flex-col items-center text-center py-8 gap-3">
+                <div className="w-14 h-14 rounded-full bg-purple-100 flex items-center justify-center">
+                  <Sparkles className="w-7 h-7 text-purple-600" />
+                </div>
+                <h2 className="font-display font-bold text-lg text-slate-900">New Sign-Ups Coming Soon</h2>
+                <p className="text-xs text-slate-500 max-w-xs leading-relaxed">
+                  We're working hard to make this functionality available soon. Thanks for your patience — check back shortly!
+                </p>
+                <button
+                  onClick={() => setAuthMode("signin")}
+                  className="mt-2 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs uppercase tracking-tight px-5 py-2.5 rounded-full transition-colors cursor-pointer"
+                >
+                  Already have an account? Sign In
+                </button>
+              </div>
+            ) : authAccountType === "jobOwner" && authMode === "signup" && hireWizardStep === 1 ? (
               <div className="flex flex-col">
                 {/* Modal Logo / Header Area */}
                 <div className="flex items-center gap-3 mb-4">
