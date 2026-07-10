@@ -25,7 +25,13 @@ interface PortfolioSectionProps {
   isPublicView?: boolean;
 }
 
+import { PortfolioClientSection } from "./PortfolioClientSection";
+
 export default function PortfolioSection({ userProfile, isPublicView = false }: PortfolioSectionProps) {
+  if (userProfile?.accountType === "jobOwner" && !isPublicView) {
+    return <PortfolioClientSection userProfile={userProfile} />;
+  }
+
   const portfolioItems = userProfile.portfolio || [];
 
   const handleShare = () => {

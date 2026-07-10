@@ -12,6 +12,7 @@ import {
   Activity
 } from "lucide-react";
 import { UserProfile, ConsultancyTask } from "../types";
+import { ClientDashboard } from "./ClientDashboard";
 
 export function UserDashboard({ 
   userProfile, 
@@ -22,6 +23,10 @@ export function UserDashboard({
   tasks: ConsultancyTask[];
   onNavigate: (id: string) => void;
 }) {
+  if (userProfile?.accountType === "jobOwner") {
+    return <ClientDashboard userProfile={userProfile} tasks={tasks} onNavigate={onNavigate} />;
+  }
+
   const activeTasks = tasks.filter(t => t.status !== 'done');
   const pendingEscrow = activeTasks.reduce((acc, t) => acc + (t.amount || 0), 0);
   

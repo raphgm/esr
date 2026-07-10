@@ -194,8 +194,8 @@ export interface Survey {
   id: string;
   title: string;
   description: string;
-  type: "survey" | "poll";
-  questions: { id: string; question: string; options?: string[]; type: "single" | "multiple" | "text" }[];
+  type: "survey" | "poll" | "code_task";
+  questions: { id: string; question: string; options?: string[]; type: "single" | "multiple" | "text" | "code"; language?: string; codeSnippet?: string }[];
   responsesCount: number;
   createdAt: string;
   creatorId: string;

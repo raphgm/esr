@@ -6,6 +6,3 @@ coverage/
 *.log
 .env*
 !.env.example
-
-# Credentials guide — keep out of git (contains OAuth secrets)
-OAUTH_SETUP_GUIDE.md

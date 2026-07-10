@@ -23,6 +23,7 @@ import {
   Building,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
+import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, ResponsiveContainer, Legend } from "recharts";
 import { VoiceRecorder, AudioPlayer } from "./VoiceRecorder";
 import { MessageSquare } from "lucide-react";
 
@@ -73,6 +74,8 @@ function parseTaskDetails(task: ConsultancyTask) {
   return { budget, client, cleanDesc };
 }
 
+import { ConsultancyClientSection } from "./ConsultancyClientSection";
+
 export default function ConsultancySection({
   userProfile,
   tasks,
@@ -81,6 +84,10 @@ export default function ConsultancySection({
   onNavigate,
   campaigns,
 }: ConsultancySectionProps) {
+  if (userProfile?.accountType === "jobOwner") {
+    return <ConsultancyClientSection userProfile={userProfile} tasks={tasks} onNavigate={onNavigate} />;
+  }
+
   const [activeTab, setActiveTab] = useState<"board" | "deal-builder" | "escrow-feed" >("board");
   
   // States for contract creation
@@ -92,6 +99,7 @@ export default function ConsultancySection({
   const [newDueDate, setNewDueDate] = useState("");
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
   const [openCommentsId, setOpenCommentsId] = useState<string | null>(null);
   const [commentText, setCommentText] = useState("");
 
@@ -207,6 +215,18 @@ export default function ConsultancySection({
     onUpdateTasks(updated);
   };
 
+  const deleteSelectedTasks = () => {
+    const updated = tasks.filter((t) => !selectedTasks.includes(t.id));
+    onUpdateTasks(updated);
+    setSelectedTasks([]);
+  };
+
+  const toggleTaskSelection = (taskId: string) => {
+    setSelectedTasks((prev) =>
+      prev.includes(taskId) ? prev.filter((id) => id !== taskId) : [...prev, taskId]
+    );
+  };
+
   // AI Pricing and milestone estimator logic
   const handleEstimateDeal = () => {
     if (!serviceType.trim()) return;
@@ -299,6 +319,13 @@ export default function ConsultancySection({
     },
     { total: 0, proposed: 0, escrowed: 0, pendingRelease: 0, disbursed: 0 }
   );
+
+  const chartData = [
+    { name: "Proposed", value: tasks.filter(t => t.status === "todo").length, color: "#f59e0b" },
+    { name: "Funded", value: tasks.filter(t => t.status === "inprogress").length, color: "#10b981" },
+    { name: "Review", value: tasks.filter(t => t.status === "review").length, color: "#a855f7" },
+    { name: "Disbursed", value: tasks.filter(t => t.status === "done").length, color: "#64748b" },
+  ].filter(d => d.value > 0);
 
   return (
     <div id="consultancy-section" className="flex flex-col gap-6">
@@ -735,10 +762,52 @@ export default function ConsultancySection({
             </div>
           ) : (
           <div className="flex flex-col gap-4">
-          <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex items-center gap-3">
-             <Search className="w-4 h-4 text-slate-9000" />
-             <input type="text" placeholder="Search consultancy engagements by title or assignee..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full text-xs bg-transparent border-none focus:outline-none text-slate-700" />
+          <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex flex-col md:flex-row items-center gap-3 justify-between">
+            <div className="flex items-center gap-3 w-full">
+              <Search className="w-4 h-4 text-slate-400" />
+              <input type="text" placeholder="Search consultancy engagements by title or assignee..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full text-xs bg-transparent border-none focus:outline-none text-slate-700" />
+            </div>
+            {selectedTasks.length > 0 && (
+              <button
+                onClick={deleteSelectedTasks}
+                className="bg-rose-500 hover:bg-rose-600 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all shrink-0 cursor-pointer flex items-center gap-2 justify-center whitespace-nowrap"
+              >
+                <Trash2 className="w-4 h-4" /> Delete Selected ({selectedTasks.length})
+              </button>
+            )}
           </div>
+          {chartData.length > 0 && (
+            <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col md:flex-row items-center gap-6">
+              <div className="flex-1">
+                <h4 className="font-display font-bold text-sm text-slate-900 mb-1">Task Distribution</h4>
+                <p className="text-xs text-slate-500 mb-4">Overview of all consultancy engagements by their current status.</p>
+              </div>
+              <div className="h-48 w-full md:w-1/2">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie 
+                      data={chartData} 
+                      dataKey="value" 
+                      nameKey="name" 
+                      cx="50%" 
+                      cy="50%" 
+                      outerRadius={65}
+                      innerRadius={45}
+                      paddingAngle={5}
+                    >
+                      {chartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <RechartsTooltip 
+                      contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)' }}
+                    />
+                    <Legend iconType="circle" wrapperStyle={{ fontSize: '12px' }} />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          )}
           <div className="flex flex-col md:flex-row gap-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
             {(["todo", "inprogress", "review", "done"] as const).map((status) => {
               const statusTasks = tasks.filter((t) => t.status === status && (t.title.toLowerCase().includes(searchQuery.toLowerCase()) || (t.assignee && t.assignee.toLowerCase().includes(searchQuery.toLowerCase()))));
@@ -828,6 +897,12 @@ export default function ConsultancySection({
                         >
                           <div className="flex justify-between items-start">
                             <div className="flex gap-2 items-center">
+                              <input
+                                type="checkbox"
+                                checked={selectedTasks.includes(task.id)}
+                                onChange={() => toggleTaskSelection(task.id)}
+                                className="w-3.5 h-3.5 text-purple-600 rounded border-slate-300 focus:ring-purple-500 cursor-pointer"
+                              />
                               <span className="text-[10px] font-mono font-black text-slate-900 bg-slate-50 px-2.5 py-1 rounded-xl border border-slate-100">
                                 ${budget.toLocaleString()}
                               </span>

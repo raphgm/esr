@@ -1,16 +1,5 @@
 import React from "react";
-import { 
-  Zap, 
-  Terminal, 
-  Layers, 
-  Cpu, 
-  Workflow, 
-  ShieldCheck, 
-  Code, 
-  Sparkles,
-  ArrowRight,
-  MousePointer2
-} from "lucide-react";
+import { Zap, Terminal, Layers, Cpu, Workflow, ShieldCheck, Code, Sparkles, ArrowRight, MousePointer2, Network, LineChart } from "lucide-react";
 
 const tools = [
   {
@@ -66,6 +55,24 @@ const tools = [
     color: "text-amber-500",
     bg: "bg-amber-50",
     badge: "Scalable"
+  },
+  {
+    id: "network",
+    title: "Deal Flow Network",
+    desc: "Direct integration with top-tier startup deal flows and venture studio opportunities.",
+    icon: Network,
+    color: "text-cyan-500",
+    bg: "bg-cyan-50",
+    badge: "Exclusive"
+  },
+  {
+    id: "analytics",
+    title: "Talent Analytics",
+    desc: "Deep insights into your market value, skill demand, and interview conversion rates.",
+    icon: LineChart,
+    color: "text-orange-500",
+    bg: "bg-orange-50",
+    badge: "Data-Driven"
   }
 ];
 
@@ -88,40 +95,46 @@ export const PlatformTools = ({ onNavigate }: { onNavigate?: (id: string) => voi
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-5">
           {tools.map((tool, idx) => (
             <div 
               key={idx} 
-              className="group p-8 bg-white border border-slate-200 rounded-3xl hover:border-purple-500 transition-all duration-300 relative overflow-hidden shadow-sm hover:shadow-xl"
+              className="group p-5 md:p-6 bg-white border-2 border-slate-100 rounded-3xl transition-all duration-300 relative overflow-hidden shadow-sm hover:shadow-md hover:border-purple-200 hover:-translate-y-1 flex flex-col min-h-[200px] cursor-pointer"
+              onClick={() => onNavigate?.(tool.id)}
             >
-              <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
-                <tool.icon className="w-24 h-24" />
-              </div>
-              
-              <div className={`w-12 h-12 ${tool.bg} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
-                <tool.icon className={`w-6 h-6 ${tool.color}`} />
+              <div className="absolute -right-8 -bottom-8 p-6 opacity-[0.03] group-hover:opacity-[0.06] transition-all duration-500 transform-gpu pointer-events-none group-hover:scale-110">
+                <tool.icon className={`w-48 h-48 ${tool.color}`} />
               </div>
 
-              <div className="flex justify-between items-start mb-2">
-                <h3 className="text-lg font-black text-slate-900 uppercase tracking-tight font-display">
-                  {tool.title}
-                </h3>
-                <span className="text-[9px] font-mono font-bold uppercase px-2 py-0.5 bg-slate-100 text-slate-500 rounded-md">
+              <div className="flex justify-between items-start mb-6 relative z-10">
+                <div className="w-12 h-12 rounded-[1rem] bg-white border-2 border-slate-50 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-sm relative overflow-hidden group-hover:border-transparent">
+                  <div className={`absolute inset-0 ${tool.bg} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+                  <tool.icon className={`w-5 h-5 text-slate-400 group-hover:scale-110 transition-all duration-300 ${tool.color.replace('text-', 'group-hover:text-')} relative z-10`} />
+                </div>
+                <span className={`text-[8px] font-mono font-bold uppercase px-2.5 py-0.5 bg-slate-50 border border-slate-200 text-slate-500 rounded-full group-hover:bg-white group-hover:border-slate-300 ${tool.color.replace('text-', 'group-hover:text-')} transition-colors duration-300 shadow-xs flex items-center gap-1.5`}>
+                  {/* Subtle pulsing dot */}
+                  <span className={`w-1.5 h-1.5 rounded-full ${tool.color.replace('text-', 'bg-')} opacity-50 group-hover:opacity-100 animate-pulse`} />
                   {tool.badge}
                 </span>
               </div>
+              
+              <div className="relative z-10 flex-1">
+                <h3 className="text-[15px] font-black text-slate-900 tracking-tight font-display mb-1">
+                  {tool.title}
+                </h3>
+                <p className="text-slate-500 text-[11px] leading-relaxed font-medium">
+                  {tool.desc}
+                </p>
+              </div>
 
-              <p className="text-slate-500 text-sm leading-relaxed mb-6">
-                {tool.desc}
-              </p>
-
-              <button 
-                onClick={() => onNavigate?.(tool.id)}
-                className="flex items-center gap-2 text-xs font-bold text-slate-900 hover:text-purple-600 transition-colors group/btn"
-              >
-                <span>Access Tool</span>
-                <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-              </button>
+              <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between relative z-10">
+                <span className="text-[9px] font-bold text-slate-400 group-hover:text-slate-800 transition-colors uppercase tracking-wider">
+                  Explore Tool
+                </span>
+                <div className={`w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center border border-slate-200 transition-all duration-300  group-hover:scale-110 ${tool.bg.replace('bg-', 'group-hover:bg-')} ${tool.color.replace('text-', 'group-hover:border-')}`}>
+                  <ArrowRight className={`w-3.5 h-3.5 text-slate-400 transition-colors ${tool.color.replace('text-', 'group-hover:text-')}`} />
+                </div>
+              </div>
             </div>
           ))}
         </div>

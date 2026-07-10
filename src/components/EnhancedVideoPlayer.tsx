@@ -328,7 +328,6 @@ export function EnhancedVideoPlayer({
         playsInline
         muted={isMuted}
         preload="auto"
-        referrerPolicy="no-referrer"
         onLoadStart={() => {
           setIsLoading(true);
           setHasError(false);

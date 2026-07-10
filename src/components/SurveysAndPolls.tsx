@@ -73,7 +73,7 @@ export const SurveysAndPolls: React.FC<SurveysAndPollsProps> = ({ userProfile })
       id: `survey-${Date.now()}`,
       title: newSurvey.title,
       description: newSurvey.description || "",
-      type: newSurvey.type as "survey" | "poll",
+      type: newSurvey.type as "survey" | "poll" | "code_task",
       questions: newSurvey.questions as Survey["questions"],
       responsesCount: 0,
       createdAt: new Date().toISOString(),
@@ -136,8 +136,11 @@ export const SurveysAndPolls: React.FC<SurveysAndPollsProps> = ({ userProfile })
       <div className="flex flex-col gap-6">
         <button onClick={() => setIsCreating(false)} className="text-purple-600 font-bold text-sm w-fit">&larr; Cancel</button>
         <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col gap-4">
-           <h2 className="text-xl font-black text-slate-900">Create New {newSurvey.type === "poll" ? "Poll" : "Survey"}</h2>
+           <h2 className="text-xl font-black text-slate-900">Create New {newSurvey.type === "poll" ? "Poll" : newSurvey.type === "code_task" ? "Code Task" : "Survey"}</h2>
            <div className="flex gap-4 mb-2">
+              <label className="flex items-center gap-2 text-sm font-bold text-slate-700 cursor-pointer">
+                <input type="radio" checked={newSurvey.type === "code_task"} onChange={() => setNewSurvey({...newSurvey, type: "code_task"})} /> Code Task
+              </label>
               <label className="flex items-center gap-2 text-sm font-bold text-slate-700 cursor-pointer">
                 <input type="radio" checked={newSurvey.type === "survey"} onChange={() => setNewSurvey({...newSurvey, type: "survey"})} /> Survey
               </label>
@@ -178,6 +181,7 @@ export const SurveysAndPolls: React.FC<SurveysAndPollsProps> = ({ userProfile })
                        <option value="single">Single Choice</option>
                        <option value="multiple">Multiple Choice</option>
                        <option value="text">Text Answer</option>
+                       <option value="code">Code Review / Snippet</option>
                      </select>
                    </div>
                    <input 
@@ -191,7 +195,32 @@ export const SurveysAndPolls: React.FC<SurveysAndPollsProps> = ({ userProfile })
                         setNewSurvey({...newSurvey, questions: updated});
                       }}
                    />
-                   {q.type !== "text" && (
+                   {q.type === "code" && (
+                     <div className="space-y-2 mt-2">
+                       <input 
+                         type="text" 
+                         placeholder="Language (e.g., python, typescript)"
+                         className="w-full border border-slate-200 rounded-lg p-2 text-sm"
+                         value={q.language || ""}
+                         onChange={e => {
+                           const updated = [...newSurvey.questions!];
+                           updated[idx].language = e.target.value;
+                           setNewSurvey({...newSurvey, questions: updated});
+                         }}
+                       />
+                       <textarea
+                         placeholder="Enter code snippet here..."
+                         className="w-full h-32 font-mono text-xs border border-slate-200 rounded-lg p-2 bg-slate-900 text-slate-300"
+                         value={q.codeSnippet || ""}
+                         onChange={e => {
+                           const updated = [...newSurvey.questions!];
+                           updated[idx].codeSnippet = e.target.value;
+                           setNewSurvey({...newSurvey, questions: updated});
+                         }}
+                       ></textarea>
+                     </div>
+                   )}
+                   {q.type !== "text" && q.type !== "code" && (
                      <div className="space-y-2 pl-4 border-l-2 border-slate-200">
                        {q.options?.map((opt, oIdx) => (
                          <div key={oIdx} className="flex gap-2">
@@ -239,7 +268,7 @@ export const SurveysAndPolls: React.FC<SurveysAndPollsProps> = ({ userProfile })
              onClick={handleCreate}
              className="bg-slate-900 hover:bg-purple-600 text-white font-bold py-3 rounded-xl transition-colors mt-4"
            >
-             Publish {newSurvey.type === "poll" ? "Poll" : "Survey"}
+             Publish {newSurvey.type === "poll" ? "Poll" : newSurvey.type === "code_task" ? "Code Task" : "Survey"}
            </button>
         </div>
       </div>
@@ -259,8 +288,8 @@ export const SurveysAndPolls: React.FC<SurveysAndPollsProps> = ({ userProfile })
         {surveys.map(item => (
           <div key={item.id} onClick={() => setViewingSurvey(item)} className={`bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col transition-colors cursor-pointer group ${item.type === 'poll' ? 'hover:border-blue-300' : 'hover:border-purple-300'}`}>
             <div className="flex justify-between items-start mb-4">
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform ${item.type === 'poll' ? 'bg-blue-100 text-blue-600' : 'bg-purple-100 text-purple-600'}`}>
-                {item.type === 'poll' ? <BarChart3 className="w-6 h-6" /> : <FileText className="w-6 h-6" />}
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform ${item.type === 'poll' ? 'bg-blue-100 text-blue-600' : item.type === 'code_task' ? 'bg-emerald-100 text-emerald-600' : 'bg-purple-100 text-purple-600'}`}>
+                {item.type === 'poll' ? <BarChart3 className="w-6 h-6" /> : item.type === 'code_task' ? <Zap className="w-6 h-6" /> : <FileText className="w-6 h-6" />}
               </div>
               <button 
                 onClick={(e) => handleShare(e, item.id)}
@@ -279,8 +308,8 @@ export const SurveysAndPolls: React.FC<SurveysAndPollsProps> = ({ userProfile })
                 {item.type === 'poll' ? <Zap className="w-4 h-4 text-emerald-500" /> : <Users className="w-4 h-4" />} 
                 {item.responsesCount} {item.type === 'poll' ? 'Votes' : 'Responses'}
               </div>
-              <span className={`${item.type === 'poll' ? 'text-blue-600' : 'text-purple-600'} text-sm font-bold flex items-center gap-1`}>
-                {item.type === 'poll' ? 'Vote Now' : 'Take Survey'} <ChevronRight className="w-4 h-4" />
+              <span className={`${item.type === 'poll' ? 'text-blue-600' : item.type === 'code_task' ? 'text-emerald-600' : 'text-purple-600'} text-sm font-bold flex items-center gap-1`}>
+                {item.type === 'poll' ? 'Vote Now' : item.type === 'code_task' ? 'Review Code' : 'Take Survey'} <ChevronRight className="w-4 h-4" />
               </span>
             </div>
           </div>

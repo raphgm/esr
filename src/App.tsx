@@ -227,7 +227,7 @@ export default function App() {
 
   // Router State
   const [activeTab, setActiveTab] = useState<
-    "home" | "connect" | "ai-lab" | "marketplace" | "consultancy" | "gigs" | "community" | "mobile" | "teams" | "careers" | "about" | "how-it-works" | "payments" | "events" | "admin" | "portfolio"
+    "home" | "connect" | "ai-lab" | "marketplace" | "consultancy" | "gigs" | "community" | "mobile" | "teams" | "careers" | "about" | "how-it-works" | "payments" | "events" | "admin" | "portfolio" | "rewards"
   >(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("survey")) return "ai-lab";
@@ -714,7 +714,15 @@ ActivityPost>("posts", initialPosts);
     try {
       if (authMode === "signin") {
         try {
-          await signInWithEmailAndPassword(auth, authEmail, authPassword);
+          const userCredential = await signInWithEmailAndPassword(auth, authEmail, authPassword);
+          const email = userCredential.user.email?.toLowerCase();
+          if (email === "rdgabmomoh@gmail.com" || email === "raphdafemomoh@gmail.com") {
+             const profile = await getUserProfile(userCredential.user.uid);
+             if (profile.accountType !== authAccountType) {
+                 await saveUserProfile(userCredential.user.uid, { ...profile, accountType: authAccountType });
+                 setUserProfile({ ...profile, accountType: authAccountType });
+             }
+          }
         } catch (signInErr: any) {
           // If the user doesn't exist (invalid-credential or user-not-found), automatically attempt registration as a seamless fallback
           if (signInErr.code === "auth/invalid-credential" || signInErr.code === "auth/user-not-found") {
@@ -788,7 +796,15 @@ ActivityPost>("posts", initialPosts);
           if (signUpErr.code === "auth/email-already-in-use") {
             console.log("Email already in use on signup. Attempting seamless auto-login fallback...");
             try {
-              await signInWithEmailAndPassword(auth, authEmail, authPassword);
+              const userCredential = await signInWithEmailAndPassword(auth, authEmail, authPassword);
+              const email = userCredential.user.email?.toLowerCase();
+              if (email === "rdgabmomoh@gmail.com" || email === "raphdafemomoh@gmail.com") {
+                 const profile = await getUserProfile(userCredential.user.uid);
+                 if (profile.accountType !== authAccountType) {
+                     await saveUserProfile(userCredential.user.uid, { ...profile, accountType: authAccountType });
+                     setUserProfile({ ...profile, accountType: authAccountType });
+                 }
+              }
               // Successfully logged in as existing user. Let's prevent the vetting modal since they aren't new.
               setAuthMode("signin"); // Will prevent the vetting modal condition
             } catch (signInErr: any) {
@@ -830,7 +846,7 @@ ActivityPost>("posts", initialPosts);
   const [isSidebarHidden, setIsSidebarHidden] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const navSections = [
+  const freelancerSections = [
     {
       title: "Intelligence & Insights Hub",
       items: [
@@ -843,7 +859,6 @@ ActivityPost>("posts", initialPosts);
       title: "Gig Market & Escrow Services",
       items: [
         { id: "gigs", label: "AI Gig Builder", desc: "Draft & list your services", icon: Sparkles },
-        { id: "consultancy", label: "Consultancy", desc: "Manage consultancy projects & tasks", icon: Target },
         { id: "careers", label: "Jobs Board", desc: "Full-time & remote roles", icon: Compass },
         { id: "marketplace", label: "Brand Campaigns", desc: "Exclusive high-ticket sponsorships", icon: ShoppingCart },
       ]
@@ -862,7 +877,35 @@ ActivityPost>("posts", initialPosts);
         { id: "payments", label: "Digital Wallet", desc: "Transfers & distributions", icon: CreditCard },
         { id: "rewards", label: "Ambassadors", desc: "Earn Points & Rewards", icon: Gift }
       ]
+    }
+  ];
+
+  const clientSections = [
+    {
+      title: "Client Portal",
+      items: [
+        { id: "home", label: "Dashboard", desc: "Manage projects & spend", icon: Home },
+        { id: "ai-lab", label: "Post AI Task", desc: "Hire for AI training", icon: BrainCircuit },
+        { id: "consultancy", label: "Post IT Project", desc: "Hire for IT consultancy", icon: Briefcase },
+      ]
     },
+    {
+      title: "Talent Discovery",
+      items: [
+        { id: "connect", label: "Talent Network", desc: "Search & connect with pros", icon: Users },
+        { id: "portfolio", label: "View Portfolios", desc: "Review previous work", icon: Sparkles },
+      ]
+    },
+    {
+      title: "Billing & Escrow",
+      items: [
+        { id: "payments", label: "Funding & Escrow", desc: "Manage deposits & payments", icon: CreditCard },
+      ]
+    }
+  ];
+
+  const navSections = [
+    ...(userProfile?.accountType === "jobOwner" ? clientSections : freelancerSections),
     ...(isAdmin ? [{
       title: "Admin Controls",
       items: [
@@ -978,7 +1021,7 @@ ActivityPost>("posts", initialPosts);
                       type="button"
                       onClick={() => setAuthAccountType("freelancer")}
                       className={`flex-1 py-1.5 px-3 rounded-full border text-xs font-bold tracking-tight transition-all cursor-pointer ${
-                        authAccountType === "freelancer"
+                        (authAccountType as string) === "freelancer"
                           ? "bg-purple-50 border-purple-500 text-purple-600 shadow-xs"
                           : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"
                       }`}
@@ -989,7 +1032,7 @@ ActivityPost>("posts", initialPosts);
                       type="button"
                       onClick={() => setAuthAccountType("jobOwner")}
                       className={`flex-1 py-1.5 px-3 rounded-full border text-xs font-bold tracking-tight transition-all cursor-pointer ${
-                        authAccountType === "jobOwner"
+                        (authAccountType as string) === "jobOwner"
                           ? "bg-purple-50 border-purple-500 text-purple-600 shadow-xs"
                           : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"
                       }`}
@@ -1319,9 +1362,10 @@ ActivityPost>("posts", initialPosts);
                     </svg>
                   </div>
                   <h1 className="font-display font-bold text-xl tracking-tight mt-2 text-slate-900">ESTARR</h1>
-                  <p className="text-[11px] text-purple-600 font-bold tracking-wide mt-0.5">Talent Networks</p>
+                  <p className="text-[11px] text-purple-600 font-bold tracking-wide mt-0.5">
+                    {authAccountType === "jobOwner" ? "Hiring Portal" : "Talent Networks"}
+                  </p>
                 </div>
-
                 {authAccountType === "jobOwner" && authMode === "signup" && hireWizardStep === 2 && (
                   <div className="mb-4">
                     <button
@@ -1337,8 +1381,46 @@ ActivityPost>("posts", initialPosts);
                     </div>
                   </div>
                 )}
-
                 <form onSubmit={handleLogin} className="flex flex-col gap-3 text-xs">
+                  <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-1">
+                      <span className="font-display font-extrabold text-[9px] uppercase tracking-wider text-slate-900">
+                        Sign In As *
+                      </span>
+                      <div className="flex gap-1.5">
+                        <button
+                          type="button"
+                          disabled={isAuthLoading}
+                          onClick={() => setAuthAccountType("freelancer")}
+                          className={`flex-1 py-1.5 px-2 rounded-full border text-[10px] font-bold tracking-tight transition-all disabled:opacity-60 cursor-pointer ${
+                            authAccountType === "freelancer"
+                              ? "bg-purple-50 border-purple-500 text-purple-600"
+                              : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"
+                          }`}
+                        >
+                          Freelancer
+                        </button>
+                        <button
+                          type="button"
+                          disabled={isAuthLoading}
+                          onClick={() => {
+                            setAuthAccountType("jobOwner");
+                            if (authMode === "signup") {
+                              setHireWizardStep(1); // Return to wizard step 1
+                            }
+                          }}
+                          className={`flex-1 py-1.5 px-2 rounded-full border text-[10px] font-bold tracking-tight transition-all disabled:opacity-60 cursor-pointer ${
+                            authAccountType === "jobOwner"
+                              ? "bg-purple-50 border-purple-500 text-purple-600"
+                              : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"
+                          }`}
+                        >
+                          Client
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
                   {authMode === "signup" && (
                     <>
                       <div className="flex flex-col gap-1">
@@ -1356,43 +1438,7 @@ ActivityPost>("posts", initialPosts);
                           />
                         </div>
                       </div>
-
                       <div className="flex flex-col gap-3">
-                        <div className="flex flex-col gap-1">
-                          <span className="font-display font-extrabold text-[9px] uppercase tracking-wider text-slate-900">
-                            Account Type *
-                          </span>
-                          <div className="flex gap-1.5">
-                            <button
-                              type="button"
-                              disabled={isAuthLoading}
-                              onClick={() => setAuthAccountType("freelancer")}
-                              className={`flex-1 py-1.5 px-2 rounded-full border text-[10px] font-bold tracking-tight transition-all disabled:opacity-60 cursor-pointer ${
-                                authAccountType === "freelancer"
-                                  ? "bg-purple-50 border-purple-500 text-purple-600"
-                                  : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"
-                              }`}
-                            >
-                              Freelancer
-                            </button>
-                            <button
-                              type="button"
-                              disabled={isAuthLoading}
-                              onClick={() => {
-                                setAuthAccountType("jobOwner");
-                                setHireWizardStep(1); // Return to wizard step 1
-                              }}
-                              className={`flex-1 py-1.5 px-2 rounded-full border text-[10px] font-bold tracking-tight transition-all disabled:opacity-60 cursor-pointer ${
-                                authAccountType === "jobOwner"
-                                  ? "bg-purple-50 border-purple-500 text-purple-600"
-                                  : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"
-                              }`}
-                            >
-                            Client
-                            </button>
-                          </div>
-                        </div>
-
                         <div className="flex flex-col gap-1">
                           <label className="font-mono text-[9px] font-bold text-slate-900 tracking-wide">Birthdate *</label>
                           <div className="relative">
@@ -1410,7 +1456,6 @@ ActivityPost>("posts", initialPosts);
                       </div>
                     </>
                   )}
-
                   <div className="flex flex-col gap-1">
                     <label className="font-mono text-[9px] font-bold text-slate-900 tracking-wide">Email Address</label>
                     <div className="relative">
@@ -1975,7 +2020,7 @@ ActivityPost>("posts", initialPosts);
                 <UserDashboard 
                   userProfile={userProfile} 
                   tasks={tasks}
-                  onNavigate={setActiveTab} 
+                  onNavigate={(tab) => setActiveTab(tab as any)} 
                 />
               ) : (
                 <>
@@ -2161,7 +2206,7 @@ ActivityPost>("posts", initialPosts);
               tasks={tasks}
               onUpdateTasks={handleUpdateTasks}
               onOpenAiChat={handleOpenAi}
-              onNavigate={setActiveTab}
+              onNavigate={(tab) => setActiveTab(tab as any)}
               campaigns={campaigns}
             />
           )}

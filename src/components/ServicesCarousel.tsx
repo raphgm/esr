@@ -157,17 +157,18 @@ export function ServicesCarousel({ onSelect }: ServicesCarouselProps) {
   }, []);
 
   return (
-    <div className="relative w-full overflow-hidden mt-8 border-t-2 border-slate-200 pt-8">
-      <div className="flex justify-between items-end mb-6 px-2">
-        <div>
-          <span className="text-[10px] font-mono font-bold text-purple-600 bg-purple-50 border border-purple-100 px-2.5 py-1 rounded-full uppercase tracking-widest inline-block mb-2">
-            ✨ Interactive Workspace modules
-          </span>
-          <h3 className="text-2xl font-bold uppercase tracking-tight text-slate-900">
-            Explore Ecosystem
-          </h3>
-        </div>
-        <div className="flex gap-2">
+    <div className="relative w-[100vw] overflow-hidden pt-16 pb-16 left-[50%] right-[50%] -ml-[50vw] -mr-[50vw]">
+      <div className="max-w-7xl mx-auto px-4 md:px-8 w-full">
+        <div className="flex items-end mb-8 px-2 relative w-full">
+          <div className="flex-1 flex flex-col items-center text-center">
+            <span className="text-[10px] font-mono font-bold text-purple-600 bg-purple-50 border border-purple-100 px-2.5 py-1 rounded-full uppercase tracking-widest inline-block mb-2">
+              ✨ Interactive Workspace modules
+            </span>
+            <h3 className="text-2xl md:text-3xl font-bold uppercase tracking-tight text-slate-900">
+              Explore Ecosystem
+            </h3>
+          </div>
+          <div className="absolute right-2 bottom-0 flex gap-2">
           <button
             onClick={() =>
               scrollRef.current?.scrollBy({ left: -320, behavior: "smooth" })
@@ -186,10 +187,10 @@ export function ServicesCarousel({ onSelect }: ServicesCarouselProps) {
           </button>
         </div>
       </div>
-
+      </div>
       <div
         ref={scrollRef}
-        className="flex overflow-x-auto gap-4 snap-x snap-mandatory pb-8 pt-2 px-2 hide-scrollbar"
+        className="flex overflow-x-auto gap-4 snap-x snap-mandatory pb-8 pt-2 hide-scrollbar px-4 md:px-8 xl:px-[calc((100vw-80rem)/2+2rem)]"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
         {services.map((service, idx) => {
@@ -238,7 +239,6 @@ export function ServicesCarousel({ onSelect }: ServicesCarouselProps) {
           );
         })}
       </div>
-
       <style>{`
         .hide-scrollbar::-webkit-scrollbar {
           display: none;

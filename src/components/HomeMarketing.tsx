@@ -186,7 +186,7 @@ export function HomeMarketing({
       metrics: "Matched in < 24 Hours",
       rating: "4.95/5 Client Rating",
       popularConsultancy: "Scale high-performance cloud infrastructure & WhatsApp commerce automation",
-      icon: Cuboid,
+      icon: Cpu,
       animationType: "float",
       accentColor: "from-blue-500 to-indigo-600",
       bgLight: "bg-blue-50/50",
@@ -211,8 +211,8 @@ export function HomeMarketing({
       metrics: "Assembled in 48 Hours",
       rating: "5.00/5 Data Precision",
       popularConsultancy: "Custom SFT dataset curation for specialized regional language models",
-      icon: Activity,
-      animationType: "rotate",
+      icon: BrainCircuit,
+      animationType: "float",
       accentColor: "from-teal-500 to-emerald-600",
       bgLight: "bg-teal-50/50",
       borderColor: "border-teal-100",
@@ -237,7 +237,7 @@ export function HomeMarketing({
       rating: "4.97/5 Deployment Score",
       popularConsultancy: "Autonomous customer support agent with RAG integration for enterprise CRM",
       icon: Sparkles,
-      animationType: "pulse",
+      animationType: "float",
       accentColor: "from-violet-500 to-purple-600",
       bgLight: "bg-purple-50/50",
       borderColor: "border-purple-100",
@@ -261,8 +261,8 @@ export function HomeMarketing({
       metrics: "Immediate Onboarding",
       rating: "4.92/5 Client Rating",
       popularConsultancy: "Aligning multi-disciplinary creative squads & agile milestone dispatch",
-      icon: Cuboid,
-      animationType: "tilt",
+      icon: Briefcase,
+      animationType: "float",
       accentColor: "from-amber-500 to-orange-600",
       bgLight: "bg-amber-50/50",
       borderColor: "border-amber-100",
@@ -286,8 +286,8 @@ export function HomeMarketing({
       metrics: "Matched in < 24 Hours",
       rating: "4.96/5 Client Rating",
       popularConsultancy: "Scaling high-performance talent platforms & automated commerce infrastructure",
-      icon: Cuboid,
-      animationType: "bounce",
+      icon: TrendingUp,
+      animationType: "float",
       accentColor: "from-emerald-500 to-teal-600",
       bgLight: "bg-emerald-50/50",
       borderColor: "border-emerald-100",
@@ -465,81 +465,76 @@ export function HomeMarketing({
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           
-          {/* Pillar 1 */}
-          <div className="p-6 bg-white border border-slate-200 hover:border-purple-300 transition-all rounded-2xl group flex flex-col justify-between shadow-xs">
-            <div>
-              <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-100 mb-4 group-hover:bg-purple-600 group-hover:text-white transition-colors">
-                <Lock className="w-5 h-5" />
+          
+          {
+            [
+              {
+                icon: Lock,
+                title: "Strict Escrow Protection",
+                desc: "Clients fund the escrow milestones upfront. Work with complete peace of mind knowing your payouts are fully collateralized and locked before you write code or upload media.",
+                metric: "ZERO PAYMENT DELAYS",
+                feature: "StrrSecure ™",
+                color: "text-purple-600",
+                bg: "bg-purple-50",
+                border: "border-purple-100",
+                hoverBg: "group-hover:bg-purple-600"
+              },
+              {
+                icon: Sparkles,
+                title: "AI Pitch & Portfolio Grader",
+                desc: "Gain access to our built-in AI Copilot. Optimize your client-facing outreach pitches, align with elite brands, and audit your portfolio gap instantly to stand out among top clients.",
+                metric: "94% PASS RATE GAIN",
+                feature: "Copilot AI",
+                color: "text-purple-600",
+                bg: "bg-purple-50",
+                border: "border-purple-100",
+                hoverBg: "group-hover:bg-purple-600"
+              },
+              {
+                icon: ShieldCheck,
+                title: "Anonymous Tech Market",
+                desc: "Hire or get hired completely anonymously based strictly on verified skill metrics. Bypass bias and evaluate true technical capabilities before revealing identities.",
+                metric: "ZERO BIAS MATCHING",
+                feature: "Anonymous Protocol",
+                color: "text-purple-600",
+                bg: "bg-purple-50",
+                border: "border-purple-100",
+                hoverBg: "group-hover:bg-purple-600"
+              },
+              {
+                icon: BrainCircuit,
+                title: "ESTARR AI Lab",
+                desc: "Collaboratively train, evaluate, and validate models through RLHF tasks. Contribute to collaborative datasets and earn rewards for shaping the future of AI.",
+                metric: "EARN VIA RLHF",
+                feature: "AI Lab",
+                color: "text-purple-600",
+                bg: "bg-purple-50",
+                border: "border-purple-100",
+                hoverBg: "group-hover:bg-purple-600"
+              }
+            ].map((pillar, idx) => (
+              <div key={idx} className="p-6 bg-white border border-slate-200 hover:border-purple-300 transition-all rounded-2xl group flex flex-col justify-between shadow-xs relative overflow-hidden z-10">
+                <div className="absolute -right-8 -bottom-8 p-6 opacity-[0.03] group-hover:opacity-[0.06] transition-all duration-500 transform-gpu pointer-events-none group-hover:scale-110 -z-10">
+                  <pillar.icon className={`w-48 h-48 ${pillar.color}`} />
+                </div>
+                <div>
+                  <div className={`w-10 h-10 rounded-xl ${pillar.bg} ${pillar.color} flex items-center justify-center border ${pillar.border} mb-4 ${pillar.hoverBg} group-hover:text-white transition-colors`}>
+                    <pillar.icon className="w-5 h-5" />
+                  </div>
+                  <h3 className="font-bold text-base text-slate-900 uppercase tracking-wide">
+                    {pillar.title}
+                  </h3>
+                  <p className="text-slate-500 text-xs mt-2 leading-relaxed">
+                    {pillar.desc}
+                  </p>
+                </div>
+                <div className="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center text-[10px] font-mono font-bold text-slate-400">
+                  <span>{pillar.metric}</span>
+                  <span className={pillar.color}>{pillar.feature}</span>
+                </div>
               </div>
-              <h3 className="font-bold text-base text-slate-900 uppercase tracking-wide">
-                Strict Escrow Protection
-              </h3>
-              <p className="text-slate-500 text-xs mt-2 leading-relaxed">
-                Clients fund the escrow milestones upfront. Work with complete peace of mind knowing your payouts are fully collateralized and locked before you write code or upload media.
-              </p>
-            </div>
-            <div className="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center text-[10px] font-mono font-bold text-slate-400">
-              <span>ZERO PAYMENT DELAYS</span>
-              <span className="text-purple-600">StrrSecure &trade;</span>
-            </div>
-          </div>
-
-          {/* Pillar 2 */}
-          <div className="p-6 bg-white border border-slate-200 hover:border-purple-300 transition-all rounded-2xl group flex flex-col justify-between shadow-xs">
-            <div>
-              <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-100 mb-4 group-hover:bg-purple-600 group-hover:text-white transition-colors">
-                <Sparkles className="w-5 h-5" />
-              </div>
-              <h3 className="font-bold text-base text-slate-900 uppercase tracking-wide">
-                AI Pitch & Portfolio Grader
-              </h3>
-              <p className="text-slate-500 text-xs mt-2 leading-relaxed">
-                Gain access to our built-in AI Copilot. Optimize your client-facing outreach pitches, align with elite brands, and audit your portfolio gap instantly to stand out among top clients.
-              </p>
-            </div>
-            <div className="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center text-[10px] font-mono font-bold text-slate-400">
-              <span>94% PASS RATE GAIN</span>
-              <span className="text-purple-600">Copilot AI</span>
-            </div>
-          </div>
-
-          {/* Pillar 3 */}
-          <div className="p-6 bg-white border border-slate-200 hover:border-purple-300 transition-all rounded-2xl group flex flex-col justify-between shadow-xs">
-            <div>
-              <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-100 mb-4 group-hover:bg-purple-600 group-hover:text-white transition-colors">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-              <h3 className="font-bold text-base text-slate-900 uppercase tracking-wide">
-                Anonymous Tech Market
-              </h3>
-              <p className="text-slate-500 text-xs mt-2 leading-relaxed">
-                Hire or get hired completely anonymously based strictly on verified skill metrics. Bypass bias and evaluate true technical capabilities before revealing identities.
-              </p>
-            </div>
-            <div className="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center text-[10px] font-mono font-bold text-slate-400">
-              <span>ZERO BIAS MATCHING</span>
-              <span className="text-purple-600">Anonymous Protocol</span>
-            </div>
-          </div>
-
-          {/* Pillar 4 */}
-          <div className="p-6 bg-white border border-slate-200 hover:border-purple-300 transition-all rounded-2xl group flex flex-col justify-between shadow-xs">
-            <div>
-              <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center border border-purple-100 mb-4 group-hover:bg-purple-600 group-hover:text-white transition-colors">
-                <BrainCircuit className="w-5 h-5" />
-              </div>
-              <h3 className="font-bold text-base text-slate-900 uppercase tracking-wide">
-                ESTARR AI Lab
-              </h3>
-              <p className="text-slate-500 text-xs mt-2 leading-relaxed">
-                Collaboratively train, evaluate, and validate models through RLHF tasks. Contribute to collaborative datasets and earn rewards for shaping the future of AI.
-              </p>
-            </div>
-            <div className="mt-6 pt-4 border-t border-slate-100 flex justify-between items-center text-[10px] font-mono font-bold text-slate-400">
-              <span>EARN VIA RLHF</span>
-              <span className="text-purple-600">AI Lab</span>
-            </div>
-          </div>
+            ))
+          }
         </div>
       </div>
 
@@ -605,26 +600,18 @@ export function HomeMarketing({
               {/* Left Details Panel */}
               <div className="lg:col-span-7 flex flex-col justify-between bg-white rounded-2xl p-6 md:p-8 border border-slate-200 shadow-xs relative overflow-hidden">
                 <div>
-                  <div className="flex items-center gap-3 mb-4">
-                    {/* Isometric Cube Icon Container */}
-                    <motion.div
-                      animate={activeAnim}
-                      style={{ perspective: "1000px" }}
-                      className="relative w-14 h-14 shrink-0"
+                  <div className="flex items-center gap-5 mb-4">
+                    {/* Icon Container */}
+                    <motion.div 
+                      animate={activeAnim as any}
+                      className={`w-14 h-14 rounded-2xl bg-gradient-to-tr ${vert.accentColor} text-white flex items-center justify-center shadow-lg border border-white/20 shrink-0`}
                     >
-                      {/* Top Face */}
-                      <div className={`absolute top-0 left-2 w-10 h-3 bg-gradient-to-r ${vert.accentColor} opacity-30 skew-x-[45deg] rounded-t-sm`} />
-                      {/* Side Face */}
-                      <div className={`absolute top-2 right-0 w-3 h-10 bg-gradient-to-b ${vert.accentColor} opacity-50 skew-y-[45deg] rounded-r-sm`} />
-                      {/* Main Front Face */}
-                      <div className={`absolute top-1.5 left-0 w-11 h-11 rounded-lg bg-gradient-to-tr ${vert.accentColor} text-white flex items-center justify-center shadow-lg border border-white/20`}>
-                        <IconComponent className="w-6 h-6" />
-                      </div>
+                      <IconComponent className="w-6 h-6" />
                     </motion.div>
-
-                    <div className="min-w-0">
+                    
+                    <div>
                       <p className="text-[10px] font-mono font-bold tracking-widest text-slate-400 uppercase">Expert Vertical</p>
-                      <h3 className="font-display font-black text-lg md:text-xl text-slate-900 leading-tight break-words">
+                      <h3 className="font-display font-black text-lg md:text-xl text-slate-900 leading-tight">
                         {vert.title}
                       </h3>
                     </div>
