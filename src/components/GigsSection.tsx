@@ -48,9 +48,10 @@ export interface Gig {
 interface GigsSectionProps {
   userProfile: UserProfile;
   onOpenAiChat: (prompt: string, context: string) => void;
+  initialCategory?: string;
 }
 
-export default function GigsSection({ userProfile, onOpenAiChat }: GigsSectionProps) {
+export default function GigsSection({ userProfile, onOpenAiChat, initialCategory = "All" }: GigsSectionProps) {
   // Mock Gigs - optimized with realistic Gen-Z gig titles and visuals
   const [gigs, setGigs] = useState<Gig[]>([
     {
@@ -245,7 +246,7 @@ export default function GigsSection({ userProfile, onOpenAiChat }: GigsSectionPr
 
   // Applet state
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory);
   const [activeGig, setActiveGig] = useState<Gig | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
@@ -299,7 +300,7 @@ export default function GigsSection({ userProfile, onOpenAiChat }: GigsSectionPr
   const handleFundEscrow = (e: React.FormEvent) => {
     e.preventDefault();
     if (!clientRequirements.trim()) {
-      alert("Please enter brief instructions for the freelancer to get started!");
+      alert("Please enter brief instructions for the professional to get started!");
       return;
     }
     setHiringStep("payment");
@@ -387,7 +388,7 @@ export default function GigsSection({ userProfile, onOpenAiChat }: GigsSectionPr
             <button
               onClick={() => {
                 onOpenAiChat(
-                  "Explain how the ESTARR Gig Escrow Protection workflow ensures that freelancers get paid on time and clients get their files safely.",
+                  "Explain how the ESTARR Gig Escrow Protection workflow ensures that professionals get paid on time and clients get their files safely.",
                   "general"
                 );
               }}
@@ -846,7 +847,7 @@ export default function GigsSection({ userProfile, onOpenAiChat }: GigsSectionPr
                       🔒 Step 1 of 2: Contract Details
                     </span>
                     <h3 className="font-display font-bold text-lg text-slate-900 mt-2">
-                      Brief the Freelancer
+                      Brief the Professional
                     </h3>
                     <p className="text-xs text-slate-500 mt-1">
                       Provide clear requirements so <strong>{activeGig.sellerName}</strong> can deliver the exact files you need.

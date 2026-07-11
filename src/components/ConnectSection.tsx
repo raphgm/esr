@@ -2,7 +2,8 @@ import { PageBanner } from "./PageBanner";
 import { CategoryTabs } from "./CategoryTabs";
 import React, { useState, useRef, useEffect } from "react";
 import { UserProfile, ActivityPost } from "../types";
-import { getCollectionData, saveCollectionItem } from "../lib/firebase";
+import { getCollectionData, saveCollectionItem, deleteCollectionItem } from "../lib/firebase";
+import { saveLocalMedia, getLocalMedia, deleteLocalMedia, compressImage } from "../lib/mediaStorage";
 import {
   Users,
   ThumbsUp,
@@ -48,7 +49,7 @@ interface ConnectSectionProps {
   posts: ActivityPost[];
   onUpdatePosts: (posts: ActivityPost[]) => void;
   onUpdateProfile: (profile: UserProfile) => void;
-  initialSubTab?: "feed" | "directory" | "mentorship" | "companion";
+  initialSubTab?: "feed" | "directory" | "mentorship";
 }
 
 const mockPeers: (UserProfile & { id: string })[] = [
@@ -151,7 +152,7 @@ export default function ConnectSection({
   const [setupBio, setSetupBio] = useState(userProfile.bio || "");
   const [setupProfession, setSetupProfession] = useState(userProfile.profession || "");
   const [activeTab, setActiveTab] = useState<
-    "feed" | "directory" | "mentorship" | "companion"
+    "feed" | "directory" | "mentorship"
   >(initialSubTab || "feed");
 
   useEffect(() => {
@@ -399,11 +400,34 @@ export default function ConnectSection({
     setTippingPost(null);
   };
 
+  // Local IndexedDB media URLs
+  const [resolvedMediaUrls, setResolvedMediaUrls] = useState<{
+    [postId: string]: { image?: string; video?: string };
+  }>({});
+
+  // Device-level camera/microphone controls
+  const [videoDevices, setVideoDevices] = useState<MediaDeviceInfo[]>([]);
+  const [audioDevices, setAudioDevices] = useState<MediaDeviceInfo[]>([]);
+  const [selectedVideoDeviceId, setSelectedVideoDeviceId] = useState<string>("");
+  const [selectedAudioDeviceId, setSelectedAudioDeviceId] = useState<string>("");
+  const [cameraFacingMode, setCameraFacingMode] = useState<"user" | "environment">("user");
+  const [creationStudioMode, setCreationStudioMode] = useState<"video" | "photo">("video");
+
   // Camera/Webcam recording state
   const [isRecordingModalOpen, setIsRecordingModalOpen] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingSeconds, setRecordingSeconds] = useState(0);
   const [recordedVideoUrl, setRecordedVideoUrl] = useState<string | null>(null);
+  const [capturedPhotoUrl, setCapturedPhotoUrl] = useState<string | null>(null);
+
+  const handleSaveCapturedPhoto = () => {
+    if (capturedPhotoUrl) {
+      setNewPostImage(capturedPhotoUrl);
+      setNewPostVideo(null); // Clear video if photo is chosen
+      setIsRecordingModalOpen(false);
+      stopCamera();
+    }
+  };
 
   const mediaRecorderRef = React.useRef<MediaRecorder | null>(null);
   const streamRef = React.useRef<MediaStream | null>(null);
@@ -412,24 +436,147 @@ export default function ConnectSection({
   const recordingIntervalRef = React.useRef<number | null>(null);
   const duetVideoRef = React.useRef<HTMLVideoElement | null>(null);
 
-  // Start Camera Stream for preview
-  const startCamera = async () => {
+  // Sync posts with local IndexedDB binary files (videos and photos)
+  useEffect(() => {
+    let active = true;
+    const loadLocalMedia = async () => {
+      const urls: typeof resolvedMediaUrls = {};
+      for (const post of posts) {
+        // Try to load local video from IndexedDB
+        const localVideo = await getLocalMedia(`${post.id}_video`);
+        if (localVideo && localVideo instanceof Blob) {
+          urls[post.id] = {
+            ...urls[post.id],
+            video: URL.createObjectURL(localVideo)
+          };
+        }
+        // Try to load local image from IndexedDB
+        const localImage = await getLocalMedia(`${post.id}_image`);
+        if (localImage) {
+          if (localImage instanceof Blob) {
+            urls[post.id] = {
+              ...urls[post.id],
+              image: URL.createObjectURL(localImage)
+            };
+          } else if (typeof localImage === "string") {
+            urls[post.id] = {
+              ...urls[post.id],
+              image: localImage
+            };
+          }
+        }
+      }
+      if (active) {
+        setResolvedMediaUrls(prev => {
+          // Revoke previous URLs to free memory
+          Object.values(prev).forEach(item => {
+            if (item.video && item.video.startsWith("blob:")) URL.revokeObjectURL(item.video);
+            if (item.image && item.image.startsWith("blob:")) URL.revokeObjectURL(item.image);
+          });
+          return urls;
+        });
+      }
+    };
+
+    loadLocalMedia();
+
+    return () => {
+      active = false;
+    };
+  }, [posts]);
+
+  // Enumerate actual device-level inputs (Cameras and Microphones)
+  const enumerateDevices = async () => {
     try {
+      // First trigger quick permission request to obtain hardware device labels
+      await navigator.mediaDevices.getUserMedia({ video: true, audio: true }).catch(() => {});
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const video = devices.filter(d => d.kind === "videoinput");
+      const audio = devices.filter(d => d.kind === "audioinput");
+      setVideoDevices(video);
+      setAudioDevices(audio);
+      if (video.length > 0 && !selectedVideoDeviceId) {
+        setSelectedVideoDeviceId(video[0].deviceId);
+      }
+      if (audio.length > 0 && !selectedAudioDeviceId) {
+        setSelectedAudioDeviceId(audio[0].deviceId);
+      }
+    } catch (err) {
+      console.error("Error enumerating devices:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (isRecordingModalOpen) {
+      enumerateDevices();
+    }
+  }, [isRecordingModalOpen]);
+
+  // Start Camera Stream for preview with specific hardware constraints
+  const startCamera = async (
+    videoDeviceId?: string,
+    audioDeviceId?: string,
+    facing?: "user" | "environment"
+  ) => {
+    try {
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach(track => track.stop());
+      }
+      
       setRecordedVideoUrl(null);
+      setCapturedPhotoUrl(null);
       setRecordingSeconds(0);
+      
+      const activeFacing = facing || cameraFacingMode;
+      const activeVideoDevice = videoDeviceId || selectedVideoDeviceId;
+      const activeAudioDevice = audioDeviceId || selectedAudioDeviceId;
+
+      const videoConstraints: MediaTrackConstraints = {
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
+      };
+
+      if (activeVideoDevice) {
+        videoConstraints.deviceId = { exact: activeVideoDevice };
+      } else {
+        videoConstraints.facingMode = activeFacing;
+      }
+
+      // Only request audio track if we are actually in Video Recording mode
+      const audioConstraints: boolean | MediaTrackConstraints = activeAudioDevice 
+        ? { deviceId: { exact: activeAudioDevice } }
+        : true;
+
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { width: 640, height: 480, facingMode: "user" },
-        audio: true
+        video: videoConstraints,
+        audio: creationStudioMode === "video" ? audioConstraints : false
       });
+      
       streamRef.current = stream;
       if (localVideoRef.current) {
         localVideoRef.current.srcObject = stream;
         localVideoRef.current.play().catch(err => console.log("video play error:", err));
+      } else {
+        console.log("localVideoRef.current is null when setting srcObject");
       }
     } catch (err) {
       console.error("Error accessing camera/microphone:", err);
-      alert("Failed to access camera/microphone. Please make sure you have granted permissions.");
-      setIsRecordingModalOpen(false);
+      // Clean fallback if exact constraints failed (e.g. invalid device IDs or not supported)
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: facing || cameraFacingMode },
+          audio: creationStudioMode === "video"
+        });
+        streamRef.current = stream;
+        if (localVideoRef.current) {
+          localVideoRef.current.srcObject = stream;
+          localVideoRef.current.play().catch(err => console.log("fallback video play error:", err));
+        }
+      } catch (fallbackErr) {
+        console.error("Fallback camera access failed:", fallbackErr);
+        alert("Failed to access camera/microphone. Please make sure permissions are granted and device is connected.");
+        setIsRecordingModalOpen(false);
+      }
     }
   };
 
@@ -518,6 +665,61 @@ export default function ConnectSection({
     }
   };
 
+  // Snap a high-quality photo directly from the active webcam/device stream
+  const handleTakePhoto = async () => {
+    if (localVideoRef.current) {
+      const video = localVideoRef.current;
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth || 640;
+      canvas.height = video.videoHeight || 480;
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        // Mirrored snapshot matching standard user-facing webcam preview
+        ctx.translate(canvas.width, 0);
+        ctx.scale(-1, 1);
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        ctx.setTransform(1, 0, 0, 1, 0, 0); // reset
+        
+        const dataUrl = canvas.toDataURL("image/jpeg", 0.9);
+        try {
+          // Compress captured photo so it fits Firestore size constraints perfectly
+          const compressed = await compressImage(dataUrl, 800, 600, 0.6);
+          setNewPostImage(compressed);
+          setNewPostVideo(null); // Clear video
+          setIsRecordingModalOpen(false);
+          stopCamera();
+        } catch (err) {
+          console.error("Error compressing captured photo:", err);
+          setNewPostImage(dataUrl);
+          setNewPostVideo(null);
+          setIsRecordingModalOpen(false);
+          stopCamera();
+        }
+      }
+    }
+  };
+
+  // Handle uploading and compressing photos from file explorer
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const rawDataUrl = reader.result as string;
+        try {
+          const compressed = await compressImage(rawDataUrl, 800, 600, 0.6);
+          setNewPostImage(compressed);
+          setNewPostVideo(null); // Clear video
+        } catch (err) {
+          console.error("Failed to compress uploaded photo:", err);
+          setNewPostImage(rawDataUrl);
+          setNewPostVideo(null);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleVideoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -542,15 +744,100 @@ export default function ConnectSection({
     null,
   );
   const [birthdayWishInput, setBirthdayWishInput] = useState("");
-  const birthdayStar = peersList.find((p) => p.name === "Fatima Bello") || peersList[0] || mockPeers[0];
-  const upcomingStars = peersList.filter((p) => p.name !== "Fatima Bello");
+  const [selectedBirthdayStarId, setSelectedBirthdayStarId] = useState<string>(() => {
+    return localStorage.getItem("selected_birthday_star_id") || "peer-fatima";
+  });
+  const [selectedCertifiedStarId, setSelectedCertifiedStarId] = useState<string>(() => {
+    return localStorage.getItem("selected_certified_star_id") || "peer-kofi";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("selected_birthday_star_id", selectedBirthdayStarId);
+  }, [selectedBirthdayStarId]);
+
+  useEffect(() => {
+    localStorage.setItem("selected_certified_star_id", selectedCertifiedStarId);
+  }, [selectedCertifiedStarId]);
+
+  const candidatesList = [
+    {
+      id: "user-profile",
+      name: userProfile.name,
+      email: userProfile.email,
+      profession: userProfile.profession || "ESTARR Member",
+      bio: userProfile.bio,
+      location: userProfile.location || "ESTARR Hub",
+      avatar: userProfile.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150",
+      skills: userProfile.skills || [],
+      interests: userProfile.interests || [],
+      goals: userProfile.goals || [],
+      certifications: userProfile.certifications || [],
+      recommends: userProfile.recommends || 0,
+      birthdate: userProfile.birthdate || "",
+    },
+    ...peersList
+  ];
+
+  const formatBirthdate = (dateStr?: string) => {
+    if (!dateStr) return "July 6th";
+    try {
+      const parts = dateStr.split("-");
+      if (parts.length === 3) {
+        const monthNum = parseInt(parts[1], 10);
+        const dayNum = parseInt(parts[2], 10);
+        const months = [
+          "January", "February", "March", "April", "May", "June",
+          "July", "August", "September", "October", "November", "December"
+        ];
+        const monthName = months[monthNum - 1] || "July";
+        
+        let suffix = "th";
+        if (dayNum === 1 || dayNum === 21 || dayNum === 31) suffix = "st";
+        else if (dayNum === 2 || dayNum === 22) suffix = "nd";
+        else if (dayNum === 3 || dayNum === 23) suffix = "rd";
+        
+        return `${monthName} ${dayNum}${suffix}`;
+      }
+    } catch (e) {
+      // fallback
+    }
+    return "July 6th";
+  };
+
+  const birthdayStar = candidatesList.find((p) => p.id === selectedBirthdayStarId) || candidatesList[0];
+  const upcomingStars = candidatesList.filter((p) => p.id !== selectedBirthdayStarId);
+
+  const [certWishInput, setCertWishInput] = useState("");
+  const certifiedStar = candidatesList.find((p) => p.id === selectedCertifiedStarId) || candidatesList[1] || candidatesList[0];
+  const otherCertifiedGraduates = candidatesList.filter((p) => p.id !== selectedCertifiedStarId && p.certifications && p.certifications.length > 0);
+
+  const getBirthdayComments = () => {
+    const targetPostId = `birthday-${birthdayStar.id}`;
+    const p = posts.find((p) => p.id === targetPostId);
+    if (p) return p.comments;
+    return [
+      { author: "Kofi Mensah", content: `Happy Birthday ${birthdayStar.name}! Have an amazing day! 🎉🎂`, time: "2h ago" },
+      { author: "Eleni Wolde", content: `Wishing you a wonderful year ahead, ${birthdayStar.name}! 💖🍰`, time: "1h ago" }
+    ];
+  };
+
+  const getCertComments = () => {
+    const targetPostId = `certification-${certifiedStar.id}`;
+    const p = posts.find((p) => p.id === targetPostId);
+    if (p) return p.comments;
+    return [
+      { author: "Fatima Bello", content: `Big congratulations ${certifiedStar.name}! Extremely proud of your DevOps milestone! 🎓👏`, time: "1h ago" },
+      { author: "Aisha Yusuf", content: `Incredible work, ${certifiedStar.name}! 🚀🙌`, time: "45m ago" }
+    ];
+  };
 
   const handleQuickReaction = (reactionEmoji: string) => {
     const message = `${reactionEmoji} Celebrated with a reaction!`;
-    const birthdayPost = posts.find((p) => p.id === "birthday-fatima");
+    const targetPostId = `birthday-${birthdayStar.id}`;
+    const birthdayPost = posts.find((p) => p.id === targetPostId);
     if (birthdayPost) {
       const updated = posts.map((post) => {
-        if (post.id === "birthday-fatima") {
+        if (post.id === targetPostId) {
           return {
             ...post,
             likes: post.likes + 1,
@@ -567,6 +854,66 @@ export default function ConnectSection({
         return post;
       });
       onUpdatePosts(updated);
+    } else {
+      const newBirthdayPost: ActivityPost = {
+        id: targetPostId,
+        author: birthdayStar.name,
+        avatar: birthdayStar.avatar,
+        role: "Birthday Celebrant 🍰",
+        content: `🎂 Happy Birthday ${birthdayStar.name}! Send your supportive wishes and quick reactions below! 💖`,
+        likes: 1,
+        comments: [
+          ...getBirthdayComments(),
+          {
+            author: userProfile.name,
+            content: message,
+            time: "Just now",
+          },
+        ],
+        time: "Just now"
+      };
+      onUpdatePosts([newBirthdayPost, ...posts]);
+    }
+  };
+
+  const handleCertQuickReaction = (reactionEmoji: string) => {
+    const message = `${reactionEmoji} Congrats sent with a reaction!`;
+    const targetPostId = `certification-${certifiedStar.id}`;
+    const certPost = posts.find((p) => p.id === targetPostId);
+    if (certPost) {
+      const updated = posts.map((post) => {
+        if (post.id === targetPostId) {
+          return {
+            ...post,
+            likes: post.likes + 1,
+            comments: [
+              ...post.comments,
+              {
+                author: userProfile.name,
+                content: message,
+                time: "Just now",
+              },
+            ],
+          };
+        }
+        return post;
+      });
+      onUpdatePosts(updated);
+    } else {
+      const newCertPost: ActivityPost = {
+        id: targetPostId,
+        author: certifiedStar.name,
+        avatar: certifiedStar.avatar,
+        role: "Platform Honors",
+        content: `🎓 ESTARR Academy Certified Stars Celebration Wall for ${certifiedStar.name}!`,
+        likes: 13,
+        comments: [
+          ...getCertComments(),
+          { author: userProfile.name, content: message, time: "Just now" }
+        ],
+        time: "Just now"
+      };
+      onUpdatePosts([newCertPost, ...posts]);
     }
   };
 
@@ -574,10 +921,11 @@ export default function ConnectSection({
     e.preventDefault();
     if (!birthdayWishInput.trim()) return;
 
-    const birthdayPost = posts.find((p) => p.id === "birthday-fatima");
+    const targetPostId = `birthday-${birthdayStar.id}`;
+    const birthdayPost = posts.find((p) => p.id === targetPostId);
     if (birthdayPost) {
       const updated = posts.map((post) => {
-        if (post.id === "birthday-fatima") {
+        if (post.id === targetPostId) {
           return {
             ...post,
             comments: [
@@ -594,13 +942,90 @@ export default function ConnectSection({
       });
       onUpdatePosts(updated);
       setBirthdayWishInput("");
+    } else {
+      const newBirthdayPost: ActivityPost = {
+        id: targetPostId,
+        author: birthdayStar.name,
+        avatar: birthdayStar.avatar,
+        role: "Birthday Celebrant 🍰",
+        content: `🎂 Happy Birthday ${birthdayStar.name}! Send your supportive wishes and quick reactions below! 💖`,
+        likes: 0,
+        comments: [
+          ...getBirthdayComments(),
+          { author: userProfile.name, content: birthdayWishInput.trim(), time: "Just now" }
+        ],
+        time: "Just now"
+      };
+      onUpdatePosts([newBirthdayPost, ...posts]);
+      setBirthdayWishInput("");
+    }
+  };
+
+  const submitCertWish = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!certWishInput.trim()) return;
+
+    const targetPostId = `certification-${certifiedStar.id}`;
+    const certPost = posts.find((p) => p.id === targetPostId);
+    if (certPost) {
+      const updated = posts.map((post) => {
+        if (post.id === targetPostId) {
+          return {
+            ...post,
+            comments: [
+              ...post.comments,
+              {
+                author: userProfile.name,
+                content: certWishInput.trim(),
+                time: "Just now",
+              },
+            ],
+          };
+        }
+        return post;
+      });
+      onUpdatePosts(updated);
+      setCertWishInput("");
+    } else {
+      const newCertPost: ActivityPost = {
+        id: targetPostId,
+        author: certifiedStar.name,
+        avatar: certifiedStar.avatar,
+        role: "Platform Honors",
+        content: `🎓 ESTARR Academy Certified Stars Celebration Wall for ${certifiedStar.name}!`,
+        likes: 12,
+        comments: [
+          ...getCertComments(),
+          { author: userProfile.name, content: certWishInput.trim(), time: "Just now" }
+        ],
+        time: "Just now"
+      };
+      onUpdatePosts([newCertPost, ...posts]);
+      setCertWishInput("");
     }
   };
 
   // Post handling
-  const handleCreatePost = (e: React.FormEvent) => {
+  const handleCreatePost = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newPostContent.trim() && !newPostImage && !newPostVideo) return;
+
+    const postId = `post-${Date.now()}`;
+
+    // Store media locally in IndexedDB for the owner's device
+    if (newPostImage) {
+      await saveLocalMedia(`${postId}_image`, newPostImage);
+    }
+
+    if (newPostVideo && newPostVideo.startsWith("blob:")) {
+      try {
+        const res = await fetch(newPostVideo);
+        const blob = await res.blob();
+        await saveLocalMedia(`${postId}_video`, blob);
+      } catch (err) {
+        console.error("Error saving video blob to local DB:", err);
+      }
+    }
 
     const selectedTrack = MOCK_AUDIO_TRACKS.find((t) => t.id === creatorAudio);
     const audioTrackName = selectedTrack && creatorAudio !== "none" 
@@ -608,13 +1033,15 @@ export default function ConnectSection({
       : undefined;
 
     const newPost: ActivityPost = {
-      id: `post-${Date.now()}`,
+      id: postId,
       author: userProfile.name,
       avatar: userProfile.avatar,
       role: userProfile.profession,
       content: newPostContent,
+      // For images, we store the compressed base64 directly in the Firestore post so other users can see it
       image: newPostImage || undefined,
-      video: newPostVideo || undefined,
+      // For videos, we store the local media pointer so we know to load it from IndexedDB
+      video: newPostVideo ? `local-media:${postId}` : undefined,
       videoFilter: newPostVideo ? newPostVideoFilter : undefined,
       audioTrack: newPostVideo ? audioTrackName : undefined,
       playbackSpeed: newPostVideo ? creatorSpeed : undefined,
@@ -638,6 +1065,15 @@ export default function ConnectSection({
     setCreatorTextOverlay("");
     setCreatorTextStyle("classic-white");
     setDuetSourcePost(null);
+  };
+
+  const handleDeletePost = async (postId: string) => {
+    try {
+      await deleteCollectionItem("posts", postId);
+      onUpdatePosts(posts.filter((p) => p.id !== postId));
+    } catch (error) {
+      console.error("Error deleting post:", error);
+    }
   };
 
   const handleLikePost = (postId: string) => {
@@ -939,17 +1375,6 @@ export default function ConnectSection({
             >
               🤝 Mentorship Hub
             </button>
-            <button
-              id="tab-connect-companion"
-              onClick={() => setActiveTab("companion")}
-              className={`w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                activeTab === "companion"
-                  ? "bg-emerald-50 text-emerald-700"
-                  : "text-slate-500 hover:bg-slate-50"
-              }`}
-            >
-              📱 Companion Sync
-            </button>
           </div>
 
           {/* Trending Now Sidebar */}
@@ -1052,6 +1477,9 @@ export default function ConnectSection({
                       (() => {
                         const reelPosts = posts.filter(p => p.video);
                         const activeReel = reelPosts[currentReelIndex % reelPosts.length];
+                        const resolvedReelVideoUrl = (activeReel.video && activeReel.video.startsWith("local-media:"))
+                          ? (resolvedMediaUrls[activeReel.id]?.video || activeReel.video)
+                          : activeReel.video;
                         
                         return (
                           <div className="relative w-full h-full flex items-center justify-center overflow-hidden bg-slate-950">
@@ -1070,7 +1498,7 @@ export default function ConnectSection({
                                 </div>
                                 <div className="relative overflow-hidden bg-slate-950">
                                   <EnhancedVideoPlayer
-                                    videoUrl={activeReel.video}
+                                    videoUrl={resolvedReelVideoUrl}
                                     poster={activeReel.poster}
                                     filter={activeReel.videoFilter || "none"}
                                     playbackSpeed={activeReel.playbackSpeed || "1x"}
@@ -1088,7 +1516,7 @@ export default function ConnectSection({
                               </div>
                             ) : (
                               <EnhancedVideoPlayer
-                                videoUrl={activeReel.video}
+                                videoUrl={resolvedReelVideoUrl}
                                 poster={activeReel.poster}
                                 filter={activeReel.videoFilter || "none"}
                                 playbackSpeed={activeReel.playbackSpeed || "1x"}
@@ -1265,7 +1693,7 @@ export default function ConnectSection({
                                   onClick={() => {
                                     setDuetSourcePost(activeReel);
                                     setIsRecordingModalOpen(true);
-                                    startCamera();
+                                    setTimeout(startCamera, 100);
                                   }}
                                   className="flex flex-col items-center gap-0.5 text-rose-400 hover:text-rose-300 transition-colors cursor-pointer"
                                   title="Duet with this video"
@@ -1320,7 +1748,7 @@ export default function ConnectSection({
                           type="button"
                           onClick={() => {
                             setIsRecordingModalOpen(true);
-                            startCamera();
+                            setTimeout(startCamera, 100);
                           }}
                           className="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded-xl flex items-center gap-1.5 shadow"
                         >
@@ -1577,10 +2005,26 @@ export default function ConnectSection({
                   <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-purple-700 bg-amber-100/50 px-2.5 py-1 rounded-full w-fit">
                     🍰 ESTARR CONNECT CELEBRATIONS
                   </span>
-                  <h3 className="font-display font-bold text-lg text-slate-800">
-                    ESTARR Birthday Board & Support Network
-                  </h3>
-                  <p className="text-xs text-slate-500">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <h3 className="font-display font-bold text-lg text-slate-800">
+                      ESTARR Birthday Board & Support Network
+                    </h3>
+                    <div className="flex items-center gap-1.5 bg-white/80 backdrop-blur-xs border border-amber-200/60 rounded-xl px-2.5 py-1.5 shrink-0 shadow-2xs">
+                      <span className="text-[10px] font-bold text-slate-500 font-mono">Select Celebrant:</span>
+                      <select
+                        value={selectedBirthdayStarId}
+                        onChange={(e) => setSelectedBirthdayStarId(e.target.value)}
+                        className="bg-transparent border-none text-[11px] font-bold text-slate-800 focus:outline-none cursor-pointer max-w-[150px]"
+                      >
+                        {candidatesList.map((c) => (
+                          <option key={c.id} value={c.id}>
+                            {c.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-500 max-w-2xl">
                     Support your peers as they grow their skills. Each reaction and comment builds stronger vocational community ties!
                   </p>
                 </div>
@@ -1591,7 +2035,7 @@ export default function ConnectSection({
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
                         <span className="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></span>
-                        Celebrating Today (July 6th)
+                        Celebrating Today ({formatBirthdate(birthdayStar.birthdate)})
                       </span>
                       <span className="text-[10px] bg-amber-50 text-amber-700 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
                         Birthday Star 🍰
@@ -1649,7 +2093,7 @@ export default function ConnectSection({
                     <form onSubmit={submitBirthdayWish} className="flex gap-2 pt-2 border-t border-slate-100">
                       <input
                         type="text"
-                        placeholder="Write a custom supportive wish..."
+                        placeholder={`Write a supportive wish for ${birthdayStar.name.split(" ")[0]}...`}
                         value={birthdayWishInput}
                         onChange={(e) => setBirthdayWishInput(e.target.value)}
                         className="flex-1 bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-amber-400 focus:bg-white text-slate-700 font-medium"
@@ -1670,8 +2114,8 @@ export default function ConnectSection({
                       <span className="text-xs font-bold text-slate-700 block">
                         📅 Upcoming Birthdays
                       </span>
-                      <div className="flex flex-col gap-3">
-                        {upcomingStars.map((peer, pIdx) => (
+                      <div className="flex flex-col gap-3 max-h-[120px] overflow-y-auto scrollbar-thin">
+                        {upcomingStars.slice(0, 3).map((peer, pIdx) => (
                           <div key={pIdx} className="flex justify-between items-center text-xs">
                             <div className="flex gap-2 items-center">
                               <img
@@ -1688,8 +2132,8 @@ export default function ConnectSection({
                                 </span>
                               </div>
                             </div>
-                            <span className="text-[10px] text-purple-700 font-semibold font-mono bg-amber-50 px-2 py-0.5 rounded-full">
-                              July {peer.name === "Kofi Mensah" ? "8th" : "15th"}
+                            <span className="text-[10px] text-purple-700 font-semibold font-mono bg-amber-50 px-2 py-0.5 rounded-full shrink-0">
+                              {formatBirthdate(peer.birthdate)}
                             </span>
                           </div>
                         ))}
@@ -1704,11 +2148,188 @@ export default function ConnectSection({
                         </span>
                       </span>
                       <div className="max-h-[140px] overflow-y-auto flex flex-col gap-2 pr-1 scrollbar-thin">
-                        {posts.find((p) => p.id === "birthday-fatima")?.comments.map((comment, cIdx) => (
+                        {getBirthdayComments().map((comment, cIdx) => (
                           <div key={cIdx} className="bg-slate-50 rounded-xl p-2 text-[11px] border border-slate-100/50">
                             <div className="flex justify-between mb-0.5">
                               <span className="font-bold text-slate-700">{comment.author}</span>
                               <span className="text-[8px] text-slate-9000 font-mono">{comment.time}</span>
+                            </div>
+                            <p className="text-slate-500 leading-tight">{comment.content}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* ESTARR Certification Celebration Hub */}
+              <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-3xl p-6 shadow-sm flex flex-col gap-6 relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+                  <Award className="w-32 h-32 text-emerald-600 animate-pulse" />
+                </div>
+
+                <div className="flex flex-col gap-1.5 relative z-10">
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-emerald-700 bg-emerald-100/50 px-2.5 py-1 rounded-full w-fit">
+                    🎓 ESTARR ACADEMY HONORS
+                  </span>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <h3 className="font-display font-bold text-lg text-slate-800">
+                      ESTARR Certification Board & Support Network
+                    </h3>
+                    <div className="flex items-center gap-1.5 bg-white/80 backdrop-blur-xs border border-emerald-200/60 rounded-xl px-2.5 py-1.5 shrink-0 shadow-2xs">
+                      <span className="text-[10px] font-bold text-slate-500 font-mono">Select Champion:</span>
+                      <select
+                        value={selectedCertifiedStarId}
+                        onChange={(e) => setSelectedCertifiedStarId(e.target.value)}
+                        className="bg-transparent border-none text-[11px] font-bold text-slate-800 focus:outline-none cursor-pointer max-w-[150px]"
+                      >
+                        {candidatesList.map((c) => (
+                          <option key={c.id} value={c.id}>
+                            {c.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-500 max-w-2xl">
+                    Celebrate our certified champions who passed deep Google AI, Cloud DevOps, and Smart Contract audits. Each congratulatory comment builds peer credibility!
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-6 relative z-10">
+                  {/* Highlighted Graduate Column */}
+                  <div className="md:col-span-7 bg-white rounded-xl p-5 border border-slate-100 shadow-xs flex flex-col gap-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                        <span className="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></span>
+                        Recently Certified (This Week)
+                      </span>
+                      <span className="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                        Graduate Star 🌟
+                      </span>
+                    </div>
+
+                    {certifiedStar && (
+                      <div className="flex gap-4 items-start">
+                        <img
+                          src={certifiedStar.avatar}
+                          alt={certifiedStar.name}
+                          className="w-14 h-14 rounded-full object-cover border-2 border-emerald-300 shadow-sm"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-display font-bold text-sm text-slate-800 leading-tight">
+                            {certifiedStar.name}
+                          </h4>
+                          <p className="text-xs text-emerald-600 font-medium">
+                            {certifiedStar.profession}
+                          </p>
+                          <p className="text-[10px] text-slate-500 font-mono mt-1 flex items-center gap-1">
+                            <MapPin className="w-3 h-3 text-emerald-500 shrink-0" /> {certifiedStar.location}
+                          </p>
+                          <div className="mt-2.5 bg-emerald-50/50 border border-emerald-100/80 rounded-lg p-2.5 flex items-center gap-2">
+                            <Award className="w-5 h-5 text-emerald-600 shrink-0" />
+                            <div className="min-w-0">
+                              <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-emerald-700 block">Passed Certification</span>
+                              <span className="text-xs font-semibold text-slate-800 block truncate">
+                                {certifiedStar.certifications?.[0] || "ESTARR Professional Certificate"}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Quick Reactions */}
+                    <div className="flex flex-col gap-2 pt-2 border-t border-slate-100">
+                      <span className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-wider">
+                        Send Quick Congratulations
+                      </span>
+                      <div className="flex gap-2">
+                        {[
+                          { emoji: "🎓", label: "Graduate" },
+                          { emoji: "🏆", label: "Trophy" },
+                          { emoji: "👏", label: "Applause" },
+                          { emoji: "🌟", label: "Star" },
+                          { emoji: "🙌", label: "Hooray" },
+                        ].map((rx) => (
+                          <button
+                            key={rx.emoji}
+                            onClick={() => handleCertQuickReaction(rx.emoji)}
+                            className="bg-slate-50 hover:bg-emerald-50 hover:scale-105 border border-slate-100 rounded-xl px-2.5 py-1.5 flex items-center gap-1 text-xs cursor-pointer transition-all animate-none"
+                            title={rx.label}
+                            type="button"
+                          >
+                            <span>{rx.emoji}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Custom Message Congrats */}
+                    <form onSubmit={submitCertWish} className="flex gap-2 pt-2 border-t border-slate-100">
+                      <input
+                        type="text"
+                        placeholder={`Write a congratulatory message for ${certifiedStar.name.split(" ")[0]}...`}
+                        value={certWishInput}
+                        onChange={(e) => setCertWishInput(e.target.value)}
+                        className="flex-1 bg-slate-50 border border-slate-100 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-400 focus:bg-white text-slate-700 font-medium"
+                      />
+                      <button
+                        type="submit"
+                        disabled={!certWishInput.trim()}
+                        className="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer disabled:opacity-50"
+                      >
+                        Send Congrats
+                      </button>
+                    </form>
+                  </div>
+
+                  {/* Other Graduates Column */}
+                  <div className="md:col-span-5 flex flex-col gap-4">
+                    <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-xs flex flex-col gap-2.5">
+                      <span className="text-xs font-bold text-slate-700 block">
+                        🎓 Recent Graduates
+                      </span>
+                      <div className="flex flex-col gap-3 max-h-[120px] overflow-y-auto scrollbar-thin">
+                        {otherCertifiedGraduates.map((grad, gIdx) => (
+                          <div key={gIdx} className="flex justify-between items-center text-xs">
+                            <div className="flex gap-2 items-center">
+                              <img
+                                src={grad.avatar}
+                                alt={grad.name}
+                                className="w-7 h-7 rounded-full object-cover"
+                              />
+                              <div>
+                                <span className="font-bold text-slate-800 block leading-tight">
+                                  {grad.name}
+                                </span>
+                                <span className="text-[9px] text-emerald-600 font-semibold block">
+                                  {grad.certifications?.[0] || "ESTARR Graduate"}
+                                </span>
+                              </div>
+                            </div>
+                            <span className="text-[8px] text-emerald-700 font-bold font-mono bg-emerald-50 px-2 py-0.5 rounded-full shrink-0">
+                              Graduate 🎓
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="bg-white rounded-xl p-4 border border-slate-100 shadow-xs flex-1 flex flex-col gap-2">
+                      <span className="text-xs font-bold text-slate-700 flex items-center justify-between">
+                        <span>💬 Congratulations Feed</span>
+                        <span className="text-[9px] font-mono text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full animate-pulse">
+                          Live
+                        </span>
+                      </span>
+                      <div className="max-h-[140px] overflow-y-auto flex flex-col gap-2 pr-1 scrollbar-thin">
+                        {getCertComments().map((comment, cIdx) => (
+                          <div key={cIdx} className="bg-slate-50 rounded-xl p-2 text-[11px] border border-slate-100/50">
+                            <div className="flex justify-between mb-0.5">
+                              <span className="font-bold text-slate-700">{comment.author}</span>
+                              <span className="text-[8px] text-slate-500 font-mono">{comment.time}</span>
                             </div>
                             <p className="text-slate-500 leading-tight">{comment.content}</p>
                           </div>
@@ -1933,17 +2554,7 @@ export default function ConnectSection({
                         type="file"
                         accept="image/*"
                         className="hidden"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            const reader = new FileReader();
-                            reader.onloadend = () => {
-                              setNewPostImage(reader.result as string);
-                              setNewPostVideo(null); // Clear video if image is chosen
-                            };
-                            reader.readAsDataURL(file);
-                          }
-                        }}
+                        onChange={handlePhotoUpload}
                       />
                     </label>
 
@@ -1965,7 +2576,7 @@ export default function ConnectSection({
                       type="button"
                       onClick={() => {
                         setIsRecordingModalOpen(true);
-                        startCamera();
+                        setTimeout(startCamera, 100);
                       }}
                       className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 hover:text-emerald-600 bg-slate-50 hover:bg-slate-100 px-3 py-1.5 rounded-xl cursor-pointer transition-colors border border-slate-200"
                     >
@@ -2024,7 +2635,7 @@ export default function ConnectSection({
                     {/* Post Image (optional) */}
                     {post.image && (
                       <img
-                        src={post.image}
+                        src={resolvedMediaUrls[post.id]?.image || post.image}
                         alt="post visual"
                         className="rounded-xl w-full max-h-80 object-cover mt-2"
                       />
@@ -2037,7 +2648,9 @@ export default function ConnectSection({
                           <div className="grid grid-cols-2 gap-1 bg-black rounded-xl overflow-hidden border border-slate-150 shadow-inner relative h-[450px] md:h-[550px]">
                             <div className="relative border-r border-slate-900 overflow-hidden bg-slate-950">
                               <EnhancedVideoPlayer
-                                videoUrl={post.duetWithVideo}
+                                videoUrl={(post.duetWithVideo && post.duetWithVideo.startsWith("local-media:")) 
+                                  ? (resolvedMediaUrls[post.id]?.video || post.duetWithVideo) 
+                                  : post.duetWithVideo}
                                 poster={post.poster}
                                 autoPlay={true}
                                 isMutedDefault={true}
@@ -2049,7 +2662,9 @@ export default function ConnectSection({
                             </div>
                             <div className="relative overflow-hidden bg-slate-950">
                               <EnhancedVideoPlayer
-                                videoUrl={post.video}
+                                videoUrl={(post.video && post.video.startsWith("local-media:")) 
+                                  ? (resolvedMediaUrls[post.id]?.video || post.video) 
+                                  : post.video}
                                 poster={post.poster}
                                 autoPlay={true}
                                 filter={post.videoFilter || "none"}
@@ -2068,7 +2683,9 @@ export default function ConnectSection({
                           </div>
                         ) : (
                           <EnhancedVideoPlayer
-                            videoUrl={post.video}
+                            videoUrl={(post.video && post.video.startsWith("local-media:")) 
+                              ? (resolvedMediaUrls[post.id]?.video || post.video) 
+                              : post.video}
                             poster={post.poster}
                             autoPlay={true}
                             filter={post.videoFilter || "none"}
@@ -2099,15 +2716,21 @@ export default function ConnectSection({
                         <MessageSquare className="w-4 h-4" />{" "}
                         {post.comments.length} Comments
                       </div>
+                      <button
+                        onClick={() => handleDeletePost(post.id)}
+                        className="flex items-center gap-1.5 font-medium hover:text-rose-600 transition-colors cursor-pointer ml-auto"
+                      >
+                        <Trash2 className="w-4 h-4" /> Delete
+                      </button>
                       {post.video && !post.duetWithVideo && (
                         <button
                           type="button"
                           onClick={() => {
                             setDuetSourcePost(post);
                             setIsRecordingModalOpen(true);
-                            startCamera();
+                            setTimeout(startCamera, 100);
                           }}
-                          className="flex items-center gap-1 font-semibold hover:text-rose-500 hover:bg-rose-50 text-rose-600 bg-rose-50/50 border border-rose-200/50 px-2.5 py-1 rounded-xl transition-all cursor-pointer shadow-xs ml-auto text-[11px]"
+                          className="flex items-center gap-1 font-semibold hover:text-rose-500 hover:bg-rose-50 text-rose-600 bg-rose-50/50 border border-rose-200/50 px-2.5 py-1 rounded-xl transition-all cursor-pointer shadow-xs text-[11px]"
                         >
                           <Radio className="w-3.5 h-3.5 animate-pulse text-rose-500" /> Duet
                         </button>
@@ -2460,22 +3083,18 @@ export default function ConnectSection({
               )}
             </div>
           )}
-
-          {activeTab === "companion" && (
-            <SyncConsole />
-          )}
         </div>
       </div>
 
       {/* Real-time Video Studio / Recording Modal */}
       {isRecordingModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/80 backdrop-blur-md p-4 animate-fade-in">
-          <div className="bg-slate-900 text-white w-full max-w-2xl rounded-3xl overflow-hidden border border-slate-800 shadow-2xl flex flex-col max-h-[90vh]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-4 animate-fade-in">
+          <div className="bg-slate-900 text-white w-full max-w-2xl rounded-3xl overflow-hidden border border-slate-800 shadow-2xl flex flex-col max-h-[95vh]">
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-slate-800">
+            <div className="flex items-center justify-between p-6 border-b border-slate-800 bg-slate-950/40">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 bg-rose-500 rounded-full animate-ping" />
-                <h3 className="font-display font-bold text-lg text-white">ESTARR Video Creation Studio</h3>
+                <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse" />
+                <h3 className="font-display font-bold text-lg text-white">ESTARR Creation Studio</h3>
               </div>
               <button
                 type="button"
@@ -2483,35 +3102,75 @@ export default function ConnectSection({
                   stopCamera();
                   setIsRecordingModalOpen(false);
                 }}
-                className="text-slate-9000 hover:text-white bg-slate-800 hover:bg-slate-700 p-2 rounded-xl transition-all cursor-pointer"
+                className="text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 p-2 rounded-xl transition-all cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
+            {/* Mode Switcher Tabs */}
+            <div className="px-6 py-3 flex justify-center border-b border-slate-850 bg-slate-950/20">
+              <div className="flex gap-2 bg-slate-950/60 p-1 rounded-2xl w-full max-w-md border border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCreationStudioMode("video");
+                    startCamera(selectedVideoDeviceId, selectedAudioDeviceId, cameraFacingMode);
+                  }}
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-bold rounded-xl transition-all cursor-pointer ${
+                    creationStudioMode === "video"
+                      ? "bg-emerald-600 text-white shadow-md"
+                      : "text-slate-400 hover:text-white hover:bg-slate-800/40"
+                  }`}
+                >
+                  <Video className="w-3.5 h-3.5" />
+                  <span>🎥 Record Video Feed</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCreationStudioMode("photo");
+                    startCamera(selectedVideoDeviceId, selectedAudioDeviceId, cameraFacingMode);
+                  }}
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-bold rounded-xl transition-all cursor-pointer ${
+                    creationStudioMode === "photo"
+                      ? "bg-emerald-600 text-white shadow-md"
+                      : "text-slate-400 hover:text-white hover:bg-slate-800/40"
+                  }`}
+                >
+                  <Camera className="w-3.5 h-3.5" />
+                  <span>📸 Snap Live Photo</span>
+                </button>
+              </div>
+            </div>
+
             {/* Content Body */}
             <div className="p-6 flex-1 overflow-y-auto flex flex-col gap-4">
-              <p className="text-xs text-slate-9000">
-                Showcase your talent, craft, products, or practical tips in real-time! Record a video up to <span className="text-emerald-400 font-bold">30 seconds</span> and share it directly onto the community feed.
+              <p className="text-xs text-slate-400 leading-relaxed">
+                {creationStudioMode === "video" 
+                  ? "Showcase your artisan crafts, custom work, or product tutorials! Record up to a 30-second high-definition video." 
+                  : "Snap a premium, light-optimized workspace/product snapshot to feature as the main cover of your post."
+                }
               </p>
 
-              {/* Video Player Display Container */}
-              <div className="relative bg-black rounded-xl overflow-hidden h-80 border border-slate-800 shadow-inner flex items-center justify-center">
-                {/* Live Camera Stream (Visible if camera active and no recording URL generated) */}
+              {/* Viewfinder Preview Box */}
+              <div className="relative bg-black rounded-2xl overflow-hidden h-72 border border-slate-850 shadow-inner flex items-center justify-center">
+                {/* Live Camera Stream */}
                 <video
                   ref={localVideoRef}
+                  autoPlay
                   muted
                   playsInline
                   style={{ 
-                    display: recordedVideoUrl ? "none" : "block", 
+                    display: (recordedVideoUrl || capturedPhotoUrl) ? "none" : "block", 
                     filter: newPostVideoFilter, 
-                    transform: "scaleX(-1)" 
+                    transform: cameraFacingMode === "user" ? "scaleX(-1)" : "none" 
                   }}
                   className="w-full h-full object-cover transition-all duration-300"
                 />
 
-                {/* Saved/Recorded Playback Stream (Visible once recorded) */}
-                {recordedVideoUrl && (
+                {/* Recorded Video Playback Stream */}
+                {recordedVideoUrl && creationStudioMode === "video" && (
                   <video
                     src={recordedVideoUrl}
                     controls
@@ -2521,26 +3180,112 @@ export default function ConnectSection({
                   />
                 )}
 
-                {/* Pulse Record Indicator Overlay */}
+                {/* Captured Photo Image Preview */}
+                {capturedPhotoUrl && creationStudioMode === "photo" && (
+                  <img
+                    src={capturedPhotoUrl}
+                    alt="Captured workspace preview"
+                    style={{ filter: newPostVideoFilter }}
+                    className="w-full h-full object-cover transition-all duration-300 animate-scale-in"
+                  />
+                )}
+
+                {/* Recording Overlay */}
                 {isRecording && (
                   <div className="absolute top-4 left-4 bg-rose-600/90 text-white font-mono text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-md z-10">
-                    <span className="w-2.5 h-2.5 bg-white rounded-full animate-pulse" />
+                    <span className="w-2 h-2 bg-white rounded-full animate-ping" />
                     <span>REC • 0:{recordingSeconds < 10 ? `0${recordingSeconds}` : recordingSeconds} / 0:30</span>
                   </div>
                 )}
               </div>
 
+              {/* Hardware Input Configuration */}
+              <div className="bg-slate-950 border border-slate-850 rounded-xl p-4 flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                    <Sliders className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>⚙ Device Hardware Controls</span>
+                  </span>
+                  
+                  {/* Front/Back Camera flip for owner's mobile/laptop */}
+                  {videoDevices.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const nextFacing = cameraFacingMode === "user" ? "environment" : "user";
+                        setCameraFacingMode(nextFacing);
+                        startCamera(selectedVideoDeviceId, selectedAudioDeviceId, nextFacing);
+                      }}
+                      className="text-[9px] font-bold bg-slate-850 hover:bg-slate-800 text-slate-200 px-2.5 py-1 rounded-lg border border-slate-700 hover:text-white flex items-center gap-1 cursor-pointer transition-colors"
+                    >
+                      <RefreshCw className="w-2.5 h-2.5" />
+                      <span>Flip Facing ({cameraFacingMode === "user" ? "Front" : "Back"})</span>
+                    </button>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  {/* Video Selector */}
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] font-bold text-slate-500 font-mono uppercase tracking-wide">Primary Camera</label>
+                    <select
+                      value={selectedVideoDeviceId}
+                      onChange={(e) => {
+                        setSelectedVideoDeviceId(e.target.value);
+                        startCamera(e.target.value, selectedAudioDeviceId, cameraFacingMode);
+                      }}
+                      className="bg-slate-900 border border-slate-850 rounded-xl p-2 text-white text-xs focus:outline-none focus:border-emerald-500 w-full cursor-pointer"
+                    >
+                      {videoDevices.length > 0 ? (
+                        videoDevices.map((d, idx) => (
+                          <option key={d.deviceId} value={d.deviceId}>
+                            {d.label || `Camera Device ${idx + 1}`}
+                          </option>
+                        ))
+                      ) : (
+                        <option value="">No Camera Detected</option>
+                      )}
+                    </select>
+                  </div>
+
+                  {/* Audio Selector */}
+                  {creationStudioMode === "video" && (
+                    <div className="flex flex-col gap-1">
+                      <label className="text-[10px] font-bold text-slate-500 font-mono uppercase tracking-wide">Audio Input</label>
+                      <select
+                        value={selectedAudioDeviceId}
+                        onChange={(e) => {
+                          setSelectedAudioDeviceId(e.target.value);
+                          startCamera(selectedVideoDeviceId, e.target.value, cameraFacingMode);
+                        }}
+                        className="bg-slate-900 border border-slate-850 rounded-xl p-2 text-white text-xs focus:outline-none focus:border-emerald-500 w-full cursor-pointer"
+                      >
+                        {audioDevices.length > 0 ? (
+                          audioDevices.map((d, idx) => (
+                            <option key={d.deviceId} value={d.deviceId}>
+                              {d.label || `Microphone Device ${idx + 1}`}
+                            </option>
+                          ))
+                        ) : (
+                          <option value="">No Microphone Detected</option>
+                        )}
+                      </select>
+                    </div>
+                  )}
+                </div>
+              </div>
+
               {/* Live Video Filter Options */}
-              <div className="bg-slate-950 border border-slate-800 rounded-xl p-4">
+              <div className="bg-slate-950 border border-slate-850 rounded-xl p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] text-slate-9000 font-bold uppercase tracking-wider flex items-center gap-1">
-                    <span>✨ Real-time Video Studio Filter:</span>
+                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                    <span>✨ Real-time Aesthetic Filter:</span>
                   </span>
                   {newPostVideoFilter !== "none" && (
                     <button
                       type="button"
                       onClick={() => setNewPostVideoFilter("none")}
-                      className="text-[9px] text-emerald-400 hover:underline font-bold"
+                      className="text-[9px] text-emerald-400 hover:underline font-bold cursor-pointer"
                     >
                       Reset Filter
                     </button>
@@ -2555,7 +3300,7 @@ export default function ConnectSection({
                       className={`px-3 py-1.5 text-[11px] font-semibold rounded-xl border shrink-0 transition-all cursor-pointer ${
                         newPostVideoFilter === f.value
                           ? "bg-emerald-600 border-emerald-500 text-white shadow"
-                          : "bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-850 hover:text-white"
+                          : "bg-slate-900 border-slate-850 text-slate-300 hover:bg-slate-800 hover:text-white"
                       }`}
                     >
                       {f.name}
@@ -2563,70 +3308,102 @@ export default function ConnectSection({
                   ))}
                 </div>
               </div>
-
-              {/* Guidance Tips */}
-              <div className="bg-slate-950 border border-slate-800 rounded-xl p-4 flex flex-col gap-1.5 text-xs text-slate-300">
-                <span className="font-bold text-emerald-400 flex items-center gap-1">💡 Tips for a Great Talent Showcase:</span>
-                <ul className="list-disc pl-4 space-y-0.5 text-slate-9000 text-[11px]">
-                  <li>Position yourself in a well-lit, quiet area.</li>
-                  <li>Speak clearly and demonstrate your tools, materials, or products in action!</li>
-                  <li>Mention your name, talent, and location to connect with local buyers or partners.</li>
-                </ul>
-              </div>
             </div>
 
             {/* Footer Control Panel */}
-            <div className="p-6 bg-slate-950/50 border-t border-slate-800 flex justify-between items-center gap-4">
+            <div className="p-6 bg-slate-950/60 border-t border-slate-800 flex justify-between items-center gap-4">
               <div>
-                {!recordedVideoUrl ? (
-                  <span className="text-xs text-slate-9000 font-medium">
-                    {isRecording ? "Recording in progress..." : "Camera initialized & ready"}
-                  </span>
+                {creationStudioMode === "video" ? (
+                  !recordedVideoUrl ? (
+                    <span className="text-xs text-slate-400 font-medium">
+                      {isRecording ? "Recording video capture..." : "Camera ready"}
+                    </span>
+                  ) : (
+                    <span className="text-xs text-emerald-400 font-bold flex items-center gap-1">
+                      <Check className="w-3.5 h-3.5" /> Video ready
+                    </span>
+                  )
                 ) : (
-                  <span className="text-xs text-emerald-400 font-bold flex items-center gap-1">
-                    ✓ Video Recorded Successfully
-                  </span>
+                  !capturedPhotoUrl ? (
+                    <span className="text-xs text-slate-400 font-medium">
+                      Press Snap Photo below
+                    </span>
+                  ) : (
+                    <span className="text-xs text-emerald-400 font-bold flex items-center gap-1">
+                      <Check className="w-3.5 h-3.5" /> Image ready
+                    </span>
+                  )
                 )}
               </div>
 
               <div className="flex gap-2.5">
-                {!recordedVideoUrl ? (
-                  isRecording ? (
-                    <button
-                      type="button"
-                      onClick={stopRecording}
-                      className="bg-rose-600 hover:bg-rose-700 text-white px-5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-lg shadow-rose-900/30"
-                    >
-                      <span className="w-2.5 h-2.5 bg-white rounded-sm animate-pulse" />
-                      Stop Recording
-                    </button>
+                {creationStudioMode === "video" ? (
+                  !recordedVideoUrl ? (
+                    isRecording ? (
+                      <button
+                        type="button"
+                        onClick={stopRecording}
+                        className="bg-rose-600 hover:bg-rose-700 text-white px-5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-lg shadow-rose-900/30"
+                      >
+                        <span className="w-2.5 h-2.5 bg-white rounded-sm animate-pulse" />
+                        Stop Recording
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={startRecording}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-lg shadow-emerald-900/30"
+                      >
+                        <span className="w-2.5 h-2.5 bg-white rounded-full animate-ping" />
+                        Start Recording
+                      </button>
+                    )
                   ) : (
-                    <button
-                      type="button"
-                      onClick={startRecording}
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-lg shadow-emerald-900/30"
-                    >
-                      <span className="w-2.5 h-2.5 bg-white rounded-full animate-ping" />
-                      Start Recording
-                    </button>
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => startCamera(selectedVideoDeviceId, selectedAudioDeviceId, cameraFacingMode)}
+                        className="bg-slate-850 hover:bg-slate-800 text-slate-200 px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer border border-slate-700"
+                      >
+                        Retake Video
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleSaveRecordedVideo}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-lg"
+                      >
+                        Attach to Post
+                      </button>
+                    </>
                   )
                 ) : (
-                  <>
+                  !capturedPhotoUrl ? (
                     <button
                       type="button"
-                      onClick={startCamera}
-                      className="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer border border-slate-700"
+                      onClick={handleTakePhoto}
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-lg"
                     >
-                      Retake Video
+                      <Camera className="w-4 h-4" />
+                      Snap Photo
                     </button>
-                    <button
-                      type="button"
-                      onClick={handleSaveRecordedVideo}
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-lg"
-                    >
-                      Attach to Post
-                    </button>
-                  </>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => startCamera(selectedVideoDeviceId, selectedAudioDeviceId, cameraFacingMode)}
+                        className="bg-slate-850 hover:bg-slate-800 text-slate-200 px-4 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer border border-slate-700"
+                      >
+                        Retake Photo
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleSaveCapturedPhoto}
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-lg"
+                      >
+                        Attach to Post
+                      </button>
+                    </>
+                  )
                 )}
               </div>
             </div>

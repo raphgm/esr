@@ -8,7 +8,7 @@ export interface PortfolioItem {
 }
 
 export interface UserProfile {
-  accountType?: "freelancer" | "jobOwner";
+  accountType?: "independent" | "jobOwner";
   name: string;
   email: string;
   profession: string;
@@ -16,12 +16,24 @@ export interface UserProfile {
   location: string;
   avatar: string;
   skills: string[];
+  skillScore?: number;
+  reputation?: number;
   interests: string[];
   goals: string[];
   certifications: string[];
   recommends: number;
   birthdate?: string;
   walletBalance?: number;
+  walletTransactions?: {
+    id: string;
+    type: "receive" | "send";
+    amount: number;
+    sender?: string;
+    receiver?: string;
+    date: string;
+    status: "completed" | "pending";
+    description?: string;
+  }[];
   instructorEarnings?: number;
   unlockedCourseIds?: string[];
   role?: string;
@@ -31,6 +43,36 @@ export interface UserProfile {
   portfolio?: PortfolioItem[];
   handle?: string;
   hasSetupConnectProfile?: boolean;
+  apiKey?: string;
+  clientSecret?: string;
+  webhooks?: {
+    id: string;
+    url: string;
+    events: string[];
+    status: string;
+    secret: string;
+  }[];
+  webhookLogs?: {
+    id: string;
+    timestamp: string;
+    event: string;
+    url: string;
+    status: number;
+    payload: string;
+    response: string;
+  }[];
+  appIntegrations?: {
+    id: string;
+    name: string;
+    desc: string;
+    accent: string;
+    connected: boolean;
+    config: any;
+  }[];
+  badgeTheme?: "cosmic" | "emerald" | "amber" | "dark";
+  badgeSize?: "small" | "medium" | "large";
+  badgeType?: "client" | "talent";
+  sidebarTheme?: "white" | "ivory" | "slate" | "indigo";
 }
 
 export interface ActivityPost {
@@ -105,25 +147,47 @@ export interface BrandCampaign {
   createdDate: string;
 }
 
+export interface Annotation {
+  id: string;
+  type: "bounding-box" | "timestamp";
+  data: {
+    x?: number;
+    y?: number;
+    width?: number;
+    height?: number;
+    timestamp?: string;
+  };
+  label: string;
+  workflowStatus: "Draft" | "Review" | "Approved" | "Rejected";
+}
+
 export interface ConsultancyTask {
   id: string;
   category?: "marketing" | "dev" | "design" | string;
   title: string;
   desc: string;
-  status: "todo" | "inprogress" | "review" | "done";
+  status: "todo" | "inprogress" | "review" | "done" | "needs-verification";
   priority: "High" | "Medium" | "Low";
   assignee: string;
   dueDate: string;
   amount?: number;
   userId?: string;
   comments?: { id: string; author: string; text: string; audioUrl?: string; audioDuration?: number; time: string }[];
+  reviewerId?: string;
+  feedback?: string;
+  qualityScore?: number;
+  skillRequired?: string;
+  requiredConsensus?: number;
+  validationRules?: { minTags?: number; minDuration?: number };
+  consensusResults?: { userId: string; result: any }[];
+  annotations?: Annotation[];
 }
 
 export interface Job {
   id: string;
   title: string;
   company: string;
-  type: "Full-time" | "Internship" | "Apprenticeship" | "Freelance";
+  type: "Full-time" | "Internship" | "Apprenticeship" | "Independent";
   location: string;
   salary: string;
   description: string;
@@ -222,12 +286,43 @@ export interface ValidationTask {
   points: number;
 }
 
+export interface AuditLog {
+  id: string;
+  action: string;
+  timestamp: string;
+  userId: string;
+  details?: string;
+}
+
+export interface Version {
+  id: string;
+  data: any;
+  timestamp: string;
+  authorId: string;
+}
+
+export interface AnnotationProject {
+  id: string;
+  name: string;
+  datasetId: string;
+  labelingGuidelines: string;
+  qualityRequirements: {
+    minTagsPerItem: number;
+    consensusRequired: number;
+  };
+  status: "Draft" | "Ready" | "Published" | "Completed";
+  assignedFreelancers: string[];
+  createdAt: string;
+}
+
 export interface Dataset {
   id: string;
   name: string;
   type: string;
   size: string;
   items: string;
-  status: "Ready" | "Annotating" | "Processing";
+  status: "Ready" | "Annotating" | "Processing" | "Review";
   createdAt: string;
+  auditLogs?: AuditLog[];
+  versions?: Version[];
 }

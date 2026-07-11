@@ -1,7 +1,8 @@
 import { PageBanner } from "./PageBanner";
 import { CategoryTabs } from "./CategoryTabs";
 import React, { useState } from "react";
-import { Product, UserProfile } from "../types";
+import { Product, UserProfile, ConsultancyTask } from "../types";
+import { findBestTasks } from "../lib/routing";
 import {
   ShoppingCart,
   Star,
@@ -10,20 +11,25 @@ import {
   Plus,
   Sparkles,
   X,
+  Target,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
 interface MarketplaceSectionProps {
   userProfile: UserProfile;
   products: Product[];
+  tasks: ConsultancyTask[];
   onUpdateProducts: (products: Product[]) => void;
+  onUpdateTasks: (tasks: ConsultancyTask[]) => void;
   onOpenAiChat: (prompt: string, context: string) => void;
 }
 
 export default function MarketplaceSection({
   userProfile,
   products,
+  tasks,
   onUpdateProducts,
+  onUpdateTasks,
   onOpenAiChat,
 }: MarketplaceSectionProps) {
   const [selectedCategory, setSelectedCategory] = useState("All");
@@ -154,11 +160,11 @@ export default function MarketplaceSection({
       />
 
       {/* Escrow Banner */}
-      <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 flex gap-3 items-start text-xs text-emerald-400">
+      <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex gap-3 items-start text-xs text-emerald-900">
         <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
         <div>
-          <h4 className="font-bold">ESTARR 100% Escrow Protection Guard</h4>
-          <p className="text-emerald-300 mt-0.5">
+          <h4 className="font-bold text-emerald-950">ESTARR 100% Escrow Protection Guard</h4>
+          <p className="text-emerald-800 mt-0.5">
             Your money stays securely locked in escrow until the supplier
             delivers your items or completes the service. Upon verification, the
             escrow automatically pays out. Absolutely risk-free!
@@ -171,6 +177,29 @@ export default function MarketplaceSection({
         selectedCategory={selectedCategory}
         onSelect={setSelectedCategory}
       />
+      
+      {/* Best Matched Tasks */}
+      <div className="mt-8">
+        <h3 className="font-display font-bold text-lg text-white mb-4 flex items-center gap-2">
+          <Target className="w-5 h-5 text-purple-500" /> Best Matched Consultancy Tasks
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {findBestTasks(userProfile, tasks).length > 0 ? (
+            findBestTasks(userProfile, tasks).slice(0, 4).map(task => (
+              <div key={task.id} className="bg-slate-900 border border-slate-700 p-4 rounded-xl">
+                <h4 className="text-white font-bold text-sm">{task.title}</h4>
+                <p className="text-slate-400 text-xs mt-1">{task.desc}</p>
+                <div className="flex gap-2 mt-3">
+                  <span className="text-[10px] bg-slate-800 text-slate-300 px-2 py-1 rounded-md">Required: {task.skillRequired}</span>
+                  <span className="text-[10px] bg-emerald-600/20 text-emerald-400 px-2 py-1 rounded-md">{task.priority} Priority</span>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-slate-400">No matching tasks yet based on your profile skills.</p>
+          )}
+        </div>
+      </div>
 
       {/* Product Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

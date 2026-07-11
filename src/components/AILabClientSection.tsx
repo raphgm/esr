@@ -416,7 +416,7 @@ export const AILabClientSection: React.FC<AILabClientSectionProps> = ({ userProf
             <div className="text-center p-8 bg-slate-50 rounded-2xl border border-slate-200">
               <Users className="w-8 h-8 text-slate-400 mx-auto mb-2" />
               <p className="font-bold text-slate-900">No applications yet</p>
-              <p className="text-sm text-slate-500">Applications will appear here once freelancers apply.</p>
+              <p className="text-sm text-slate-500">Applications will appear here once professionals apply.</p>
             </div>
           )}
         </div>

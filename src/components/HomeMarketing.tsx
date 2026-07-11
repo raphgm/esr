@@ -42,6 +42,7 @@ import { db } from "../lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 import { PlatformTools } from "./PlatformTools";
+import { BackgroundDoodles } from "./BackgroundDoodles";
 
 export function HomeMarketing({
   onStartEarning,
@@ -760,38 +761,37 @@ export function HomeMarketing({
       <PlatformTools onNavigate={onNavigate} />
 
       {/* SECTION 3: INTERACTIVE ELITE SELF-ASSESSMENT WIZARD */}
-      <div className="bg-slate-950 border border-slate-800 rounded-3xl p-6 md:p-10 text-white relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-purple-600/10 rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute -bottom-10 -left-10 w-96 h-96 bg-purple-800/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="bg-gradient-to-br from-white to-slate-100 border border-slate-200 rounded-3xl p-6 md:p-10 relative overflow-hidden shadow-sm">
+        <BackgroundDoodles />
         
         <div className="relative z-10 max-w-3xl mx-auto">
           <div className="text-center mb-8">
-            <span className="text-[9px] font-mono font-bold text-purple-300 bg-purple-900/60 border border-purple-500/30 px-3 py-1 rounded-full uppercase tracking-widest">
-              Elite 3% Simulator
+            <span className="text-[9px] font-mono font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full uppercase tracking-widest">
+              Professional Talent Assessment
             </span>
-            <h3 className="text-2xl md:text-3xl font-extrabold uppercase mt-3 tracking-tight font-display text-slate-100">
-              Assess Your Standing as Elite Talent
+            <h3 className="text-2xl md:text-3xl font-extrabold uppercase mt-3 tracking-tight font-display text-slate-900">
+              Verify Your Professional Readiness
             </h3>
-            <p className="text-slate-400 text-xs mt-1">
-              Test your skills against our benchmark criteria to find out if you qualify for premier contract matching.
+            <p className="text-slate-600 text-xs mt-1">
+              Complete this brief evaluation to understand your alignment for high-impact contracts.
             </p>
           </div>
 
           {!quizCompleted ? (
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+            <div className="bg-slate-50 border border-slate-100 rounded-2xl p-6 shadow-none">
               {/* Progress Bar */}
-              <div className="w-full bg-slate-800 h-1 rounded-full overflow-hidden mb-6">
+              <div className="w-full bg-slate-200 h-1 rounded-full overflow-hidden mb-6">
                 <div 
-                  className="bg-purple-500 h-full transition-all duration-300"
+                  className="bg-slate-900 h-full transition-all duration-300"
                   style={{ width: `${((quizStep + 1) / quizQuestions.length) * 100}%` }}
                 />
               </div>
 
-              <span className="text-[10px] font-mono font-bold text-slate-500 uppercase">
+              <span className="text-[10px] font-mono font-bold text-slate-400 uppercase">
                 Step {quizStep + 1} of {quizQuestions.length}
               </span>
               
-              <h4 className="font-bold text-base text-slate-150 mt-2 mb-6">
+              <h4 className="font-bold text-base text-slate-900 mt-2 mb-6">
                 {quizQuestions[quizStep].question}
               </h4>
 
@@ -801,7 +801,7 @@ export function HomeMarketing({
                     key={idx}
                     type="button"
                     onClick={() => handleQuizAnswer(option.score, option.value)}
-                    className="w-full text-left p-4 bg-slate-950 hover:bg-purple-950/20 border border-slate-800 hover:border-purple-500/40 rounded-xl transition-all font-sans text-xs font-semibold text-slate-300 hover:text-white cursor-pointer"
+                    className="w-full text-left p-4 bg-white hover:bg-slate-100 border border-slate-200 rounded-xl transition-all font-sans text-xs font-semibold text-slate-700 cursor-pointer shadow-sm"
                   >
                     {option.label}
                   </button>
@@ -809,29 +809,29 @@ export function HomeMarketing({
               </div>
             </div>
           ) : (
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-8 text-center shadow-xl animate-fade-in">
-              <div className="w-16 h-16 bg-purple-950 border border-purple-500/30 text-purple-400 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <div className="bg-slate-50 border border-slate-100 rounded-2xl p-8 text-center shadow-none animate-fade-in">
+              <div className="w-16 h-16 bg-slate-100 text-slate-900 rounded-full flex items-center justify-center mx-auto mb-4 border border-slate-200">
                 <Trophy className="w-8 h-8" />
               </div>
-              <h4 className="text-2xl font-black text-slate-100 uppercase tracking-tight font-display">
-                Quiz Evaluation Completed
+              <h4 className="text-2xl font-black text-slate-900 uppercase tracking-tight font-display">
+                Evaluation Completed
               </h4>
-              <p className="text-[11px] font-mono text-purple-400 uppercase tracking-wider font-bold mt-1">
-                Security clearance level: Elite Tier-1
+              <p className="text-[11px] font-mono text-slate-500 uppercase tracking-wider font-bold mt-1">
+                Your Assessment Profile is Ready
               </p>
 
-              <div className="my-6 max-w-md mx-auto p-4 bg-slate-950 border border-slate-850 rounded-xl">
+              <div className="my-6 max-w-md mx-auto p-4 bg-white border border-slate-100 rounded-xl">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-xs text-slate-400">Your Evaluation Score:</span>
-                  <span className="text-xl font-black text-emerald-400 font-mono">{quizScore}%</span>
+                  <span className="text-xs text-slate-500">Your Evaluation Score:</span>
+                  <span className="text-xl font-black text-slate-900 font-mono">{quizScore}%</span>
                 </div>
-                <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                  <div className="bg-emerald-400 h-full" style={{ width: `${quizScore}%` }} />
+                <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                  <div className="bg-slate-900 h-full" style={{ width: `${quizScore}%` }} />
                 </div>
-                <p className="text-[11px] text-slate-400 mt-3 text-left leading-normal font-sans">
+                <p className="text-[11px] text-slate-600 mt-3 text-left leading-normal font-sans">
                   {quizScore >= 80 
-                    ? "✓ Outstanding match! You possess the necessary experience, portfolio, and self-direction parameters to interact with our top corporate escrows."
-                    : "✓ Verified match. Your credentials indicate good platform alignment. Complete our free Certifications to guarantee contract placement."
+                    ? "✓ You show excellent alignment for senior-level contract roles. Please proceed to portfolio verification."
+                    : "✓ Your profile is noted. We recommend enhancing your specialized certification registry to improve dispatch matching."
                   }
                 </p>
               </div>
@@ -839,15 +839,15 @@ export function HomeMarketing({
               <div className="flex justify-center gap-3">
                 <button
                   onClick={resetQuiz}
-                  className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold transition-all cursor-pointer border border-slate-750"
+                  className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-900 rounded-xl text-xs font-bold transition-all cursor-pointer border border-slate-200"
                 >
-                  Retake Test
+                  Retake
                 </button>
                 <button
                   onClick={onStartEarning}
-                  className="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition-all cursor-pointer shadow-lg shadow-purple-500/10"
+                  className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm"
                 >
-                  Create Elite Portfolio
+                  View Recommendations
                 </button>
               </div>
             </div>
@@ -964,148 +964,7 @@ export function HomeMarketing({
           </div>
         </div>
 
-        {/* Global Compensation Calculator */}
-        <div className="bg-slate-950 border border-slate-900 rounded-3xl p-6 md:p-10 text-white relative overflow-hidden shadow-2xl">
-          <div className="absolute -top-10 -right-10 w-96 h-96 bg-purple-600/10 rounded-full blur-[100px] pointer-events-none" />
-          
-          <div className="max-w-3xl mx-auto">
-            <div className="text-center mb-8">
-              <span className="text-[9px] font-mono font-bold text-purple-400 bg-purple-950/60 border border-purple-900/40 px-2.5 py-1 rounded-full uppercase tracking-widest inline-block">
-                Transparent Compensation Calculator
-              </span>
-              <h3 className="text-2xl md:text-3xl font-extrabold uppercase mt-3 tracking-tight font-display text-slate-100">
-                Global Earnings & purchasing power estimator
-              </h3>
-              <p className="text-slate-400 text-xs mt-1">
-                Calculate real-time contract payout rates. We pay standard global rates directly to our pre-vetted network.
-              </p>
-            </div>
 
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 md:p-8 shadow-sm">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Inputs */}
-                <div className="space-y-5">
-                  <div>
-                    <label className="block text-[10px] font-mono uppercase text-slate-500 font-bold mb-2">
-                      Select Target Professional Role
-                    </label>
-                    <div className="grid grid-cols-1 gap-2">
-                      {calcRoles.map((role) => (
-                        <button
-                          key={role.name}
-                          type="button"
-                          onClick={() => setCalcRole(role.name)}
-                          className={`w-full text-left p-3 rounded-xl border transition-all text-xs font-bold flex items-center justify-between cursor-pointer ${
-                            calcRole === role.name
-                              ? "bg-purple-50 border-purple-500 text-purple-950 shadow-sm"
-                              : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 hover:border-slate-300"
-                          }`}
-                        >
-                          <span>{role.name}</span>
-                          <span className="font-mono text-[10px] text-purple-600">${role.hourlyRate}/hr</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between items-center mb-2">
-                      <label className="text-[10px] font-mono uppercase text-slate-550 font-bold">
-                        Target Hours / Week
-                      </label>
-                      <span className="text-xs font-mono font-bold text-purple-600">{calcHours} hours</span>
-                    </div>
-                    <input
-                      type="range"
-                      min={10}
-                      max={60}
-                      step={5}
-                      value={calcHours}
-                      onChange={(e) => setCalcHours(Number(e.target.value))}
-                      className="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-purple-650"
-                    />
-                    <div className="flex justify-between text-[8px] font-mono text-slate-400 mt-1">
-                      <span>10 hrs (Part-time)</span>
-                      <span>40 hrs (Full-time)</span>
-                      <span>60 hrs (Maximum)</span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-[10px] font-mono uppercase text-slate-500 font-bold mb-2">
-                      Convert to Regional Local Currency
-                    </label>
-                    <select
-                      value={calcCurrency}
-                      onChange={(e) => setCalcCurrency(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs px-3.5 py-2.5 rounded-xl focus:outline-none focus:border-purple-500 font-medium cursor-pointer"
-                    >
-                      {Object.keys(currencies).map((curr) => (
-                        <option key={curr} value={curr}>
-                          {currencies[curr].label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                {/* Live Output Card */}
-                <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 flex flex-col justify-between">
-                  <div className="space-y-4">
-                    <span className="text-[9px] font-mono font-bold uppercase text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-md inline-block">
-                      Instant Verified Estimate
-                    </span>
-
-                    <div className="space-y-1">
-                      <p className="text-[10px] font-mono uppercase text-slate-500 font-bold leading-none">
-                        Est. Annual Earning Potential
-                      </p>
-                      <h4 className="text-3xl font-black text-slate-900 tracking-tight font-display">
-                        {currencies[calcCurrency].symbol}
-                        {((calcRoles.find(r => r.name === calcRole)?.hourlyRate || 95) * calcHours * 52 * currencies[calcCurrency].rate).toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                      </h4>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-200">
-                      <div>
-                        <p className="text-[9px] font-mono text-slate-500 uppercase font-bold">Monthly Rate</p>
-                        <p className="text-sm font-bold text-slate-800">
-                          {currencies[calcCurrency].symbol}
-                          {(((calcRoles.find(r => r.name === calcRole)?.hourlyRate || 95) * calcHours * 52 * currencies[calcCurrency].rate) / 12).toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-[9px] font-mono text-slate-500 uppercase font-bold">Hourly Rate</p>
-                        <p className="text-sm font-bold text-slate-800">
-                          {currencies[calcCurrency].symbol}
-                          {((calcRoles.find(r => r.name === calcRole)?.hourlyRate || 95) * currencies[calcCurrency].rate).toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Purchasing Power Premium Banner */}
-                  <div className="mt-6 bg-purple-50 border border-purple-150 p-3.5 rounded-xl space-y-1">
-                    <div className="flex items-center gap-1.5 text-purple-700">
-                      <TrendingUp className="w-3.5 h-3.5 text-purple-600 shrink-0" />
-                      <span className="text-[9px] font-mono uppercase font-bold tracking-wider">
-                        Purchasing Power Premium
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-slate-600 leading-relaxed font-sans">
-                      This remote rate is approximately <strong className="text-emerald-600 font-mono font-bold">
-                        {(
-                          (((calcRoles.find(r => r.name === calcRole)?.hourlyRate || 95) * calcHours * 52) / 12) / 
-                          (calcRoles.find(r => r.name === calcRole)?.averageLocalSal || 1000)
-                        ).toFixed(1)}x Higher
-                      </strong> than typical senior local office salaries in this region.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* SECTION 4: INTEGRATED CAREERS BOARD - FILTERABLE JOBS */}

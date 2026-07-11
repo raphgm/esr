@@ -9,20 +9,54 @@ import {
   ArrowRight,
   ShieldCheck,
   Cpu,
-  Activity
+  Activity,
+  Download
 } from "lucide-react";
-import { UserProfile, ConsultancyTask } from "../types";
+import { UserProfile, ConsultancyTask, ActivityPost } from "../types";
 import { ClientDashboard } from "./ClientDashboard";
+import { ContributorAnalyticsDashboard } from "./ContributorAnalyticsDashboard";
 
 export function UserDashboard({ 
   userProfile, 
   tasks,
+  posts,
   onNavigate 
 }: { 
   userProfile: UserProfile;
   tasks: ConsultancyTask[];
+  posts: ActivityPost[];
   onNavigate: (id: string) => void;
 }) {
+  const calculateCompletion = (profile: UserProfile) => {
+    let percentage = 0;
+    if (profile.name) percentage += 10;
+    if (profile.profession) percentage += 10;
+    if (profile.bio) percentage += 10;
+    if (profile.location) percentage += 10;
+    if (profile.avatar) percentage += 10;
+    if (profile.skills && profile.skills.length > 0) percentage += 20;
+    if (profile.interests && profile.interests.length > 0) percentage += 10;
+    if (profile.goals && profile.goals.length > 0) percentage += 10;
+    if (profile.portfolio && profile.portfolio.length > 0) percentage += 10;
+    return percentage;
+  };
+
+  const handleExport = () => {
+    const exportData = {
+      profile: userProfile,
+      history: userProfile.history,
+      tasks: tasks,
+      exportedAt: new Date().toISOString()
+    };
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", `user-dashboard-export-${userProfile.name.replace(/\s+/g, '-').toLowerCase()}.json`);
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+  };
+
   if (userProfile?.accountType === "jobOwner") {
     return <ClientDashboard userProfile={userProfile} tasks={tasks} onNavigate={onNavigate} />;
   }
@@ -66,25 +100,27 @@ export function UserDashboard({
   return (
     <div className="flex flex-col gap-8 animate-fade-in">
       {/* Welcome Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
+      <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+        <div className="flex flex-col gap-2">
           <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase font-display">
             Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600">{userProfile.name.split(' ')[0]}</span>
           </h1>
-          <p className="text-slate-500 font-medium text-sm mt-1">
-            Your infrastructure is operational. {activeTasks.length} active milestone{activeTasks.length !== 1 ? 's' : ''} require attention.
-          </p>
+          <div className="flex items-center gap-3">
+            <div className="w-48 h-2 bg-slate-200 rounded-full overflow-hidden">
+              <div className="h-full bg-purple-600 rounded-full" style={{ width: `${calculateCompletion(userProfile)}%` }}></div>
+            </div>
+            <p className="text-slate-500 font-bold text-[10px] uppercase tracking-widest">
+              {calculateCompletion(userProfile)}% Profile Complete
+            </p>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 border border-emerald-200">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            System Online
-          </div>
-          <div className="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-[10px] font-bold uppercase tracking-widest border border-slate-200">
-            Authenticated
-          </div>
+        <div className="flex items-center gap-4">
         </div>
       </div>
+
+      <p className="text-slate-500 font-medium text-sm -mt-6">
+        Your infrastructure is operational. {activeTasks.length} active milestone{activeTasks.length !== 1 ? 's' : ''} require attention.
+      </p>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -101,6 +137,8 @@ export function UserDashboard({
           </div>
         ))}
       </div>
+
+      <ContributorAnalyticsDashboard userProfile={userProfile} tasks={tasks} posts={posts} />
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Active Milestones */}
@@ -159,14 +197,26 @@ export function UserDashboard({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
             <button 
               onClick={() => onNavigate("gigs")}
-              className="flex items-center gap-4 p-5 bg-slate-900 text-white rounded-2xl hover:bg-slate-800 transition-all text-left group"
+              className="flex items-center gap-4 p-5 bg-slate-900 text-white rounded-2xl hover:bg-slate-800 transition-all text-left group flex-1"
             >
               <div className="p-3 bg-white/10 rounded-xl group-hover:bg-purple-600 transition-colors">
-                <Cpu className="w-5 h-5" />
+                <Users className="w-5 h-5" />
               </div>
               <div>
                 <p className="text-xs font-black uppercase tracking-widest text-purple-300">Talent Market</p>
-                <p className="text-sm font-medium text-slate-300 mt-0.5">Apply for a role or create a gig for your service</p>
+                <p className="text-sm font-medium text-slate-300 mt-0.5">Find creators & vocational pros</p>
+              </div>
+            </button>
+            <button 
+              onClick={() => onNavigate("ai-jobs")}
+              className="flex items-center gap-4 p-5 bg-purple-600 text-white rounded-2xl hover:bg-purple-700 transition-all text-left group flex-1"
+            >
+              <div className="p-3 bg-white/10 rounded-xl group-hover:bg-slate-900 transition-colors">
+                <Cpu className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-xs font-black uppercase tracking-widest text-purple-100">AI Job Market</p>
+                <p className="text-sm font-medium text-purple-100 mt-0.5">Apply for AI training & engineering jobs</p>
               </div>
             </button>
             <button 
@@ -231,12 +281,20 @@ export function UserDashboard({
               </div>
 
               <div className="pt-4 border-t border-slate-800">
-                <button 
-                  onClick={() => onNavigate("payments")}
-                  className="w-full py-2 bg-white/5 hover:bg-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest border border-white/10 transition-colors"
-                >
-                  Manage Wallet
-                </button>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => onNavigate("payments")}
+                    className="flex-1 py-2 bg-white/5 hover:bg-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest border border-white/10 transition-colors"
+                  >
+                    Manage Wallet
+                  </button>
+                  <button 
+                    onClick={handleExport}
+                    className="px-3 py-2 bg-white/5 hover:bg-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest border border-white/10 transition-colors"
+                  >
+                    <Download className="w-3 h-3" />
+                  </button>
+                </div>
               </div>
             </div>
           </div>

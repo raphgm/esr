@@ -285,15 +285,12 @@ export function DjinniAnonymousSection({ userProfile, jobs, onUpdateProfile }: D
       <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 pb-6 border-b border-slate-800">
         <div>
           <div className="flex items-center gap-2 mb-1.5">
-            <span className="bg-blue-500 text-white font-mono font-black text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-full shadow-md">
-              Anonymous Profile Integration
-            </span>
             <span className="text-[10px] text-slate-400 font-mono flex items-center gap-1">
               <Lock className="w-3 h-3 text-emerald-400" /> Anonymous Recruitment Pipeline
             </span>
           </div>
-          <h2 className="text-2xl font-black font-display tracking-tight text-white uppercase flex items-center gap-2">
-            <ShieldCheck className="w-7 h-7 text-blue-500" /> Anonymous Tech Market
+          <h2 className="text-lg md:text-xl font-black font-display tracking-tight text-white uppercase flex items-center gap-2 whitespace-nowrap">
+            <ShieldCheck className="w-6 h-6 md:w-7 md:h-7 text-blue-500" /> Anonymous Tech Market
           </h2>
           <p className="text-slate-400 text-xs mt-1 max-w-xl">
             Freelancers publish anonymous professional summaries & desired salaries. Employers initiate pitches first, protecting candidates from unsolicited outreach until they explicitly unlock contacts.

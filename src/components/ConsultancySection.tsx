@@ -99,9 +99,23 @@ export default function ConsultancySection({
   const [newDueDate, setNewDueDate] = useState("");
   const [isAddingTask, setIsAddingTask] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortOrder, setSortOrder] = useState<"createdAt" | "status" | "priority">("createdAt");
   const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
   const [openCommentsId, setOpenCommentsId] = useState<string | null>(null);
   const [commentText, setCommentText] = useState("");
+
+  const sortedTasks = [...tasks].sort((a, b) => {
+    if (sortOrder === "createdAt") return b.id.localeCompare(a.id);
+    if (sortOrder === "priority") {
+      const p = { High: 3, Medium: 2, Low: 1 };
+      return p[b.priority] - p[a.priority];
+    }
+    if (sortOrder === "status") {
+      const s = { todo: 1, inprogress: 2, review: 3, done: 4 };
+      return s[a.status] - s[b.status];
+    }
+    return 0;
+  });
 
   // AI Deal Estimator states
   const [serviceType, setServiceType] = useState("");
@@ -147,10 +161,10 @@ export default function ConsultancySection({
     setIsAddingTask(false);
   };
 
-  const moveTask = (taskId: string, newStatus: ConsultancyTask["status"]) => {
+  const moveTask = (taskId: string, newStatus: ConsultancyTask["status"], feedback?: string, qualityScore?: number) => {
     const updated = tasks.map((t) => {
       if (t.id === taskId) {
-        return { ...t, status: newStatus };
+        return { ...t, status: newStatus, feedback, qualityScore };
       }
       return t;
     });
@@ -388,11 +402,11 @@ export default function ConsultancySection({
       />
 
       {/* Escrow Banner */}
-      <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 flex gap-3 items-start text-xs text-emerald-400">
+      <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex gap-3 items-start text-xs text-emerald-900">
         <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
         <div>
-          <h4 className="font-bold text-slate-900">ESTARR 100% Escrow Protection Guard</h4>
-          <p className="text-slate-600 mt-0.5">
+          <h4 className="font-bold text-emerald-950">ESTARR 100% Escrow Protection Guard</h4>
+          <p className="text-emerald-800 mt-0.5">
             Your money stays securely locked in escrow until the supplier delivers your items or completes the service. Upon verification, the escrow automatically pays out. Absolutely risk-free!
           </p>
         </div>
@@ -629,12 +643,23 @@ export default function ConsultancySection({
                 <h3 className="font-display font-black text-lg text-slate-900 tracking-tight">
                   Contract & Milestone Pipeline
                 </h3>
-                <button
-                  onClick={() => setIsAddingTask(!isAddingTask)}
-                  className="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl text-xs font-bold cursor-pointer transition-colors"
-                >
-                  {isAddingTask ? "Hide Form" : "Create Contract"}
-                </button>
+                <div className="flex items-center gap-3">
+                  <select
+                    value={sortOrder}
+                    onChange={(e) => setSortOrder(e.target.value as any)}
+                    className="bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-700 cursor-pointer focus:outline-none"
+                  >
+                    <option value="createdAt">Created Date</option>
+                    <option value="status">Status</option>
+                    <option value="priority">Priority</option>
+                  </select>
+                  <button
+                    onClick={() => setIsAddingTask(!isAddingTask)}
+                    className="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2 rounded-xl text-xs font-bold cursor-pointer transition-colors"
+                  >
+                    {isAddingTask ? "Hide Form" : "Create Contract"}
+                  </button>
+                </div>
               </div>
 
           {isAddingTask && (
@@ -810,7 +835,7 @@ export default function ConsultancySection({
           )}
           <div className="flex flex-col md:flex-row gap-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
             {(["todo", "inprogress", "review", "done"] as const).map((status) => {
-              const statusTasks = tasks.filter((t) => t.status === status && (t.title.toLowerCase().includes(searchQuery.toLowerCase()) || (t.assignee && t.assignee.toLowerCase().includes(searchQuery.toLowerCase()))));
+              const statusTasks = sortedTasks.filter((t) => t.status === status && (t.title.toLowerCase().includes(searchQuery.toLowerCase()) || (t.assignee && t.assignee.toLowerCase().includes(searchQuery.toLowerCase()))));
               const colors = {
                 todo: {
                   bg: "bg-amber-50/20",
@@ -970,12 +995,22 @@ export default function ConsultancySection({
                             )}
 
                             {status === "review" && (
-                              <button
-                                onClick={(e) => handleApproveAndRelease(e, task, budget)}
-                                className="w-full bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-black py-1.5 rounded-xl text-center cursor-pointer transition-all flex items-center justify-center gap-1 shadow-sm border border-slate-800"
-                              >
-                                💰 Approve & Release Cash
-                              </button>
+                              <div className="flex flex-col gap-2 w-full">
+                                <div className="flex gap-2">
+                                  <button
+                                    onClick={() => moveTask(task.id, "inprogress", "Needs further refinement.")}
+                                    className="w-full bg-rose-100 hover:bg-rose-200 text-rose-700 text-[10px] font-bold py-1.5 rounded-xl text-center cursor-pointer transition-all"
+                                  >
+                                    Reject
+                                  </button>
+                                  <button
+                                    onClick={(e) => handleApproveAndRelease(e, task, budget)}
+                                    className="w-full bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-black py-1.5 rounded-xl text-center cursor-pointer transition-all border border-slate-800"
+                                  >
+                                    Approve
+                                  </button>
+                                </div>
+                              </div>
                             )}
 
                             {status === "done" && (

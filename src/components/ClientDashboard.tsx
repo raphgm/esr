@@ -1,15 +1,9 @@
 import React from "react";
-import { 
-  Briefcase, 
-  Users, 
-  TrendingUp, 
-  Clock, 
-  ArrowRight,
-  ShieldCheck,
-  CreditCard,
-  Plus
-} from "lucide-react";
+import { Briefcase, Users, TrendingUp, Clock, ArrowRight, ShieldCheck, CreditCard, Plus, X } from "lucide-react";
 import { UserProfile, ConsultancyTask } from "../types";
+import { AnnotationManagement } from "./AnnotationManagement";
+import { ManagerAnalyticsDashboard } from "./ManagerAnalyticsDashboard";
+import { TalentDetailModal } from "./TalentDetailModal";
 
 export function ClientDashboard({ 
   userProfile, 
@@ -20,8 +14,20 @@ export function ClientDashboard({
   tasks: ConsultancyTask[];
   onNavigate: (id: string) => void;
 }) {
+  const [selectedTalent, setSelectedTalent] = React.useState<{ name: string, role: string, rating: string, bio: string, projectsCount: number, isVerified: boolean } | null>(null);
+  const [talents, setTalents] = React.useState([
+    { name: "Sarah J.", role: "Senior AI Engineer", rating: "4.9", bio: "Expert in LLM fine-tuning and distributed training systems. Over 10 years of experience.", projectsCount: 12, isVerified: true },
+    { name: "Michael T.", role: "Data Scientist", rating: "5.0", bio: "Specialized in computer vision and anomaly detection. Passionate about ethical AI.", projectsCount: 8, isVerified: true },
+    { name: "Elena R.", role: "Full Stack Dev", rating: "4.8", bio: "Building scalable web applications with a focus on performant data visualization.", projectsCount: 15, isVerified: false }
+  ]);
+  const [rejectedTalents, setRejectedTalents] = React.useState<Array<{ talent: {name: string, role: string, rating: string, bio: string, projectsCount: number, isVerified: boolean}, rejectedAt: Date }>>([]);
   const activeTasks = tasks.filter(t => t.status !== 'done');
   const totalSpend = 2450.00; // Mock data for client
+
+  const rejectTalent = (talent: typeof talents[0]) => {
+    setTalents(talents.filter(t => t.name !== talent.name));
+    setRejectedTalents([...rejectedTalents, { talent, rejectedAt: new Date() }]);
+  };
   
   const stats = [
     { 
@@ -47,7 +53,7 @@ export function ClientDashboard({
     },
     { 
       label: "Pending Approvals", 
-      value: "3", 
+      value: tasks.filter(t => t.status === 'review').length.toString(), 
       icon: ShieldCheck, 
       color: "text-orange-600", 
       bg: "bg-orange-50" 
@@ -99,6 +105,9 @@ export function ClientDashboard({
           </div>
         ))}
       </div>
+
+      <ManagerAnalyticsDashboard tasks={tasks} />
+      <AnnotationManagement />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Active Projects */}
@@ -203,13 +212,9 @@ export function ClientDashboard({
           <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
             <h3 className="font-bold text-slate-900 mb-4">Top Talent Suggestions</h3>
             <div className="space-y-4">
-              {[
-                { name: "Sarah J.", role: "Senior AI Engineer", rating: "4.9" },
-                { name: "Michael T.", role: "Data Scientist", rating: "5.0" },
-                { name: "Elena R.", role: "Full Stack Dev", rating: "4.8" }
-              ].map((talent, i) => (
-                <div key={i} className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
+              {talents.map((talent, i) => (
+                <div key={i} className="flex items-center justify-between bg-slate-50/50 border border-slate-100 p-3 rounded-2xl cursor-pointer hover:bg-white hover:border-slate-200 hover:shadow-sm transition-all group">
+                  <div className="flex items-center gap-4 flex-1" onClick={() => setSelectedTalent(talent)}>
                     <div className="w-10 h-10 rounded-full bg-slate-200 overflow-hidden">
                       <img src={`https://i.pravatar.cc/150?u=talent-${i}`} alt="Avatar" className="w-full h-full object-cover" />
                     </div>
@@ -218,13 +223,33 @@ export function ClientDashboard({
                       <p className="text-xs text-slate-500">{talent.role}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md">
-                    ★ {talent.rating}
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md">
+                      ★ {talent.rating}
+                    </div>
+                    <button onClick={(e) => { e.stopPropagation(); rejectTalent(talent); }} className="text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <X className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
               ))}
             </div>
+            
+            {rejectedTalents.length > 0 && (
+                <div className="mt-8 pt-6 border-t border-slate-200">
+                    <h3 className="font-bold text-slate-900 mb-4 text-sm">Rejected Talent</h3>
+                    <div className="space-y-3">
+                        {rejectedTalents.map((item, i) => (
+                            <div key={i} className="flex items-center justify-between p-2 rounded-xl bg-slate-50 text-slate-500">
+                                <p className="text-sm font-medium">{item.talent.name}</p>
+                                <span className="text-xs">Rejected {item.rejectedAt.toLocaleDateString()}</span>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
           </div>
+          {selectedTalent && <TalentDetailModal talent={selectedTalent} onClose={() => setSelectedTalent(null)} />}
         </div>
       </div>
     </div>

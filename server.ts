@@ -86,7 +86,7 @@ app.post("/api/chat", async (req, res) => {
     }
 
     const systemInstruction = `You are ESTARR AI, the intelligent assistant for the ESTARR APP digital ecosystem. 
-ESTARR APP is designed to help young individuals, Gen Z creators, professional freelancers, entrepreneurs, and SMEs move "from learning to earning".
+ESTARR APP is designed to help young individuals, Gen Z creators, professional independents, entrepreneurs, and SMEs move "from learning to earning".
 You can:
 - Answer professional, business, educational, content creation, or branding questions.
 - Generate business ideas or content hooks and video scripts.
@@ -629,6 +629,230 @@ app.post("/api/upload/url", async (req, res) => {
   } catch (error: any) {
     console.error("S3 Presigned URL Error:", error.message);
     res.status(500).json({ error: "Failed to generate upload URL" });
+  }
+});
+
+// REAL SANDBOX AND WEBHOOK TRIGGERS
+import fs from "fs";
+import crypto from "crypto";
+import { initializeApp as initFirebaseApp } from "firebase/app";
+import { getFirestore as initFirestore, collection as fCollection, getDocs as fGetDocs, doc as fDoc, setDoc as fSetDoc } from "firebase/firestore";
+
+let fbDbInstance: any = null;
+function getFirestoreDb() {
+  if (!fbDbInstance) {
+    try {
+      const configPath = path.join(process.cwd(), "firebase-applet-config.json");
+      if (fs.existsSync(configPath)) {
+        const config = JSON.parse(fs.readFileSync(configPath, "utf8"));
+        const fbApp = initFirebaseApp(config);
+        fbDbInstance = initFirestore(fbApp, config.firestoreDatabaseId);
+      }
+    } catch (err) {
+      console.error("Failed to initialize Firebase in server:", err);
+    }
+  }
+  return fbDbInstance;
+}
+
+// REST API endpoint: Talent List
+app.get("/api/v1/talent/list", async (req, res) => {
+  try {
+    const role = req.query.role as string;
+    const limitVal = parseInt(req.query.limit as string) || 10;
+    const dbObj = getFirestoreDb();
+    
+    let list: any[] = [];
+    if (dbObj) {
+      try {
+        const snapshot = await fGetDocs(fCollection(dbObj, "users"));
+        snapshot.forEach(doc => {
+          list.push({ id: doc.id, ...doc.data() });
+        });
+      } catch (err) {
+        console.error("Firestore user query error in sandbox API:", err);
+      }
+    }
+    
+    list = list.filter(u => u.role !== "Administrator");
+    
+    if (role) {
+      const lowerRole = role.toLowerCase();
+      list = list.filter(u => 
+        (u.profession && u.profession.toLowerCase().includes(lowerRole)) || 
+        (u.skills && u.skills.some((s: string) => s.toLowerCase().includes(lowerRole)))
+      );
+    }
+    
+    let mapped = list.slice(0, limitVal).map(u => ({
+      id: "tal_" + u.id.slice(0, 6),
+      name: u.name,
+      role: u.profession || "Expert Professional",
+      vettedStatus: "VERIFIED_TOP_3_PERCENT",
+      ccatScore: u.points ? Math.min(99, 90 + (u.points % 10)) : 95,
+      verifiedSkills: u.skills || ["React", "TypeScript", "Node.js"],
+      milestonesCompleted: u.history ? u.history.length : 5,
+      escrowSuccessRate: "100%"
+    }));
+
+    if (mapped.length === 0) {
+      mapped = [
+        {
+          id: "tal_9a8b7c",
+          name: "Olanrewaju Cole",
+          role: "Senior AI Infrastructure Architect",
+          vettedStatus: "VERIFIED_TOP_3_PERCENT",
+          ccatScore: 94,
+          verifiedSkills: ["TensorFlow", "Kubernetes", "PyTorch", "Rust"],
+          milestonesCompleted: 14,
+          escrowSuccessRate: "100%"
+        },
+        {
+          id: "tal_123def",
+          name: "Amara Okonkwo",
+          role: "Full-Stack Web3 Specialist",
+          vettedStatus: "VERIFIED_TOP_3_PERCENT",
+          ccatScore: 96,
+          verifiedSkills: ["React", "Solidity", "Node.js", "Docker"],
+          milestonesCompleted: 8,
+          escrowSuccessRate: "98.2%"
+        }
+      ];
+    }
+
+    res.json({
+      object: "list",
+      count: mapped.length,
+      data: mapped,
+      filters_applied: {
+        role: role || "All",
+        limit: limitVal,
+        vettedOnly: req.query.vettedOnly === "true"
+      }
+    });
+  } catch (error: any) {
+    console.error("API /api/v1/talent/list error:", error);
+    res.status(500).json({ error: "Failed to fetch talent list" });
+  }
+});
+
+// REST API endpoint: Escrow Create
+app.post("/api/v1/escrow/create", async (req, res) => {
+  try {
+    const { title, amount, clientName, clientEmail } = req.body;
+    const escrowAmount = parseFloat(amount) || 12500;
+    const escrowTitle = title || "Production System Migration - Node/Postgres";
+    const id = "esc_" + Math.random().toString(36).substring(2, 12);
+    
+    const dbObj = getFirestoreDb();
+    if (dbObj) {
+      try {
+        await fSetDoc(fDoc(dbObj, "tasks", id), {
+          id,
+          title: escrowTitle,
+          desc: `REST API Automated Escrow Contract created for Olanrewaju Cole. Vetted under ESTARR top-tier AI pipelines.`,
+          budget: escrowAmount.toString(),
+          status: "inprogress",
+          category: "AI & ML",
+          date: new Date().toISOString().split("T")[0]
+        });
+      } catch (err) {
+        console.error("Firestore task insert error in sandbox API:", err);
+      }
+    }
+
+    res.json({
+      object: "escrow_contract",
+      id,
+      status: "funded",
+      currency: "USD",
+      amount: escrowAmount,
+      created_at: Math.floor(Date.now() / 1000),
+      title: escrowTitle,
+      client: {
+        id: "cli_" + Math.random().toString(36).substring(2, 6),
+        name: clientName || "Enterprise Sponsor",
+        email: clientEmail || "sponsor@enterprise.com"
+      },
+      contractor: {
+        id: "tal_9a8b7c",
+        name: "Olanrewaju Cole"
+      },
+      milestones: [
+        { step: 1, title: "Architecture & Schema Setup", amount: Math.round(escrowAmount * 0.35), status: "active" },
+        { step: 2, title: "Data Migration Validation", amount: Math.round(escrowAmount * 0.65), status: "pending" }
+      ]
+    });
+  } catch (error: any) {
+    console.error("API /api/v1/escrow/create error:", error);
+    res.status(500).json({ error: "Failed to create escrow contract" });
+  }
+});
+
+// REST API endpoint: Sanya Vetting Report
+app.get("/api/v1/vetting/report/sanya", (req, res) => {
+  res.json({
+    object: "vetting_protocol_result",
+    applicant: {
+      id: "app-849",
+      name: "Sanya Olayemi",
+      profession: "Senior React & Node Engineer"
+    },
+    cognitive_profile: {
+      spatial_reasoning: "97%",
+      logical_deduction: "99%",
+      problem_solving_velocity: "0.03ms"
+    },
+    verifiable_credential_uri: "https://estarr.com/credentials/vc_sanya_olayemi_2026.json"
+  });
+});
+
+// Webhook Proxy Trigger Route (Dispatches a real HTTP request with signatures!)
+app.post("/api/v1/webhooks/trigger", async (req, res) => {
+  try {
+    const { url, event, payload, secret } = req.body;
+    if (!url) {
+      return res.status(400).json({ error: "Webhook URL is required" });
+    }
+
+    const payloadStr = typeof payload === "string" ? payload : JSON.stringify(payload);
+    const signature = secret 
+      ? crypto.createHmac("sha256", secret).update(payloadStr).digest("hex") 
+      : "estarr_sig_unsigned";
+
+    const startTime = Date.now();
+    try {
+      const response = await axios.post(url, payload, {
+        headers: {
+          "Content-Type": "application/json",
+          "X-Estarr-Event": event || "simulated.event",
+          "X-Estarr-Signature": signature,
+          "User-Agent": "ESTARR-Webhook-Gateway/1.0"
+        },
+        timeout: 8000
+      });
+
+      const responseTime = `${Date.now() - startTime}ms`;
+      res.json({
+        success: true,
+        status: response.status,
+        statusText: response.statusText,
+        responseTime,
+        responseBody: typeof response.data === "object" ? JSON.stringify(response.data) : String(response.data)
+      });
+    } catch (err: any) {
+      const responseTime = `${Date.now() - startTime}ms`;
+      res.json({
+        success: false,
+        status: err.response?.status || 504,
+        statusText: err.response?.statusText || "Connection Failure / Timeout",
+        responseTime,
+        responseBody: err.response?.data ? (typeof err.response.data === "object" ? JSON.stringify(err.response.data) : String(err.response.data)) : err.message
+      });
+    }
+  } catch (error: any) {
+    console.error("Webhook trigger error:", error);
+    res.status(500).json({ error: "Webhook execution failed" });
   }
 });
 

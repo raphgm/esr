@@ -36,10 +36,12 @@ import { TeamsSection } from "./components/TeamsSection";
 import { JobsSection } from "./components/JobsSection";
 import { HowItWorksSection } from "./components/HowItWorksSection";
 import { RewardsSection } from "./components/RewardsSection";
+import { IntegrationsSection } from "./components/IntegrationsSection";
 import { NotificationsDrawer } from "./components/NotificationsDrawer";
 import { BackgroundDoodles } from "./components/BackgroundDoodles";
 import { AdminSection } from "./components/AdminSection";
 import { UserDashboard } from "./components/UserDashboard";
+import { AnnotationWorkspace } from "./components/AnnotationWorkspace";
 
 // Icons
 import {
@@ -83,7 +85,7 @@ import {
   Globe,
   Cpu,
   
-  Target, Activity, BrainCircuit
+  Target, Activity, BrainCircuit, Square
 } from "lucide-react";
 
 const initialTasks: ConsultancyTask[] = [];
@@ -185,7 +187,7 @@ export default function App() {
   const [authPassword, setAuthPassword] = useState("password123");
   const [authName, setAuthName] = useState("Chinedu Okafor");
   const [authBirthdate, setAuthBirthdate] = useState("");
-  const [authAccountType, setAuthAccountType] = useState<"freelancer" | "jobOwner">("freelancer");
+  const [authAccountType, setAuthAccountType] = useState<"independent" | "jobOwner">("independent");
   const [authConfirmPassword, setAuthConfirmPassword] = useState("");
   const [applyingAs, setApplyingAs] = useState("Developer");
   const [authError, setAuthError] = useState<string | null>(null);
@@ -227,7 +229,7 @@ export default function App() {
 
   // Router State
   const [activeTab, setActiveTab] = useState<
-    "home" | "connect" | "ai-lab" | "marketplace" | "consultancy" | "gigs" | "community" | "mobile" | "teams" | "careers" | "about" | "how-it-works" | "payments" | "events" | "admin" | "portfolio" | "rewards"
+    "home" | "connect" | "ai-lab" | "marketplace" | "consultancy" | "gigs" | "ai-jobs" | "community" | "mobile" | "teams" | "careers" | "about" | "how-it-works" | "payments" | "events" | "admin" | "portfolio" | "rewards" | "integrations" | "annotation-workspace"
   >(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("survey")) return "ai-lab";
@@ -249,7 +251,7 @@ export default function App() {
       }
     }
   }, [activeTab]);
-  const [connectSubTab, setConnectSubTab] = useState<"feed" | "directory" | "mentorship" | "companion">("feed");
+  const [connectSubTab, setConnectSubTab] = useState<"feed" | "directory" | "mentorship">("feed");
 
   const [collapsedNavSections, setCollapsedNavSections] = useState<Record<string, boolean>>({
     "Core Hub & Insights": false,
@@ -260,6 +262,11 @@ export default function App() {
   });
 
   const [sidebarTheme, setSidebarTheme] = useState<"white" | "ivory" | "slate" | "indigo">("ivory");
+
+  const updateSidebarTheme = (theme: "white" | "ivory" | "slate" | "indigo") => {
+    setSidebarTheme(theme);
+    handleUpdateProfile({ ...userProfile, sidebarTheme: theme });
+  };
 
   const sidebarStyles = {
     white: {
@@ -392,13 +399,13 @@ ActivityPost[]>(initialPosts);
             email: email,
             avatar: oauthUser?.picture || oauthUser?.avatar_url || userProfile.avatar,
             profession: `${provider === "linkedin" ? "LinkedIn" : "GitHub"} Verified Professional`,
-            accountType: "freelancer" as const
+            accountType: "independent" as const
           };
           
                     setUserProfile(updatedProfile);
           setIsAuthenticated(true);
           setShowAuthModal(false);
-          if (authAccountType === "freelancer" && authMode === "signup") {
+          if (authAccountType === "independent" && authMode === "signup") {
             setShowVettingModal(true);
           }
           setIsAuthLoading(false);
@@ -568,6 +575,7 @@ ActivityPost[]) => {
   const [editProfession, setEditProfession] = useState(userProfile.profession || "");
   const [editSkills, setEditSkills] = useState(userProfile.skills?.join(", ") || "");
   const [editBirthdate, setEditBirthdate] = useState(userProfile.birthdate || "1998-07-06");
+  const [editCerts, setEditCerts] = useState(userProfile.certifications?.join(", ") || "");
   const [editAvatar, setEditAvatar] = useState(userProfile.avatar || "");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -578,6 +586,7 @@ ActivityPost[]) => {
       setEditProfession(userProfile.profession || "");
       setEditSkills(userProfile.skills?.join(", ") || "");
       setEditBirthdate(userProfile.birthdate || "1998-07-06");
+      setEditCerts(userProfile.certifications?.join(", ") || "");
       setEditAvatar(userProfile.avatar || "");
     }
   }, [isProfileOpen, userProfile]);
@@ -586,16 +595,6 @@ ActivityPost[]) => {
   React.useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // Access restricted while ESTARR is in private preview: only the
-        // owner account may sign in. Everyone else is immediately signed out.
-        const signedInEmail = (user.email || "").trim().toLowerCase();
-        if (signedInEmail !== "rdgabmomoh@gmail.com") {
-          await firebaseSignOut(auth);
-          setIsAuthenticated(false);
-          setAuthError("ESTARR is currently in private preview. We're working hard to make this available soon — please check back!");
-          return;
-        }
-
         // Fetch custom user profile from Firestore or load fallback profile
         let profile = await getUserProfile(user.uid, user.email || undefined, user.displayName || undefined);
         
@@ -606,6 +605,7 @@ ActivityPost[]) => {
         }
         
         setUserProfile(profile);
+        setSidebarTheme(profile.sidebarTheme || "ivory");
         setIsAuthenticated(true);
         
         // Auto-set admin privileges if email matches admin accounts
@@ -697,6 +697,7 @@ ActivityPost>("posts", initialPosts);
       profession: editProfession,
       skills: editSkills.split(",").map(s => s.trim()).filter(Boolean),
       birthdate: editBirthdate,
+      certifications: editCerts.split(",").map(c => c.trim()).filter(Boolean),
       avatar: editAvatar
     };
     setUserProfile(updatedProfile);
@@ -714,11 +715,10 @@ ActivityPost>("posts", initialPosts);
     e.preventDefault();
     if (!authEmail || !authPassword) return;
 
-    if (authMode === "signup") {
-      setAuthError("New sign-ups are temporarily unavailable. We're working hard to make this available soon — please check back!");
+    if (authMode === "signup" && authAccountType === "independent" && authPassword !== authConfirmPassword) {
+      setAuthError("Passwords do not match.");
       return;
     }
-
 
     setIsAuthLoading(true);
     setAuthError(null);
@@ -746,7 +746,7 @@ ActivityPost>("posts", initialPosts);
             email: authEmail,
             birthdate: authBirthdate || "1998-07-06",
             accountType: authAccountType,
-            profession: authAccountType === "freelancer" ? (applyingAs ? `${applyingAs} Specialist` : "Professional Freelancer") : (selectedRoleType ? `Hiring: ${selectedRoleType}` : "Job Provider / Client"),
+            profession: authAccountType === "independent" ? (applyingAs ? `${applyingAs} Specialist` : "Professional Independent") : (selectedRoleType ? `Hiring: ${selectedRoleType}` : "Job Provider / Client"),
             walletBalance: 0,
             history: [],
           });
@@ -783,7 +783,7 @@ ActivityPost>("posts", initialPosts);
             email: authEmail,
             birthdate: authBirthdate || "1998-07-06",
             accountType: authAccountType,
-            profession: authAccountType === "freelancer" ? (applyingAs ? `${applyingAs} Specialist` : "Professional Freelancer") : (selectedRoleType ? `Hiring: ${selectedRoleType}` : "Job Provider / Client"),
+            profession: authAccountType === "independent" ? (applyingAs ? `${applyingAs} Specialist` : "Professional Independent") : (selectedRoleType ? `Hiring: ${selectedRoleType}` : "Job Provider / Client"),
             walletBalance: 0,
             history: [],
           });
@@ -800,7 +800,7 @@ ActivityPost>("posts", initialPosts);
             }).catch(err => console.error("Async welcome email dispatch failed:", err));
           } catch (e) {}
           
-          if (authAccountType === "freelancer") {
+          if (authAccountType === "independent") {
             setShowVettingModal(true);
           }
         } catch (signUpErr: any) {
@@ -857,7 +857,7 @@ ActivityPost>("posts", initialPosts);
   const [isSidebarHidden, setIsSidebarHidden] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const freelancerSections = [
+  const independentSections = [
     {
       title: "Intelligence & Insights Hub",
       items: [
@@ -912,11 +912,17 @@ ActivityPost>("posts", initialPosts);
       items: [
         { id: "payments", label: "Funding & Escrow", desc: "Manage deposits & payments", icon: CreditCard },
       ]
+    },
+    {
+      title: "Developer & Sync",
+      items: [
+        { id: "integrations", label: "Integrations Hub", desc: "REST APIs & Webhooks", icon: Cpu }
+      ]
     }
   ];
 
   const navSections = [
-    ...(userProfile?.accountType === "jobOwner" ? clientSections : freelancerSections),
+    ...(userProfile?.accountType === "jobOwner" ? clientSections : independentSections),
     ...(isAdmin ? [{
       title: "Admin Controls",
       items: [
@@ -995,30 +1001,14 @@ ActivityPost>("posts", initialPosts);
           <div className={`w-full ${
             (authAccountType === "jobOwner" && authMode === "signup" && hireWizardStep === 1) 
               ? "max-w-xl md:max-w-2xl" 
-              : (authAccountType === "freelancer" && authMode === "signup") 
+              : (authAccountType === "independent" && authMode === "signup") 
               ? "max-w-xl md:max-w-4xl" 
               : "max-w-sm"
           } bg-white border-2 border-slate-200 p-5 md:p-6 shadow-lg shadow-slate-200/50 relative z-10 rounded-xl transition-all duration-300`}>
             <button onClick={() => setShowAuthModal(false)} className="absolute top-4 right-4 text-slate-950 hover:text-purple-600 transition-colors cursor-pointer"><X className="w-5 h-5" /></button>
             
             {/* Conditional Render: Step 1 of the Hiring Wizard for Job Owners */}
-            {authMode === "signup" ? (
-              <div className="flex flex-col items-center text-center py-8 gap-3">
-                <div className="w-14 h-14 rounded-full bg-purple-100 flex items-center justify-center">
-                  <Sparkles className="w-7 h-7 text-purple-600" />
-                </div>
-                <h2 className="font-display font-bold text-lg text-slate-900">New Sign-Ups Coming Soon</h2>
-                <p className="text-xs text-slate-500 max-w-xs leading-relaxed">
-                  We're working hard to make this functionality available soon. Thanks for your patience — check back shortly!
-                </p>
-                <button
-                  onClick={() => setAuthMode("signin")}
-                  className="mt-2 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs uppercase tracking-tight px-5 py-2.5 rounded-full transition-colors cursor-pointer"
-                >
-                  Already have an account? Sign In
-                </button>
-              </div>
-            ) : authAccountType === "jobOwner" && authMode === "signup" && hireWizardStep === 1 ? (
+            {authAccountType === "jobOwner" && authMode === "signup" && hireWizardStep === 1 ? (
               <div className="flex flex-col">
                 {/* Modal Logo / Header Area */}
                 <div className="flex items-center gap-3 mb-4">
@@ -1046,14 +1036,14 @@ ActivityPost>("posts", initialPosts);
                   <div className="flex gap-2">
                     <button
                       type="button"
-                      onClick={() => setAuthAccountType("freelancer")}
+                      onClick={() => setAuthAccountType("independent")}
                       className={`flex-1 py-1.5 px-3 rounded-full border text-xs font-bold tracking-tight transition-all cursor-pointer ${
-                        (authAccountType as string) === "freelancer"
+                        (authAccountType as string) === "independent"
                           ? "bg-purple-50 border-purple-500 text-purple-600 shadow-xs"
                           : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"
                       }`}
                     >
-                      Freelancer
+                      Independent
                     </button>
                     <button
                       type="button"
@@ -1148,8 +1138,8 @@ ActivityPost>("posts", initialPosts);
                   </p>
                 </div>
               </div>
-            ) : authAccountType === "freelancer" && authMode === "signup" ? (
-              // Toptal-style Freelancer Sign-up Layout
+            ) : authAccountType === "independent" && authMode === "signup" ? (
+              // Toptal-style Independent Sign-up Layout
               <div className="flex flex-col md:flex-row gap-8">
                 {/* Left Side: Form */}
                 <div className="flex-1">
@@ -1202,7 +1192,7 @@ ActivityPost>("posts", initialPosts);
 
                   {/* The Form */}
                   <form onSubmit={handleLogin} className="flex flex-col gap-3 text-xs">
-                    {/* Account Type (Freelancer vs Owner) - so they can toggle back if they want */}
+                    {/* Account Type (Independent vs Owner) - so they can toggle back if they want */}
                     <div className="grid grid-cols-2 gap-3 mb-1">
                       <div className="flex flex-col gap-1">
                         <span className="font-display font-extrabold text-[9px] uppercase tracking-wider text-slate-900">
@@ -1211,10 +1201,10 @@ ActivityPost>("posts", initialPosts);
                         <div className="flex gap-1.5">
                           <button
                             type="button"
-                            onClick={() => setAuthAccountType("freelancer")}
+                            onClick={() => setAuthAccountType("independent")}
                             className="flex-1 py-1.5 px-2 rounded-full border text-[10px] font-bold tracking-tight transition-all bg-purple-50 border-purple-500 text-purple-600 cursor-pointer"
                           >
-                            Freelancer
+                            Independent
                           </button>
                           <button
                             type="button"
@@ -1418,9 +1408,9 @@ ActivityPost>("posts", initialPosts);
                         <button
                           type="button"
                           disabled={isAuthLoading}
-                          onClick={() => setAuthAccountType("freelancer")}
+                          onClick={() => setAuthAccountType("independent")}
                           className={`flex-1 py-1.5 px-2 rounded-full border text-[10px] font-bold tracking-tight transition-all disabled:opacity-60 cursor-pointer ${
-                            authAccountType === "freelancer"
+                            authAccountType === "independent"
                               ? "bg-purple-50 border-purple-500 text-purple-600"
                               : "bg-white border-slate-200 text-slate-500 hover:border-slate-300"
                           }`}
@@ -1701,6 +1691,27 @@ ActivityPost>("posts", initialPosts);
             <BrainCircuit className="w-3 h-3" />
             <span className="flex items-center gap-1">
               ESTARR AI Lab
+            </span>
+          </button>
+
+          <button
+            onClick={() => {
+              if (!isAuthenticated) {
+                setAuthMode("signup");
+                setShowAuthModal(true);
+              } else {
+                setActiveTab("annotation-workspace");
+              }
+            }}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold transition-all uppercase tracking-wider cursor-pointer ${
+              activeTab === "annotation-workspace"
+                ? "bg-purple-600 text-white shadow-md shadow-purple-500/20"
+                : "text-slate-400 hover:text-white hover:bg-slate-900/40"
+            }`}
+          >
+            <Square className="w-3 h-3" />
+            <span className="flex items-center gap-1">
+              Annotation Workspace
             </span>
           </button>
 
@@ -2047,6 +2058,7 @@ ActivityPost>("posts", initialPosts);
                 <UserDashboard 
                   userProfile={userProfile} 
                   tasks={tasks}
+                  posts={posts}
                   onNavigate={(tab) => setActiveTab(tab as any)} 
                 />
               ) : (
@@ -2222,7 +2234,9 @@ ActivityPost>("posts", initialPosts);
             <MarketplaceSection
               userProfile={userProfile}
               products={products}
+              tasks={tasks}
               onUpdateProducts={handleUpdateProducts}
+              onUpdateTasks={handleUpdateTasks}
               onOpenAiChat={handleOpenAi}
             />
           )}
@@ -2245,8 +2259,20 @@ ActivityPost>("posts", initialPosts);
             />
           )}
 
+          {activeTab === "ai-jobs" && (
+            <GigsSection
+              userProfile={userProfile}
+              onOpenAiChat={handleOpenAi}
+              initialCategory="Build AI"
+            />
+          )}
+
           {activeTab === "payments" && (
-            <PaymentsSection isNewAccount={isAuthenticated && userProfile.email?.toLowerCase().trim() !== "chinedu@estarrapp.com"} />
+            <PaymentsSection 
+              userProfile={userProfile}
+              onUpdateProfile={handleUpdateProfile}
+              isNewAccount={isAuthenticated && userProfile.email?.toLowerCase().trim() !== "chinedu@estarrapp.com"} 
+            />
           )}
 
           {activeTab === "events" && (
@@ -2254,7 +2280,7 @@ ActivityPost>("posts", initialPosts);
           )}
 
           {activeTab === "portfolio" && (
-            <PortfolioSection userProfile={userProfile} />
+            <PortfolioSection userProfile={userProfile} onUpdateProfile={handleUpdateProfile} />
           )}
 
           {activeTab === "community" && (
@@ -2265,9 +2291,16 @@ ActivityPost>("posts", initialPosts);
             />
           )}
 
+          {activeTab === "annotation-workspace" && (
+            <AnnotationWorkspace />
+          )}
 
           {activeTab === "rewards" && (
             <RewardsSection />
+          )}
+
+          {activeTab === "integrations" && (
+            <IntegrationsSection userProfile={userProfile} />
           )}
 
           {activeTab === "admin" && isAdmin && (
@@ -2275,7 +2308,7 @@ ActivityPost>("posts", initialPosts);
               isAdmin={isAdmin}
               setIsAdmin={setIsAdmin}
               sidebarTheme={sidebarTheme}
-              setSidebarTheme={setSidebarTheme}
+              setSidebarTheme={updateSidebarTheme}
               userProfile={userProfile}
             />
           )}
@@ -2494,6 +2527,18 @@ ActivityPost>("posts", initialPosts);
                   />
                   <span className="text-[9px] text-slate-500">Important for birthday celebrations on Connect!</span>
                 </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="font-bold uppercase tracking-wider text-slate-900 text-[10px]">My Certifications (Comma separated)</label>
+                  <input
+                    type="text"
+                    value={editCerts}
+                    onChange={(e) => setEditCerts(e.target.value)}
+                    className="bg-white border border-slate-200 px-3 py-2.5 text-slate-900 focus:outline-none focus:bg-slate-100 rounded-xl font-medium"
+                    placeholder="e.g. Google Cloud Professional Cloud Architect, Solidity Smart Contract Auditor"
+                  />
+                  <span className="text-[9px] text-slate-500">Celebrate your credentials on the Certification Board!</span>
+                </div>
               </div>
             </div>
 
@@ -2538,6 +2583,7 @@ ActivityPost>("posts", initialPosts);
         initialPrompt={aiPrompt}
         initialContext={aiContext}
       />
+
 
       {/* Tiny clean footer */}
       <footer className="bg-slate-950 text-white py-12 px-6 mt-auto">

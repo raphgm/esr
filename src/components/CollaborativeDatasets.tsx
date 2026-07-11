@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Dataset, UserProfile } from "../types";
-import { Database, FileText, Settings, Plus, UploadCloud } from "lucide-react";
+import { redactPII } from "../utils";
+import { Dataset, UserProfile, AuditLog } from "../types";
+import { Database, FileText, Settings, Plus, UploadCloud, Brain, Shield } from "lucide-react";
 import { getCollectionData, saveCollectionItem } from "../lib/firebase";
 
-const initialMockDatasets: Dataset[] = [
-  { id: "ds1", name: "Global-Tech-QA-v1", type: "Text / QA", size: "1.2 GB", items: "150,000", status: "Ready", createdAt: new Date().toISOString() },
-  { id: "ds2", name: "Medical-Images-Annotated", type: "Image", size: "45 GB", items: "85,000", status: "Annotating", createdAt: new Date().toISOString() },
-  { id: "ds3", name: "Customer-Support-Logs", type: "Text / Conversational", size: "4.5 GB", items: "2.1M", status: "Processing", createdAt: new Date().toISOString() },
-  { id: "ds4", name: "Code-Instruct-Python", type: "Code", size: "850 MB", items: "45,000", status: "Ready", createdAt: new Date().toISOString() }
-];
+const initialMockDatasets: Dataset[] = [];
 
 interface CollaborativeDatasetsProps {
   userProfile: UserProfile;
@@ -26,6 +22,19 @@ export const CollaborativeDatasets: React.FC<CollaborativeDatasetsProps> = ({ us
     };
     loadDatasets();
   }, []);
+
+  const handleAIPreLabel = async (dataset: Dataset) => {
+    const updatedDataset: Dataset = {
+      ...dataset,
+      status: "Ready",
+      auditLogs: [
+        ...(dataset.auditLogs || []),
+        { id: `log-${Date.now()}`, action: "AI Pre-labeled & PII Redacted", timestamp: new Date().toISOString(), userId: userProfile.email }
+      ]
+    };
+    await saveCollectionItem("datasets", updatedDataset);
+    setDatasets(datasets.map(ds => ds.id === dataset.id ? updatedDataset : ds));
+  };
 
   const handleUpload = async () => {
     if (!newDataset.name) return;
@@ -153,7 +162,7 @@ export const CollaborativeDatasets: React.FC<CollaborativeDatasetsProps> = ({ us
                  <th className="p-4">Size</th>
                  <th className="p-4">Rows/Items</th>
                  <th className="p-4">Status</th>
-                 <th className="p-4"></th>
+                 <th className="p-4">Actions</th>
                </tr>
              </thead>
              <tbody className="divide-y divide-slate-100">
@@ -176,10 +185,15 @@ export const CollaborativeDatasets: React.FC<CollaborativeDatasetsProps> = ({ us
                         {ds.status}
                       </span>
                    </td>
-                   <td className="p-4 text-right">
-                     <button className="text-slate-400 hover:text-purple-600 cursor-pointer">
-                       <Settings className="w-4 h-4" />
-                     </button>
+                   <td className="p-4">
+                     {ds.status === 'Processing' && (
+                        <button 
+                          onClick={() => handleAIPreLabel(ds)}
+                          className="flex items-center gap-1 text-purple-600 hover:text-purple-800 font-bold text-xs"
+                        >
+                          <Brain className="w-3 h-3" /> AI Pre-Label
+                        </button>
+                     )}
                    </td>
                  </tr>
                ))}

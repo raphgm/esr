@@ -22,14 +22,15 @@ import { motion } from "motion/react";
 
 interface PortfolioSectionProps {
   userProfile: UserProfile;
+  onUpdateProfile?: (updated: UserProfile) => void;
   isPublicView?: boolean;
 }
 
 import { PortfolioClientSection } from "./PortfolioClientSection";
 
-export default function PortfolioSection({ userProfile, isPublicView = false }: PortfolioSectionProps) {
+export default function PortfolioSection({ userProfile, onUpdateProfile, isPublicView = false }: PortfolioSectionProps) {
   if (userProfile?.accountType === "jobOwner" && !isPublicView) {
-    return <PortfolioClientSection userProfile={userProfile} />;
+    return <PortfolioClientSection userProfile={userProfile} onUpdateProfile={onUpdateProfile} />;
   }
 
   const portfolioItems = userProfile.portfolio || [];

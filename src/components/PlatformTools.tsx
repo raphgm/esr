@@ -140,7 +140,7 @@ export const PlatformTools = ({ onNavigate }: { onNavigate?: (id: string) => voi
         </div>
 
         {/* CTA / Setup Section - Minimalist & Thin Direction */}
-        <div className="mt-20 py-8 px-6 md:px-10 bg-white border border-slate-200 rounded-[2rem] shadow-sm flex flex-col md:flex-row items-center justify-between gap-8">
+        <div className="mt-20 py-8 px-6 md:px-10 bg-stone-50 border border-stone-100 rounded-[2rem] shadow-sm flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex items-center gap-6">
             <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100">
               <Zap className="w-5 h-5 text-purple-600" />

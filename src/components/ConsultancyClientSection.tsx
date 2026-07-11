@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { UserProfile, ConsultancyTask } from "../types";
 import { PageBanner } from "./PageBanner";
+import { AnnotationManagement } from "./AnnotationManagement";
 import { Briefcase, Plus, Search, Filter, Clock, Users, ChevronRight, CheckCircle, Clock3 } from "lucide-react";
 import { motion } from "motion/react";
 
@@ -26,6 +27,7 @@ export function ConsultancyClientSection({ userProfile, tasks, onNavigate }: Con
         
       />
       
+
       <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
           <div className="flex items-center gap-2">
@@ -101,6 +103,7 @@ export function ConsultancyClientSection({ userProfile, tasks, onNavigate }: Con
           </div>
         ) : (
           <div className="max-w-2xl mx-auto py-4">
+            <AnnotationManagement />
             <h2 className="text-xl font-bold text-slate-900 mb-6">Create New Project Listing</h2>
             
             <form className="space-y-6">
@@ -120,14 +123,25 @@ export function ConsultancyClientSection({ userProfile, tasks, onNavigate }: Con
                   <input type="number" placeholder="e.g. 5000" className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500 font-medium" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-bold text-slate-900">Expected Duration</label>
+                  <label className="text-sm font-bold text-slate-900">Skill Required</label>
                   <select className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500 font-medium bg-white">
-                    <option>Less than 1 week</option>
-                    <option>1 to 4 weeks</option>
-                    <option>1 to 3 months</option>
-                    <option>More than 3 months</option>
+                    <option value="dev">Software Development</option>
+                    <option value="design">UI/UX Design</option>
+                    <option value="marketing">Marketing</option>
+                    <option value="security">Security</option>
+                    <option value="ai_ml">AI/ML</option>
                   </select>
                 </div>
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-slate-900">Expected Duration</label>
+                <select className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:border-indigo-500 font-medium bg-white">
+                  <option>Less than 1 week</option>
+                  <option>1 to 4 weeks</option>
+                  <option>1 to 3 months</option>
+                  <option>More than 3 months</option>
+                </select>
               </div>
               
               <div className="pt-4 flex justify-end gap-3">

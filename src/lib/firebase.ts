@@ -116,7 +116,8 @@ const defaultProfile: UserProfile = {
   level: "Silver Creator",
   points: 1250,
   history: [],
-  portfolio: []
+  portfolio: [],
+  sidebarTheme: "ivory"
 };
 
 export async function saveUserProfile(uid: string, profile: Partial<UserProfile>) {
@@ -206,10 +207,26 @@ export async function saveCollectionItem<T extends { id: string }>(
   item: T
 ) {
   try {
-    await setDoc(doc(db, collectionName, item.id), item);
+    const cleanedItem = removeUndefined(item);
+    await setDoc(doc(db, collectionName, item.id), cleanedItem);
   } catch (error) {
     handleFirestoreError(error, OperationType.WRITE, `${collectionName}/${item.id}`);
   }
+}
+
+function removeUndefined(obj: any): any {
+  if (obj === undefined) return undefined;
+  if (obj === null || typeof obj !== 'object') return obj;
+  if (Array.isArray(obj)) {
+    return obj.map(removeUndefined);
+  }
+  const newObj: any = {};
+  for (const key in obj) {
+    if (obj[key] !== undefined) {
+      newObj[key] = removeUndefined(obj[key]);
+    }
+  }
+  return newObj;
 }
 
 export async function deleteCollectionItem(collectionName: string, itemId: string) {

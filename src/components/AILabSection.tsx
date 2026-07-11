@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { UserProfile } from "../types";
 import { AILabClientSection } from "./AILabClientSection";
 import { PageBanner } from "./PageBanner";
+import { tasks as importedTasks } from "../data";
 import { 
   BrainCircuit, 
   Search, 
@@ -30,13 +31,23 @@ export const AILabSection: React.FC<AILabSectionProps> = ({ userProfile }) => {
   const [activeTab, setActiveTab] = useState("available");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [minReward, setMinReward] = useState(0);
   const categories = ["All", "Software", "ML, Data & AI", "Business", "Finance", "Audio Transcription", "Image Labeling", "Text Analysis", "Survey"];
   const [activeTask, setActiveTask] = useState<any>(null);
   const [completedTasks, setCompletedTasks] = useState<string[]>([]);
   const [applicationStatus, setApplicationStatus] = useState<Record<string, 'pending' | 'accepted'>>({});
 
+  const filteredTasks = importedTasks.filter(t => 
+    !completedTasks.includes(t.id) && 
+    t.title.toLowerCase().includes(searchQuery.toLowerCase()) && 
+    (selectedCategory === "All" || t.category === selectedCategory) &&
+    t.reward >= minReward
+  );
+
+  const potentialEarnings = filteredTasks.reduce((acc, t) => acc + t.reward, 0);
+
   const handleApply = (taskId: string) => {
-    const task = tasks.find(t => t.id === taskId);
+    const task = importedTasks.find(t => t.id === taskId);
     setApplicationStatus(prev => ({ ...prev, [taskId]: 'pending' }));
     
     if (task?.autoApprove) {
@@ -47,7 +58,7 @@ export const AILabSection: React.FC<AILabSectionProps> = ({ userProfile }) => {
   };
   const [taskResponses, setTaskResponses] = useState<any>({});
 
-  const tasks = [
+  const oldTasks = [
     {
       id: "hit-001",
       title: "Evaluate LLM Response Helpfulness (RLHF)",
@@ -511,6 +522,23 @@ export const AILabSection: React.FC<AILabSectionProps> = ({ userProfile }) => {
               Work History
             </button>
           </div>
+          
+          <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl p-1">
+             <div className="px-4 py-2 text-xs font-bold text-slate-500 border-r border-slate-100">Potential Earnings: <span className="text-emerald-600">${potentialEarnings.toFixed(2)}</span></div>
+             <select 
+               className="px-4 py-2 text-xs font-bold text-slate-700 bg-transparent focus:outline-none"
+               value={minReward}
+               onChange={(e) => setMinReward(Number(e.target.value))}
+             >
+               <option value={0}>Any Reward</option>
+               <option value={1}>$1+</option>
+               <option value={10}>$10+</option>
+               <option value={100}>$100+</option>
+             </select>
+          </div>
+        </div>
+        
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
           <div className="relative w-full max-w-md">
             <Search className="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input 
@@ -524,7 +552,7 @@ export const AILabSection: React.FC<AILabSectionProps> = ({ userProfile }) => {
           
           <div className="flex items-center gap-4 text-sm font-bold text-slate-500">
              <button className="flex items-center gap-2 bg-slate-900 text-white px-4 py-2 rounded-full">
-               All <span className="bg-slate-700 px-1.5 py-0.5 rounded text-xs">130</span>
+               All <span className="bg-slate-700 px-1.5 py-0.5 rounded text-xs">{filteredTasks.length}</span>
              </button>
              <button className="flex items-center gap-2 hover:text-slate-900 transition-colors">
                Priority <span className="bg-slate-100 px-1.5 py-0.5 rounded text-xs text-slate-400">3</span>
@@ -550,7 +578,7 @@ export const AILabSection: React.FC<AILabSectionProps> = ({ userProfile }) => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {activeTab === "available" ? (
-          tasks.filter(t => !completedTasks.includes(t.id) && t.title.toLowerCase().includes(searchQuery.toLowerCase()) && (selectedCategory === "All" || t.category === selectedCategory)).map(task => (
+          filteredTasks.map(task => (
             <div key={task.id} className="bg-white border border-slate-200 rounded-3xl p-6 hover:shadow-lg hover:border-blue-200 transition-all flex flex-col justify-between group h-full min-h-[220px]">
               <div>
                 <div className="flex justify-between items-start mb-4">
@@ -601,9 +629,9 @@ export const AILabSection: React.FC<AILabSectionProps> = ({ userProfile }) => {
         
         ) : (
           <div className="col-span-full">
-            {tasks.filter(t => completedTasks.includes(t.id)).length > 0 ? (
+            {importedTasks.filter(t => completedTasks.includes(t.id)).length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {tasks.filter(t => completedTasks.includes(t.id)).map(task => (
+                {importedTasks.filter(t => completedTasks.includes(t.id)).map(task => (
                   <div key={task.id} className="bg-white border border-slate-200 rounded-3xl p-6 flex flex-col justify-between h-full min-h-[220px]">
                     <div>
                       <h3 className="text-lg font-black text-slate-900 mb-3 line-clamp-2 leading-tight">{task.title}</h3>
