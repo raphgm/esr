@@ -39,6 +39,7 @@ import {
   ShieldAlert,
   ShieldCheck,
   Linkedin,
+  AlertCircle,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { EnhancedVideoPlayer, MOCK_AUDIO_TRACKS, OVERLAY_TEXT_STYLES } from "./EnhancedVideoPlayer";
@@ -51,6 +52,15 @@ interface ConnectSectionProps {
   onUpdateProfile: (profile: UserProfile) => void;
   initialSubTab?: "feed" | "directory" | "mentorship";
 }
+
+const getRelativeBirthdate = (offsetDays: number) => {
+  const d = new Date();
+  d.setDate(d.getDate() + offsetDays);
+  const y = d.getFullYear() - 25; // default to a reasonable age e.g. 25 years ago
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+};
 
 const mockPeers: (UserProfile & { id: string })[] = [
   {
@@ -75,7 +85,7 @@ const mockPeers: (UserProfile & { id: string })[] = [
     goals: ["Build a scalable distributed system", "Publish a tech book"],
     certifications: ["AWS Certified Solutions Architect"],
     recommends: 16,
-    birthdate: "1995-07-06",
+    birthdate: getRelativeBirthdate(0), // Today!
   },
   {
     id: "peer-kofi",
@@ -99,7 +109,7 @@ const mockPeers: (UserProfile & { id: string })[] = [
     goals: ["Open source a deployment tool", "Achieve 99.999% uptime"],
     certifications: ["Certified Kubernetes Administration"],
     recommends: 29,
-    birthdate: "1993-07-08",
+    birthdate: getRelativeBirthdate(2), // In 2 days!
   },
   {
     id: "peer-aisha",
@@ -126,7 +136,7 @@ const mockPeers: (UserProfile & { id: string })[] = [
     ],
     certifications: ["Google AI Specialist"],
     recommends: 18,
-    birthdate: "1997-07-15",
+    birthdate: getRelativeBirthdate(5), // In 5 days!
   },
 ];
 
@@ -218,24 +228,24 @@ export default function ConnectSection({
 
   const skillSchProfiles = {
     "software-architect": {
-      name: "Software Architect",
-      skills: ["Advanced React Architecture", "Distributed Systems", "Off-chain State Channels", "Vite & Build Tooling"],
+      name: "AI Systems Architect",
+      skills: ["LLM Orchestration", "Agentic Frameworks", "Vector Databases", "Distributed Model Inference"],
       certification: "skill-sch.com: Certified AI Architect (2026)"
     },
     "smart-contract-developer": {
-      name: "Smart Contract Developer",
-      skills: ["Solidity Smart Contracts", "ERC-20 & ERC-721 Standards", "Cryptographic Signatures", "Ecosystem Security"],
-      certification: "skill-sch.com: Accredited Smart Contract Developer (2026)"
+      name: "AI Fine-Tuning Specialist",
+      skills: ["PyTorch", "LoRA/QLoRA", "Dataset Curation", "Model Evaluation"],
+      certification: "skill-sch.com: Accredited AI Engineer (2026)"
     },
     "agri-business-logistics": {
-      name: "Agri-Business Logistics",
-      skills: ["Supply Chain Logistics", "Agri-Business Finance", "Poultry Incubation Scales", "Cooperative Commerce"],
-      certification: "skill-sch.com: Professional Logistics Analyst (2026)"
+      name: "MLOps Engineer",
+      skills: ["Docker/Kubernetes", "Model Deployment", "Monitoring & Logging", "CI/CD for ML"],
+      certification: "skill-sch.com: Professional MLOps Engineer (2026)"
     },
     "digital-marketing": {
-      name: "Digital Marketing Specialist",
-      skills: ["TikTok Ads & Campaigns", "Instagram Outreach Metrics", "Canva Styling", "UGC Asset Production"],
-      certification: "skill-sch.com: Certified AI Marketer (2026)"
+      name: "Prompt Engineer",
+      skills: ["Zero-Shot/Few-Shot Prompting", "Chain of Thought", "LLM Security/Red Teaming", "RAG Optimization"],
+      certification: "skill-sch.com: Certified Prompt Engineer (2026)"
     }
   };
 
@@ -415,6 +425,8 @@ export default function ConnectSection({
 
   // Camera/Webcam recording state
   const [isRecordingModalOpen, setIsRecordingModalOpen] = useState(false);
+  const [isCameraStarting, setIsCameraStarting] = useState(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingSeconds, setRecordingSeconds] = useState(0);
   const [recordedVideoUrl, setRecordedVideoUrl] = useState<string | null>(null);
@@ -509,6 +521,9 @@ export default function ConnectSection({
   useEffect(() => {
     if (isRecordingModalOpen) {
       enumerateDevices();
+      setTimeout(() => startCamera(), 100);
+    } else {
+      stopCamera();
     }
   }, [isRecordingModalOpen]);
 
@@ -518,6 +533,8 @@ export default function ConnectSection({
     audioDeviceId?: string,
     facing?: "user" | "environment"
   ) => {
+    setIsCameraStarting(true);
+    setCameraError(null);
     try {
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(track => track.stop());
@@ -574,9 +591,29 @@ export default function ConnectSection({
         }
       } catch (fallbackErr) {
         console.error("Fallback camera access failed:", fallbackErr);
-        alert("Failed to access camera/microphone. Please make sure permissions are granted and device is connected.");
-        setIsRecordingModalOpen(false);
+        // Second fallback: Try just video, no audio if in video mode
+        try {
+          if (creationStudioMode === "video") {
+            const stream = await navigator.mediaDevices.getUserMedia({
+              video: { facingMode: facing || cameraFacingMode },
+              audio: false
+            });
+            streamRef.current = stream;
+            if (localVideoRef.current) {
+              localVideoRef.current.srcObject = stream;
+              localVideoRef.current.play().catch(err => console.log("second fallback video play error:", err));
+            }
+            console.warn("Microphone not found or denied. Recording video without sound.");
+          } else {
+            throw fallbackErr;
+          }
+        } catch (finalErr) {
+           console.error("Final fallback camera access failed:", finalErr);
+           setCameraError("Camera access denied or device not found. Please check your browser permissions.");
+        }
       }
+    } finally {
+      setIsCameraStarting(false);
     }
   };
 
@@ -779,29 +816,33 @@ export default function ConnectSection({
   ];
 
   const formatBirthdate = (dateStr?: string) => {
-    if (!dateStr) return "July 6th";
-    try {
-      const parts = dateStr.split("-");
-      if (parts.length === 3) {
-        const monthNum = parseInt(parts[1], 10);
-        const dayNum = parseInt(parts[2], 10);
-        const months = [
-          "January", "February", "March", "April", "May", "June",
-          "July", "August", "September", "October", "November", "December"
-        ];
-        const monthName = months[monthNum - 1] || "July";
-        
-        let suffix = "th";
-        if (dayNum === 1 || dayNum === 21 || dayNum === 31) suffix = "st";
-        else if (dayNum === 2 || dayNum === 22) suffix = "nd";
-        else if (dayNum === 3 || dayNum === 23) suffix = "rd";
-        
-        return `${monthName} ${dayNum}${suffix}`;
+    let d = new Date();
+    if (dateStr) {
+      try {
+        const parts = dateStr.split("-");
+        if (parts.length === 3) {
+          const year = parseInt(parts[0], 10);
+          const month = parseInt(parts[1], 10) - 1;
+          const day = parseInt(parts[2], 10);
+          d = new Date(year, month, day);
+        }
+      } catch (e) {
+        // use fallback
       }
-    } catch (e) {
-      // fallback
     }
-    return "July 6th";
+    const months = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+    const monthName = months[d.getMonth()] || "July";
+    const dayNum = d.getDate();
+    
+    let suffix = "th";
+    if (dayNum === 1 || dayNum === 21 || dayNum === 31) suffix = "st";
+    else if (dayNum === 2 || dayNum === 22) suffix = "nd";
+    else if (dayNum === 3 || dayNum === 23) suffix = "rd";
+    
+    return `${monthName} ${dayNum}${suffix}`;
   };
 
   const birthdayStar = candidatesList.find((p) => p.id === selectedBirthdayStarId) || candidatesList[0];
@@ -1459,17 +1500,17 @@ export default function ConnectSection({
 
               {feedMode === "reels" ? (
                 /* TikTok/Instagram Immersive Shorts Player */
-                <div className="bg-slate-950 border border-slate-900 rounded-3xl p-6 flex flex-col lg:flex-row gap-6 relative overflow-hidden text-white shadow-2xl">
+                <div className="bg-slate-100 border border-slate-200/80 rounded-3xl p-6 flex flex-col lg:flex-row gap-6 relative overflow-hidden text-slate-800 shadow-sm">
                   {/* Glowing background circles for modern look */}
-                  <div className="absolute top-0 left-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-                  <div className="absolute bottom-0 right-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+                  <div className="absolute top-0 left-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
+                  <div className="absolute bottom-0 right-0 w-64 h-64 bg-purple-500/5 rounded-full blur-3xl pointer-events-none" />
 
                   {/* Left Column: Vertical Smartphone frame video player */}
-                  <div className="flex-1 max-w-sm mx-auto relative bg-black aspect-[9/16] rounded-[2.5rem] border-[6px] border-slate-800 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.8)] overflow-hidden flex flex-col group select-none h-[560px]">
+                  <div className="flex-1 max-w-sm mx-auto relative bg-slate-100 aspect-[9/16] rounded-[2.5rem] border-[6px] border-slate-200 shadow-2xl overflow-hidden flex flex-col group select-none h-[560px]">
                     
                     {/* Top camera punch-hole styling */}
-                    <div className="absolute top-2.5 left-1/2 transform -translate-x-1/2 w-20 h-4 bg-black rounded-full z-30 flex items-center justify-center">
-                      <div className="w-2.5 h-2.5 bg-slate-900 rounded-full border border-slate-800" />
+                    <div className="absolute top-2.5 left-1/2 transform -translate-x-1/2 w-20 h-4 bg-slate-300 rounded-full z-30 flex items-center justify-center">
+                      <div className="w-2.5 h-2.5 bg-slate-800 rounded-full border border-slate-400" />
                     </div>
 
                     {/* Filtered Loop Video Stream */}
@@ -1740,9 +1781,9 @@ export default function ConnectSection({
                         );
                       })()
                     ) : (
-                      <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-slate-900">
-                        <Video className="w-12 h-12 text-slate-700 mb-4 animate-pulse" />
-                        <h4 className="font-bold text-sm text-slate-300 mb-1">No Talent Showcases Yet</h4>
+                      <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-slate-100">
+                        <Video className="w-12 h-12 text-slate-400 mb-4 animate-pulse" />
+                        <h4 className="font-bold text-sm text-slate-800 mb-1">No Talent Showcases Yet</h4>
                         <p className="text-xs text-slate-500 mb-4 leading-relaxed">Be the first to record a tutorial or upload a talent showcase to the ESTARR community!</p>
                         <button
                           type="button"
@@ -1759,20 +1800,17 @@ export default function ConnectSection({
                   </div>
 
                   {/* Right Column: Interaction details and next/previous controls */}
-                  <div className="flex-1 flex flex-col justify-between gap-5 bg-slate-900 border border-slate-800 rounded-xl p-5 relative z-10 max-h-[560px]">
-                    <div className="flex justify-between items-center border-b border-slate-800 pb-3">
+                  <div className="flex-1 flex flex-col justify-between gap-5 bg-white border border-slate-200/80 rounded-2xl p-5 relative z-10 max-h-[560px] shadow-3xs">
+                    <div className="flex justify-between items-center border-b border-slate-100 pb-3">
                       <div>
-                        <h4 className="font-display font-bold text-base text-white flex items-center gap-1.5">
-                          <Sparkles className="w-4 h-4 text-amber-400 animate-pulse" />
+                        <h4 className="font-display font-bold text-base text-slate-800 flex items-center gap-1.5">
+                          <Sparkles className="w-4 h-4 text-amber-500 animate-pulse" />
                           <span>ESTARR Video Discovery Studio</span>
                         </h4>
-                        <p className="text-[10px] text-slate-9000 font-mono uppercase tracking-wider">
-                          TikTok / Instagram Mechanics in Action
-                        </p>
                       </div>
 
                       {posts.filter(p => p.video).length > 0 && (
-                        <span className="text-[10px] font-mono font-bold text-emerald-400 bg-emerald-950 px-2.5 py-1 rounded-full border border-emerald-900">
+                        <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">
                           Video {currentReelIndex + 1} of {posts.filter(p => p.video).length}
                         </span>
                       )}
@@ -1787,16 +1825,16 @@ export default function ConnectSection({
                           <div className="flex-1 flex flex-col justify-between gap-4 overflow-hidden">
                             {/* Scrollable comments and description block */}
                             <div className="flex-1 overflow-y-auto pr-1 flex flex-col gap-4 scrollbar-thin">
-                              <div className="bg-slate-950 rounded-xl p-4 border border-slate-800 flex flex-col gap-2.5">
-                                <span className="text-[10px] font-bold text-slate-9000 uppercase tracking-widest block font-mono">
+                              <div className="bg-slate-50/80 rounded-xl p-4 border border-slate-100 flex flex-col gap-2.5">
+                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block font-mono">
                                   📌 Post Caption & Vocational Value
                                 </span>
-                                <p className="text-xs text-slate-300 leading-relaxed font-medium">
+                                <p className="text-xs text-slate-700 leading-relaxed font-medium">
                                   {activeReel.content}
                                 </p>
                                 {activeReel.audioTrack && (
-                                  <div className="text-[10px] text-purple-400 font-bold font-mono flex items-center gap-1 bg-purple-950/40 p-1.5 rounded-xl border border-purple-900/30 w-fit">
-                                    <Music className="w-3 h-3 text-purple-400 shrink-0" />
+                                  <div className="text-[10px] text-purple-600 font-bold font-mono flex items-center gap-1 bg-purple-50 p-1.5 rounded-xl border border-purple-100 w-fit">
+                                    <Music className="w-3 h-3 text-purple-500 shrink-0" />
                                     <span>Soundtrack: {activeReel.audioTrack}</span>
                                   </div>
                                 )}
@@ -1804,23 +1842,23 @@ export default function ConnectSection({
 
                               {/* Mini-Comments view for active video */}
                               <div className="flex flex-col gap-2">
-                                <span className="text-[10px] font-bold text-slate-9000 uppercase tracking-widest block font-mono">
+                                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block font-mono">
                                   💬 Comments on this Reel ({activeReel.comments.length})
                                 </span>
                                 
                                 {activeReel.comments.length > 0 ? (
                                   <div className="flex flex-col gap-2">
                                     {activeReel.comments.map((comm, cIdx) => (
-                                      <div key={cIdx} className="bg-slate-950 border border-slate-800 rounded-xl p-3 flex gap-2 items-start text-[11px] hover:border-slate-700 transition-colors">
-                                        <div className="bg-emerald-950 text-emerald-400 w-6 h-6 rounded-full font-bold flex items-center justify-center text-[9px] shrink-0 border border-emerald-900">
+                                      <div key={cIdx} className="bg-slate-50/80 border border-slate-100 rounded-xl p-3 flex gap-2 items-start text-[11px] hover:border-slate-200 transition-colors">
+                                        <div className="bg-emerald-50 text-emerald-600 w-6 h-6 rounded-full font-bold flex items-center justify-center text-[9px] shrink-0 border border-emerald-100">
                                           {comm.author.charAt(0)}
                                         </div>
                                         <div className="flex-1">
                                           <div className="flex justify-between items-center mb-0.5">
-                                            <span className="font-bold text-slate-200">{comm.author}</span>
+                                            <span className="font-bold text-slate-700">{comm.author}</span>
                                             <span className="text-[9px] text-slate-500 font-mono">{comm.time}</span>
                                           </div>
-                                          <p className="text-slate-9000 leading-snug">{comm.content}</p>
+                                          <p className="text-slate-600 leading-snug">{comm.content}</p>
                                         </div>
                                       </div>
                                     ))}
@@ -1856,14 +1894,14 @@ export default function ConnectSection({
                                 onUpdatePosts(updated);
                                 setReelCommentsInput("");
                               }}
-                              className="flex gap-2 bg-slate-950 border border-slate-800 p-2 rounded-xl"
+                              className="flex gap-2 bg-slate-50 border border-slate-200 p-2 rounded-xl"
                             >
                               <input
                                 type="text"
                                 placeholder="Add support comment..."
                                 value={reelCommentsInput}
                                 onChange={(e) => setReelCommentsInput(e.target.value)}
-                                className="flex-1 bg-transparent text-xs text-white focus:outline-none placeholder-slate-500 font-medium px-2"
+                                className="flex-1 bg-transparent text-xs text-slate-800 focus:outline-none placeholder-slate-400 font-medium px-2"
                               />
                               <button
                                 type="submit"
@@ -1875,16 +1913,16 @@ export default function ConnectSection({
                             </form>
 
                             {/* Quick Swiping Navigation Controls for TikTok Simulator */}
-                            <div className="flex items-center gap-3 pt-3 border-t border-slate-800">
+                            <div className="flex items-center gap-3 pt-3 border-t border-slate-100">
                               <button
                                 type="button"
                                 onClick={() => {
                                   setCurrentReelIndex(prev => (prev === 0 ? reelPosts.length - 1 : prev - 1));
                                   setIsReelPlaying(true);
                                 }}
-                                className="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-200 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1 border border-slate-700 cursor-pointer"
+                                className="flex-1 bg-slate-50 hover:bg-slate-100 text-slate-700 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1 border border-slate-200 cursor-pointer"
                               >
-                                <ChevronUp className="w-4 h-4 text-emerald-400" />
+                                <ChevronUp className="w-4 h-4 text-emerald-600" />
                                 <span>Previous Video</span>
                               </button>
                               <button
@@ -1901,9 +1939,9 @@ export default function ConnectSection({
                             </div>
 
                             {/* Informative educational message detailing the viral hooks */}
-                            <div className="bg-slate-950 border border-purple-900/40 rounded-xl p-3 flex flex-col gap-1 text-[10px] text-slate-300">
-                              <span className="font-bold text-purple-400 flex items-center gap-1">🧪 Why is this interface viral?</span>
-                              <p className="text-slate-9000 leading-snug">
+                            <div className="bg-purple-50/50 border border-purple-100 rounded-xl p-3 flex flex-col gap-1 text-[10px] text-slate-600">
+                              <span className="font-bold text-purple-600 flex items-center gap-1">🧪 Why is this interface viral?</span>
+                              <p className="text-slate-600 leading-snug">
                                 **TikTok's full-bleed video** creates total immersion, removing navigation friction. **Background audio tracks** foster collective memes, while **speed manipulation** empowers rapid-paced tutorials. ESTARR leverages this structure to maximize vocational matchmaking and skill discovery.
                               </p>
                             </div>
@@ -3088,13 +3126,13 @@ export default function ConnectSection({
 
       {/* Real-time Video Studio / Recording Modal */}
       {isRecordingModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-md p-4 animate-fade-in">
-          <div className="bg-slate-900 text-white w-full max-w-2xl rounded-3xl overflow-hidden border border-slate-800 shadow-2xl flex flex-col max-h-[95vh]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 animate-fade-in">
+          <div className="bg-white text-slate-900 w-full max-w-2xl rounded-3xl overflow-hidden border border-slate-200 shadow-2xl flex flex-col max-h-[95vh]">
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-slate-800 bg-slate-950/40">
+            <div className="flex items-center justify-between p-6 border-b border-slate-100 bg-slate-50/50">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse" />
-                <h3 className="font-display font-bold text-lg text-white">ESTARR Creation Studio</h3>
+                <h3 className="font-display font-bold text-lg text-slate-800">ESTARR Creation Studio</h3>
               </div>
               <button
                 type="button"
@@ -3102,15 +3140,15 @@ export default function ConnectSection({
                   stopCamera();
                   setIsRecordingModalOpen(false);
                 }}
-                className="text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 p-2 rounded-xl transition-all cursor-pointer"
+                className="text-slate-500 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 p-2 rounded-xl transition-all cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             {/* Mode Switcher Tabs */}
-            <div className="px-6 py-3 flex justify-center border-b border-slate-850 bg-slate-950/20">
-              <div className="flex gap-2 bg-slate-950/60 p-1 rounded-2xl w-full max-w-md border border-slate-800">
+            <div className="px-6 py-3 flex justify-center border-b border-slate-100 bg-slate-50/30">
+              <div className="flex gap-2 bg-slate-100 p-1 rounded-2xl w-full max-w-md border border-slate-200">
                 <button
                   type="button"
                   onClick={() => {
@@ -3119,8 +3157,8 @@ export default function ConnectSection({
                   }}
                   className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-bold rounded-xl transition-all cursor-pointer ${
                     creationStudioMode === "video"
-                      ? "bg-emerald-600 text-white shadow-md"
-                      : "text-slate-400 hover:text-white hover:bg-slate-800/40"
+                      ? "bg-white text-emerald-700 shadow-sm border border-slate-200/50"
+                      : "text-slate-500 hover:text-slate-700 hover:bg-slate-200/50"
                   }`}
                 >
                   <Video className="w-3.5 h-3.5" />
@@ -3134,8 +3172,8 @@ export default function ConnectSection({
                   }}
                   className={`flex-1 flex items-center justify-center gap-1.5 py-2 px-3 text-xs font-bold rounded-xl transition-all cursor-pointer ${
                     creationStudioMode === "photo"
-                      ? "bg-emerald-600 text-white shadow-md"
-                      : "text-slate-400 hover:text-white hover:bg-slate-800/40"
+                      ? "bg-white text-emerald-700 shadow-sm border border-slate-200/50"
+                      : "text-slate-500 hover:text-slate-700 hover:bg-slate-200/50"
                   }`}
                 >
                   <Camera className="w-3.5 h-3.5" />
@@ -3146,7 +3184,7 @@ export default function ConnectSection({
 
             {/* Content Body */}
             <div className="p-6 flex-1 overflow-y-auto flex flex-col gap-4">
-              <p className="text-xs text-slate-400 leading-relaxed">
+              <p className="text-xs text-slate-500 leading-relaxed">
                 {creationStudioMode === "video" 
                   ? "Showcase your artisan crafts, custom work, or product tutorials! Record up to a 30-second high-definition video." 
                   : "Snap a premium, light-optimized workspace/product snapshot to feature as the main cover of your post."
@@ -3154,7 +3192,34 @@ export default function ConnectSection({
               </p>
 
               {/* Viewfinder Preview Box */}
-              <div className="relative bg-black rounded-2xl overflow-hidden h-72 border border-slate-850 shadow-inner flex items-center justify-center">
+              <div className="relative bg-black rounded-2xl overflow-hidden h-72 border border-slate-200 shadow-inner flex items-center justify-center">
+                
+                {/* Error State */}
+                {cameraError && !recordedVideoUrl && !capturedPhotoUrl && (
+                  <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-slate-900/90 backdrop-blur-sm text-slate-300 gap-3 p-6 text-center animate-fade-in">
+                    <div className="w-12 h-12 bg-rose-950 text-rose-500 rounded-full flex items-center justify-center mb-2">
+                      <AlertCircle className="w-6 h-6" />
+                    </div>
+                    <span className="text-sm font-bold text-white tracking-widest uppercase">Camera Error</span>
+                    <p className="text-xs text-slate-400 max-w-sm leading-relaxed">{cameraError}</p>
+                    <button
+                      type="button"
+                      onClick={() => startCamera()}
+                      className="mt-4 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition-colors shadow"
+                    >
+                      Retry Camera
+                    </button>
+                  </div>
+                )}
+
+                {/* Loading State */}
+                {isCameraStarting && !recordedVideoUrl && !capturedPhotoUrl && (
+                  <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-slate-900 text-slate-300 gap-3 animate-fade-in">
+                    <div className="w-8 h-8 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+                    <span className="text-xs font-bold tracking-widest uppercase">Initializing Camera...</span>
+                  </div>
+                )}
+
                 {/* Live Camera Stream */}
                 <video
                   ref={localVideoRef}
@@ -3200,10 +3265,10 @@ export default function ConnectSection({
               </div>
 
               {/* Hardware Input Configuration */}
-              <div className="bg-slate-950 border border-slate-850 rounded-xl p-4 flex flex-col gap-3">
+              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col gap-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
-                    <Sliders className="w-3.5 h-3.5 text-emerald-400" />
+                  <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                    <Sliders className="w-3.5 h-3.5 text-emerald-600" />
                     <span>⚙ Device Hardware Controls</span>
                   </span>
                   
@@ -3216,7 +3281,7 @@ export default function ConnectSection({
                         setCameraFacingMode(nextFacing);
                         startCamera(selectedVideoDeviceId, selectedAudioDeviceId, nextFacing);
                       }}
-                      className="text-[9px] font-bold bg-slate-850 hover:bg-slate-800 text-slate-200 px-2.5 py-1 rounded-lg border border-slate-700 hover:text-white flex items-center gap-1 cursor-pointer transition-colors"
+                      className="text-[9px] font-bold bg-white hover:bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg border border-slate-200 hover:text-slate-900 flex items-center gap-1 cursor-pointer transition-colors shadow-3xs"
                     >
                       <RefreshCw className="w-2.5 h-2.5" />
                       <span>Flip Facing ({cameraFacingMode === "user" ? "Front" : "Back"})</span>
@@ -3234,7 +3299,7 @@ export default function ConnectSection({
                         setSelectedVideoDeviceId(e.target.value);
                         startCamera(e.target.value, selectedAudioDeviceId, cameraFacingMode);
                       }}
-                      className="bg-slate-900 border border-slate-850 rounded-xl p-2 text-white text-xs focus:outline-none focus:border-emerald-500 w-full cursor-pointer"
+                      className="bg-white border border-slate-200 rounded-xl p-2 text-slate-800 text-xs focus:outline-none focus:border-emerald-500 w-full cursor-pointer shadow-3xs"
                     >
                       {videoDevices.length > 0 ? (
                         videoDevices.map((d, idx) => (
@@ -3258,7 +3323,7 @@ export default function ConnectSection({
                           setSelectedAudioDeviceId(e.target.value);
                           startCamera(selectedVideoDeviceId, e.target.value, cameraFacingMode);
                         }}
-                        className="bg-slate-900 border border-slate-850 rounded-xl p-2 text-white text-xs focus:outline-none focus:border-emerald-500 w-full cursor-pointer"
+                        className="bg-white border border-slate-200 rounded-xl p-2 text-slate-800 text-xs focus:outline-none focus:border-emerald-500 w-full cursor-pointer shadow-3xs"
                       >
                         {audioDevices.length > 0 ? (
                           audioDevices.map((d, idx) => (
@@ -3276,22 +3341,22 @@ export default function ConnectSection({
               </div>
 
               {/* Live Video Filter Options */}
-              <div className="bg-slate-950 border border-slate-850 rounded-xl p-4">
+              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                  <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1">
                     <span>✨ Real-time Aesthetic Filter:</span>
                   </span>
                   {newPostVideoFilter !== "none" && (
                     <button
                       type="button"
                       onClick={() => setNewPostVideoFilter("none")}
-                      className="text-[9px] text-emerald-400 hover:underline font-bold cursor-pointer"
+                      className="text-[9px] text-emerald-600 hover:underline font-bold cursor-pointer"
                     >
                       Reset Filter
                     </button>
                   )}
                 </div>
-                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-slate-800">
+                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin scrollbar-thumb-slate-200">
                   {VIDEO_FILTERS.map((f) => (
                     <button
                       key={f.id}
@@ -3300,7 +3365,7 @@ export default function ConnectSection({
                       className={`px-3 py-1.5 text-[11px] font-semibold rounded-xl border shrink-0 transition-all cursor-pointer ${
                         newPostVideoFilter === f.value
                           ? "bg-emerald-600 border-emerald-500 text-white shadow"
-                          : "bg-slate-900 border-slate-850 text-slate-300 hover:bg-slate-800 hover:text-white"
+                          : "bg-white border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-900 shadow-3xs"
                       }`}
                     >
                       {f.name}
@@ -3311,25 +3376,25 @@ export default function ConnectSection({
             </div>
 
             {/* Footer Control Panel */}
-            <div className="p-6 bg-slate-950/60 border-t border-slate-800 flex justify-between items-center gap-4">
+            <div className="p-6 bg-slate-50/50 border-t border-slate-100 flex justify-between items-center gap-4">
               <div>
                 {creationStudioMode === "video" ? (
                   !recordedVideoUrl ? (
-                    <span className="text-xs text-slate-400 font-medium">
-                      {isRecording ? "Recording video capture..." : "Camera ready"}
+                    <span className="text-xs text-slate-500 font-medium">
+                      {isRecording ? "Recording video capture..." : isCameraStarting ? "Initializing camera..." : "Camera ready"}
                     </span>
                   ) : (
-                    <span className="text-xs text-emerald-400 font-bold flex items-center gap-1">
+                    <span className="text-xs text-emerald-600 font-bold flex items-center gap-1">
                       <Check className="w-3.5 h-3.5" /> Video ready
                     </span>
                   )
                 ) : (
                   !capturedPhotoUrl ? (
-                    <span className="text-xs text-slate-400 font-medium">
-                      Press Snap Photo below
+                    <span className="text-xs text-slate-500 font-medium">
+                      {isCameraStarting ? "Initializing camera..." : "Press Snap Photo below"}
                     </span>
                   ) : (
-                    <span className="text-xs text-emerald-400 font-bold flex items-center gap-1">
+                    <span className="text-xs text-emerald-600 font-bold flex items-center gap-1">
                       <Check className="w-3.5 h-3.5" /> Image ready
                     </span>
                   )
@@ -3352,10 +3417,11 @@ export default function ConnectSection({
                       <button
                         type="button"
                         onClick={startRecording}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-lg shadow-emerald-900/30"
+                        disabled={isCameraStarting}
+                        className={`px-5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-lg ${isCameraStarting ? 'bg-slate-300 text-slate-500 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer shadow-emerald-900/30'}`}
                       >
-                        <span className="w-2.5 h-2.5 bg-white rounded-full animate-ping" />
-                        Start Recording
+                        <span className={`w-2.5 h-2.5 bg-white rounded-full ${isCameraStarting ? '' : 'animate-ping'}`} />
+                        {isCameraStarting ? 'Starting...' : 'Start Recording'}
                       </button>
                     )
                   ) : (
@@ -3381,10 +3447,11 @@ export default function ConnectSection({
                     <button
                       type="button"
                       onClick={handleTakePhoto}
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-lg"
+                      disabled={isCameraStarting}
+                      className={`px-5 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all shadow-lg ${isCameraStarting ? 'bg-slate-300 text-slate-500 cursor-not-allowed' : 'bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer'}`}
                     >
                       <Camera className="w-4 h-4" />
-                      Snap Photo
+                      {isCameraStarting ? 'Starting...' : 'Snap Photo'}
                     </button>
                   ) : (
                     <>

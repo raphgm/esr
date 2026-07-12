@@ -75,6 +75,7 @@ function parseTaskDetails(task: ConsultancyTask) {
 }
 
 import { ConsultancyClientSection } from "./ConsultancyClientSection";
+import { ConsultancyDashboard } from "./ConsultancyDashboard";
 
 export default function ConsultancySection({
   userProfile,
@@ -88,7 +89,7 @@ export default function ConsultancySection({
     return <ConsultancyClientSection userProfile={userProfile} tasks={tasks} onNavigate={onNavigate} />;
   }
 
-  const [activeTab, setActiveTab] = useState<"board" | "deal-builder" | "escrow-feed" >("board");
+  const [activeTab, setActiveTab] = useState<"board" | "deal-builder" | "escrow-feed" | "dashboard">("board");
   
   // States for contract creation
   const [newTitle, setNewTitle] = useState("");
@@ -447,7 +448,7 @@ export default function ConsultancySection({
         <div className="lg:col-span-4 flex flex-col gap-6">
           
           {/* Section Navigation Tabs */}
-          <div className="bg-white border border-slate-200 rounded-3xl p-2.5 shadow-sm grid grid-cols-3 gap-1.5">
+          <div className="bg-white border border-slate-200 rounded-3xl p-2.5 shadow-sm grid grid-cols-2 md:grid-cols-4 gap-1.5">
             <button
               onClick={() => setActiveTab("board")}
               className={`py-2 rounded-xl text-[11px] font-extrabold transition-all cursor-pointer text-center ${
@@ -456,7 +457,7 @@ export default function ConsultancySection({
                   : "text-slate-500 hover:bg-slate-50"
               }`}
             >
-              📋 Contracts Board
+              📋 Contracts
             </button>
             <button
               onClick={() => setActiveTab("deal-builder")}
@@ -476,7 +477,17 @@ export default function ConsultancySection({
                   : "text-slate-500 hover:bg-slate-50"
               }`}
             >
-              🔒 Escrow Feed
+              🔒 Escrow Logs
+            </button>
+            <button
+              onClick={() => setActiveTab("dashboard")}
+              className={`py-2 rounded-xl text-[11px] font-extrabold transition-all cursor-pointer text-center ${
+                activeTab === "dashboard"
+                  ? "bg-slate-900 text-white"
+                  : "text-slate-500 hover:bg-slate-50"
+              }`}
+            >
+              📊 Performance
             </button>
           </div>
 
@@ -574,6 +585,43 @@ export default function ConsultancySection({
             </div>
           )}
 
+          {/* Tab 3: Performance Insights sidebar */}
+          {activeTab === "dashboard" && (
+            <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col gap-4 animate-fade-in">
+              <div>
+                <h4 className="font-display font-bold text-base text-slate-900 flex items-center gap-1.5">
+                  🛡️ Escrow Health & Insights
+                </h4>
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+                  How to maximize your platform ratings and guarantee swift escrow disbursements.
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-3 text-xs text-slate-600 font-medium">
+                <div className="p-3 bg-slate-50 border border-slate-100 rounded-2xl flex flex-col gap-1">
+                  <span className="font-bold text-purple-600 text-[10px] uppercase tracking-wider">
+                    💡 Payout Optimization
+                  </span>
+                  <p className="leading-relaxed text-slate-500 text-[11px] mt-0.5">
+                    To unlock payments, submit deliverables and request review. Once the client approves, funds are instantly released to your wallet.
+                  </p>
+                </div>
+
+                <div className="p-3 bg-slate-50 border border-slate-100 rounded-2xl flex flex-col gap-1">
+                  <span className="font-bold text-emerald-600 text-[10px] uppercase tracking-wider">
+                    📋 Checklist
+                  </span>
+                  <ul className="list-disc pl-4 text-slate-500 text-[11px] flex flex-col gap-1 mt-1">
+                    <li>Submit active milestones on time</li>
+                    <li>Keep review comments clear to avoid delays</li>
+                    <li>Add audio descriptions to deliverables</li>
+                    <li>Verify bank routing details in your wallet</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Standard Left Component: Live Creator Deal Matching */}
           {activeTab === "board" && (
             <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col gap-4">
@@ -638,6 +686,9 @@ export default function ConsultancySection({
 
         {/* Right Column: Escrow Contract Board & Workspaces */}
         <div className="lg:col-span-8 flex flex-col gap-6">
+          {activeTab === "dashboard" ? (
+            <ConsultancyDashboard tasks={tasks} userProfile={userProfile} />
+          ) : (
             <>
               <div className="flex justify-between items-center">
                 <h3 className="font-display font-black text-lg text-slate-900 tracking-tight">
@@ -879,6 +930,14 @@ export default function ConsultancySection({
               return (
                 <div
                   key={status}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    const taskId = e.dataTransfer.getData("taskId");
+                    if (taskId) {
+                      moveTask(taskId, status);
+                    }
+                  }}
                   className={`rounded-xl p-4 border ${colors[status].border} ${colors[status].bg} min-h-[500px] flex flex-col gap-4 relative overflow-hidden w-full md:w-[290px] lg:w-[320px] shrink-0`}
                 >
                   <div className="flex flex-col gap-1 border-b border-slate-100 pb-3">
@@ -918,10 +977,14 @@ export default function ConsultancySection({
                       return (
                         <div
                           key={task.id}
-                          className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-all flex flex-col gap-2.5 relative"
+                          draggable
+                          onDragStart={(e) => {
+                            e.dataTransfer.setData("taskId", task.id);
+                          }}
+                          className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm hover:shadow-md transition-all flex flex-col gap-2.5 relative cursor-grab active:cursor-grabbing"
                         >
                           <div className="flex justify-between items-start">
-                            <div className="flex gap-2 items-center">
+                            <div className="flex flex-wrap gap-2 items-center">
                               <input
                                 type="checkbox"
                                 checked={selectedTasks.includes(task.id)}
@@ -941,6 +1004,12 @@ export default function ConsultancySection({
                               {isDueSoon && (
                                 <span className="flex items-center gap-1 text-[9px] font-mono font-bold text-rose-500 bg-rose-500/10 px-2 py-1 rounded-xl">
                                   <Clock className="w-3 h-3" /> Due Soon
+                                </span>
+                              )}
+                              
+                              {(status === 'review' || status === 'done') && (
+                                <span className="flex items-center gap-1 text-[9px] font-mono font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-1 rounded-xl shadow-sm">
+                                  <ShieldCheck className="w-3 h-3 text-indigo-500" /> Verified
                                 </span>
                               )}
                             </div>
@@ -974,6 +1043,39 @@ export default function ConsultancySection({
                             </span>
                           </div>
 
+                          {/* Escrow Status Indicator & Progress Bar */}
+                          <div className="flex flex-col gap-1.5 mt-2 mb-1">
+                            <div className="flex justify-between items-center">
+                              <span className={`text-[9px] font-mono font-bold uppercase tracking-widest ${
+                                status === 'todo' ? 'text-amber-500' :
+                                status === 'inprogress' ? 'text-emerald-500' :
+                                status === 'review' ? 'text-indigo-500' :
+                                'text-sky-500'
+                              }`}>
+                                {status === 'todo' ? '10% Complete' : status === 'inprogress' ? '50% Complete' : status === 'review' ? '85% Complete' : '100% Complete'}
+                              </span>
+                              <span className={`flex items-center gap-1 text-[9px] font-black uppercase tracking-widest ${
+                                status === 'todo' ? 'text-amber-500' :
+                                status === 'inprogress' ? 'text-emerald-500' :
+                                status === 'review' ? 'text-indigo-500' :
+                                'text-sky-500'
+                              }`}>
+                                <ShieldCheck className="w-3 h-3" />
+                                {status === 'todo' ? 'Pending Escrow' : status === 'inprogress' ? 'Locked' : status === 'review' ? 'Verified' : 'Released'}
+                              </span>
+                            </div>
+                            <div className="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                              <div 
+                                className={`h-full transition-all duration-500 ease-in-out ${
+                                  status === 'todo' ? 'bg-amber-400 w-[10%]' :
+                                  status === 'inprogress' ? 'bg-emerald-500 w-[50%]' :
+                                  status === 'review' ? 'bg-indigo-500 w-[85%]' :
+                                  'bg-sky-500 w-full'
+                                }`}
+                              />
+                            </div>
+                          </div>
+
                           {/* Interactive pipeline triggers */}
                           <div className="flex gap-2 mt-2 pt-1 border-t border-slate-100">
                             {status === "todo" && (
@@ -986,12 +1088,28 @@ export default function ConsultancySection({
                             )}
 
                             {status === "inprogress" && (
-                              <button
-                                onClick={() => moveTask(task.id, "review")}
-                                className="w-full bg-purple-500 hover:bg-purple-700 text-slate-900 text-[10px] font-bold py-1.5 rounded-xl text-center cursor-pointer transition-all flex items-center justify-center gap-1 shadow-sm"
-                              >
-                                Submit Deliverable &rarr;
-                              </button>
+                              <div className="flex flex-col gap-2 w-full">
+                                <button
+                                  onClick={() => moveTask(task.id, "review")}
+                                  className="w-full bg-purple-500 hover:bg-purple-700 text-slate-900 text-[10px] font-bold py-1.5 rounded-xl text-center cursor-pointer transition-all flex items-center justify-center gap-1 shadow-sm"
+                                >
+                                  Submit Deliverable &rarr;
+                                </button>
+                                <div className="flex gap-2 w-full">
+                                  <button
+                                    onClick={() => alert(`Amending contract for ${client}...`)}
+                                    className="w-full bg-slate-100 hover:bg-slate-200 text-slate-600 text-[9px] font-bold py-1 rounded-xl text-center cursor-pointer transition-all"
+                                  >
+                                    Amend Scope
+                                  </button>
+                                  <button
+                                    onClick={() => alert(`Initiating arbitration dispute against ${client}...`)}
+                                    className="w-full bg-rose-50 hover:bg-rose-100 text-rose-600 text-[9px] font-bold py-1 rounded-xl text-center cursor-pointer transition-all"
+                                  >
+                                    Dispute Escrow
+                                  </button>
+                                </div>
+                              </div>
                             )}
 
                             {status === "review" && (
@@ -1010,6 +1128,12 @@ export default function ConsultancySection({
                                     Approve
                                   </button>
                                 </div>
+                                <button
+                                  onClick={() => alert(`Escalating to Escrow Arbitration for ${client}...`)}
+                                  className="w-full bg-slate-100 hover:bg-rose-50 text-slate-500 hover:text-rose-600 text-[9px] font-bold py-1 rounded-xl text-center cursor-pointer transition-all"
+                                >
+                                  Escalate to Arbitration
+                                </button>
                               </div>
                             )}
 
@@ -1119,7 +1243,8 @@ export default function ConsultancySection({
           </div>
           </div>
           )}
-          </>
+            </>
+          )}
         </div>
       </div>
     </div>

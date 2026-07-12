@@ -272,38 +272,46 @@ export default function App() {
     white: {
       navClass: "bg-white border border-slate-200 text-slate-800",
       borderClass: "border-slate-150",
-      sectionHeaderClass: "text-slate-500",
-      inactiveItemClass: "text-slate-700 hover:bg-slate-50 border-transparent hover:text-slate-900",
-      activeItemClass: "bg-purple-600 border-purple-600 text-white font-bold shadow-xs shadow-purple-500/20 translate-x-0.5",
-      descClass: "text-slate-500",
-      activeDescClass: "text-purple-100"
+      sectionHeaderClass: "text-slate-400 font-bold tracking-[0.2em] uppercase text-[9px]",
+      inactiveItemClass: "text-slate-600 hover:bg-slate-50 border-transparent hover:text-slate-900",
+      activeItemClass: "bg-slate-50 border-slate-200 text-slate-900 font-bold shadow-sm",
+      descClass: "text-slate-400",
+      activeDescClass: "text-slate-500",
+      inactiveIconClass: "text-slate-400",
+      activeIconClass: "text-slate-900"
     },
     ivory: {
-      navClass: "bg-[#FAF9F5] border-2 border-[#E9E3D5] text-slate-900",
-      borderClass: "border-[#EFECE6]",
-      sectionHeaderClass: "text-slate-600",
-      inactiveItemClass: "text-slate-700 hover:bg-[#F2ECE0]/60 border-transparent hover:text-slate-950",
-      activeItemClass: "bg-purple-700 border-purple-700 text-white font-bold shadow-md shadow-purple-750/20 translate-x-0.5",
+      navClass: "bg-[#FAF9F5] border border-[#EFECE6] text-slate-900 shadow-md",
+      borderClass: "border-[#EFECE6]/80",
+      sectionHeaderClass: "text-[#475569] font-bold tracking-[0.15em] uppercase text-[10px]",
+      inactiveItemClass: "text-[#334155] hover:bg-black/5 border-transparent hover:text-slate-900",
+      activeItemClass: "bg-[#7E22CE] text-white font-bold shadow-md",
       descClass: "text-slate-500",
-      activeDescClass: "text-purple-100"
+      activeDescClass: "text-white/80",
+      inactiveIconClass: "text-slate-600",
+      activeIconClass: "text-white"
     },
     slate: {
-      navClass: "bg-slate-950 border-2 border-slate-850 text-slate-100",
-      borderClass: "border-slate-850/80",
-      sectionHeaderClass: "text-slate-400",
-      inactiveItemClass: "text-slate-300 hover:bg-slate-900 border-transparent hover:text-white",
-      activeItemClass: "bg-purple-600 border-purple-600 text-white font-bold shadow-xs shadow-purple-500/30 translate-x-0.5",
+      navClass: "bg-slate-950 border border-slate-800 text-slate-300",
+      borderClass: "border-slate-800/60",
+      sectionHeaderClass: "text-slate-500 font-bold tracking-[0.2em] uppercase text-[9px]",
+      inactiveItemClass: "text-slate-400 hover:bg-slate-900/50 border-transparent hover:text-slate-200",
+      activeItemClass: "bg-slate-900 border-slate-800 text-slate-100 font-bold",
       descClass: "text-slate-500",
-      activeDescClass: "text-purple-100"
+      activeDescClass: "text-slate-400",
+      inactiveIconClass: "text-slate-500",
+      activeIconClass: "text-slate-200"
     },
     indigo: {
-      navClass: "bg-indigo-950 border-2 border-indigo-900 text-indigo-50",
-      borderClass: "border-indigo-900/80",
-      sectionHeaderClass: "text-indigo-300",
-      inactiveItemClass: "text-indigo-200 hover:bg-indigo-900 border-transparent hover:text-white",
-      activeItemClass: "bg-indigo-600 border-indigo-600 text-white font-bold shadow-xs shadow-indigo-500/30 translate-x-0.5",
-      descClass: "text-indigo-400",
-      activeDescClass: "text-indigo-200"
+      navClass: "bg-[#0B0F19] border border-[#1E293B] text-slate-300",
+      borderClass: "border-[#1E293B]/60",
+      sectionHeaderClass: "text-indigo-400/60 font-bold tracking-[0.2em] uppercase text-[9px]",
+      inactiveItemClass: "text-slate-400 hover:bg-[#111827] border-transparent hover:text-indigo-100",
+      activeItemClass: "bg-[#1E293B] border-[#334155] text-indigo-100 font-bold",
+      descClass: "text-slate-500",
+      activeDescClass: "text-indigo-300",
+      inactiveIconClass: "text-slate-500",
+      activeIconClass: "text-indigo-400"
     }
   };
 
@@ -598,8 +606,8 @@ ActivityPost[]) => {
         // Fetch custom user profile from Firestore or load fallback profile
         let profile = await getUserProfile(user.uid, user.email || undefined, user.displayName || undefined);
         
-        // Fix: Reset wallet balance to 0 for accounts that got the old default balance
-        if (profile.walletBalance === 842500) {
+        // Fix: Reset wallet balance to 0 for accounts that got the old default balance or have the temporary $10 balance
+        if (profile.walletBalance === 842500 || profile.walletBalance === 10) {
           profile = { ...profile, walletBalance: 0, history: [] };
           await saveUserProfile(user.uid, profile);
         }
@@ -833,7 +841,7 @@ ActivityPost>("posts", initialPosts);
       }
       setShowAuthModal(false);
     } catch (error: any) {
-      console.error("Auth error details:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
+      console.error("Auth error details:", error);
       let friendlyMessage = error.message;
       if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password" || error.code === "auth/invalid-credential") {
         friendlyMessage = "Incorrect email or password. If you don't have an account, please click SIGN UP below to register first!";
@@ -878,7 +886,7 @@ ActivityPost>("posts", initialPosts);
       title: "Network & Social Ecosystem",
       items: [
         { id: "connect", label: "Peer Connect", desc: "Professional network & peers", icon: Users },
-        { id: "community", label: "Creator Community", desc: "Cohorts & discussion boards", icon: Heart },
+        { id: "community", label: "Estarr Community", desc: "Cohorts & discussion boards", icon: Heart },
         { id: "events", label: "Live Events", desc: "Masterclasses & ticketing", icon: Calendar },
       ]
     },
@@ -1838,7 +1846,6 @@ ActivityPost>("posts", initialPosts);
                   try {
                     await firebaseSignOut(auth);
                     setActiveTab("home");
-                    alert("Successfully logged out from Firebase Auth.");
                   } catch (error: any) {
                     console.error("Logout error:", error);
                   }
@@ -1969,11 +1976,22 @@ ActivityPost>("posts", initialPosts);
               <span className="text-[10px] font-mono font-bold uppercase tracking-widest">
                 ESTARR ECOSYSTEM
               </span>
-              <span className="text-[9px] font-mono text-purple-600 bg-purple-50/80 border border-purple-100/30 px-2 py-0.5 rounded-full font-black">
+              <span className={`text-[9px] font-mono font-bold tracking-wider px-2 py-0.5 rounded-full bg-[#E9D5FF] text-[#7E22CE]`}>
                 13 MODULES
               </span>
             </div>
             
+            {/* TVL Widget */}
+            {isAuthenticated && (
+              <div className="mt-2 bg-emerald-500/10 border border-emerald-500/20 p-3 rounded-xl flex items-center justify-between">
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[9px] font-mono uppercase text-emerald-700 font-bold">Total Escrow Locked</span>
+                  <span className="font-mono text-sm font-black text-emerald-600">$4,250,000</span>
+                </div>
+                <ShieldCheck className="w-5 h-5 text-emerald-500" />
+              </div>
+            )}
+
             {/* Theme Swatches Picker removed since it can be controlled from the admin panel */}
           </div>
           {navSections.map((section) => {
@@ -1985,7 +2003,7 @@ ActivityPost>("posts", initialPosts);
                 {/* Section Header Toggle */}
                 <div 
                   onClick={() => toggleNavSection(section.title)}
-                  className={`flex items-center justify-between text-[10px] font-mono font-bold hover:opacity-80 tracking-wider cursor-pointer uppercase py-1 select-none transition-colors group ${sidebarStyles[sidebarTheme].sectionHeaderClass}`}
+                  className={`flex items-center justify-between hover:opacity-80 cursor-pointer py-1 select-none transition-colors group ${sidebarStyles[sidebarTheme].sectionHeaderClass}`}
                 >
                   <span className="flex items-center gap-1.5">
                     {hasActiveItem && (
@@ -2030,7 +2048,7 @@ ActivityPost>("posts", initialPosts);
                           }`}
                         >
                           <div className="flex items-start gap-3">
-                            <Icon className={`w-4 h-4 shrink-0 mt-0.5 transition-colors ${isActive ? "text-white" : "text-slate-500"}`} />
+                            <Icon className={`w-4 h-4 shrink-0 mt-0.5 transition-colors ${isActive ? sidebarStyles[sidebarTheme].activeIconClass : sidebarStyles[sidebarTheme].inactiveIconClass}`} />
                             <div className="flex-1 min-w-0 pr-4">
                               <span className="text-xs font-bold uppercase tracking-tight flex items-center gap-1.5 leading-tight">
                                 {item.label}
@@ -2060,6 +2078,8 @@ ActivityPost>("posts", initialPosts);
                   tasks={tasks}
                   posts={posts}
                   onNavigate={(tab) => setActiveTab(tab as any)} 
+                  onOpenAiChat={handleOpenAi}
+                  onUpdateProfile={handleUpdateProfile}
                 />
               ) : (
                 <>
@@ -2227,7 +2247,7 @@ ActivityPost>("posts", initialPosts);
             />
           )}
           {activeTab === "ai-lab" && (
-            <AILabSection userProfile={userProfile} />
+            <AILabSection userProfile={userProfile} onUpdateProfile={handleUpdateProfile} />
           )}
 
           {activeTab === "marketplace" && (
@@ -2296,7 +2316,7 @@ ActivityPost>("posts", initialPosts);
           )}
 
           {activeTab === "rewards" && (
-            <RewardsSection />
+            <RewardsSection userProfile={userProfile} onUpdateProfile={handleUpdateProfile} />
           )}
 
           {activeTab === "integrations" && (
@@ -2340,6 +2360,15 @@ ActivityPost>("posts", initialPosts);
                   <X className="w-4 h-4" />
                 </button>
               </div>
+              {isAuthenticated && (
+                <div className="mt-2 bg-emerald-500/10 border border-emerald-500/20 p-3 rounded-xl flex items-center justify-between">
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-[9px] font-mono uppercase text-emerald-700 font-bold">Total Escrow Locked</span>
+                    <span className="font-mono text-sm font-black text-emerald-600">$4,250,000</span>
+                  </div>
+                  <ShieldCheck className="w-5 h-5 text-emerald-500" />
+                </div>
+              )}
             </div>
             
             {navSections.map((section) => {
@@ -2350,7 +2379,7 @@ ActivityPost>("posts", initialPosts);
                 <div key={section.title} className="flex flex-col gap-1.5">
                   <div 
                     onClick={() => toggleNavSection(section.title)}
-                    className={`flex items-center justify-between text-[10px] font-mono font-bold hover:opacity-80 tracking-wider cursor-pointer uppercase py-1 select-none transition-colors group ${sidebarStyles[sidebarTheme].sectionHeaderClass}`}
+                    className={`flex items-center justify-between hover:opacity-80 cursor-pointer py-1 select-none transition-colors group ${sidebarStyles[sidebarTheme].sectionHeaderClass}`}
                   >
                     <span className="flex items-center gap-1.5">
                       {hasActiveItem && (
@@ -2395,7 +2424,7 @@ ActivityPost>("posts", initialPosts);
                             }`}
                           >
                             <div className="flex items-start gap-3">
-                              <Icon className={`w-4 h-4 shrink-0 mt-0.5 transition-colors ${isActive ? "text-white" : "text-slate-500"}`} />
+                              <Icon className={`w-4 h-4 shrink-0 mt-0.5 transition-colors ${isActive ? sidebarStyles[sidebarTheme].activeIconClass : sidebarStyles[sidebarTheme].inactiveIconClass}`} />
                               <div className="flex-1 min-w-0 pr-4">
                                 <span className="text-xs font-bold uppercase tracking-tight flex items-center gap-1.5 leading-tight">
                                   {item.label}

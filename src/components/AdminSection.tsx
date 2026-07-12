@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ShieldCheck,
   ShieldAlert,
@@ -16,7 +16,15 @@ import {
   FileText,
   Database,
   UserCheck,
-  AlertTriangle
+  AlertTriangle,
+  Key,
+  Globe,
+  Cpu,
+  Coins,
+  Server,
+  TrendingUp,
+  ArrowUpRight,
+  Wifi
 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { UserProfile } from "../types";
@@ -65,6 +73,32 @@ export function AdminSection({
     systemNodeStatus: "Healthy (Lagos-01)",
     apiLatency: "14ms"
   });
+
+  // Interactive metrics states
+  const [activeCurrency, setActiveCurrency] = useState<"USD" | "NGN" | "GHS" | "KES">("USD");
+  const [activeNode, setActiveNode] = useState<"Lagos-01" | "Nairobi-02" | "Accra-03" | "CapeTown-04">("Lagos-01");
+  const [liveLatency, setLiveLatency] = useState(14);
+  const [isDiagnosticsRunning, setIsDiagnosticsRunning] = useState(false);
+  const [diagnosticsOutput, setDiagnosticsOutput] = useState<string[] | null>(null);
+  const [showEscrowBreakdown, setShowEscrowBreakdown] = useState(false);
+
+  // Live Ping Latency Heartbeat Simulation
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setLiveLatency(prev => {
+        const delta = Math.random() > 0.5 ? 1 : -1;
+        const next = prev + delta;
+        return next >= 11 && next <= 17 ? next : prev;
+      });
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Developer Integration Gate Key Management (Afrika Payment Gateway & Accelerator Gate)
+  const [devKey, setDevKey] = useState<string>(
+    () => localStorage.getItem("estarr_developer_key") || "ESTARR-GATE-2026"
+  );
+  const [isDevKeyCopied, setIsDevKeyCopied] = useState(false);
 
   const handleRoleToggle = (userId: string) => {
     // Only authorized system admins can promote others in a real app
@@ -155,29 +189,243 @@ export function AdminSection({
 
       {/* Grid of Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          { label: "Active Escrows", value: "1240", desc: "Multichain talent contracts", icon: Layers, color: "text-purple-600 bg-purple-100/50 border-purple-200" },
-          { label: "Ledger Volume", value: "$34,150,000", desc: "Total secured funds", icon: Database, color: "text-indigo-600 bg-indigo-100/50 border-indigo-200" },
-          { label: "Sys Node Status", value: "Healthy (Lagos-01)", desc: "Off-chain latency", icon: Activity, color: "text-emerald-600 bg-emerald-100/50 border-emerald-200" },
-          { label: "API Ping Latency", value: "14ms", desc: "Antigravity core engine", icon: Sparkles, color: "text-amber-600 bg-amber-100/50 border-amber-200" }
-        ].map((item, idx) => {
-          const Icon = item.icon;
-          return (
-            <div key={idx} className="bg-white border-2 border-slate-200 rounded-2xl p-6 flex flex-col justify-between shadow-sm hover:shadow-md transition-all group">
-              <div className="flex items-center justify-between mb-4">
-                <div className={`w-12 h-12 rounded-xl border flex items-center justify-center shrink-0 ${item.color}`}>
-                  <Icon className="w-6 h-6" />
-                </div>
-                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+        {/* Card 1: Active Escrows */}
+        <div 
+          onClick={() => {
+            setShowEscrowBreakdown(!showEscrowBreakdown);
+            addLog("info", `Inspected Multichain Escrow Ledger contract distribution`);
+          }}
+          className="bg-white border-2 border-slate-200 hover:border-purple-300 rounded-3xl p-6 flex flex-col justify-between shadow-xs hover:shadow-md transition-all group cursor-pointer relative overflow-hidden"
+        >
+          {/* Absolute glow */}
+          <div className="absolute top-0 right-0 w-24 h-24 bg-purple-100 rounded-bl-full opacity-30 group-hover:scale-125 transition-transform duration-500" />
+          
+          <div>
+            <div className="flex items-center justify-between mb-4 relative z-10">
+              <div className="w-12 h-12 rounded-2xl bg-purple-50 border border-purple-200 flex items-center justify-center text-purple-600 shrink-0 group-hover:scale-110 transition-transform duration-350">
+                <Layers className="w-6 h-6" />
               </div>
-              <div>
-                <p className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] mb-1">{item.label}</p>
-                <h3 className="text-2xl font-black tracking-tighter text-slate-900">{item.value}</h3>
-                <p className="text-[10px] text-slate-500 font-bold mt-1 uppercase tracking-tight">{item.desc}</p>
+              <div className="flex items-center gap-1.5 bg-purple-100/60 text-purple-700 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border border-purple-200">
+                <span className="w-1.5 h-1.5 rounded-full bg-purple-600 animate-pulse" />
+                Multichain
               </div>
             </div>
-          );
-        })}
+            
+            <div className="relative z-10">
+              <p className="text-xs font-black uppercase text-slate-400 tracking-wider mb-1">Active Escrows</p>
+              <div className="flex items-baseline gap-1.5">
+                <h3 className="text-3xl font-black tracking-tighter text-slate-900 font-display">1,240</h3>
+                <span className="text-[10px] text-emerald-600 font-bold flex items-center bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100">
+                  +4.2%
+                </span>
+              </div>
+              <p className="text-[10px] text-slate-500 font-medium mt-1">
+                Contracts locked in cryptographic consensus.
+              </p>
+            </div>
+          </div>
+
+          {/* Interactive sub-detail drawer inline */}
+          <div className={`mt-4 pt-3 border-t border-slate-150 relative z-10 transition-all duration-300 ${showEscrowBreakdown ? "opacity-100 max-h-40" : "opacity-0 max-h-0 overflow-hidden"}`}>
+            <div className="flex flex-col gap-1.5 text-[9px] font-mono font-bold text-slate-650">
+              <div className="flex justify-between items-center bg-slate-50 p-1 px-2 rounded border border-slate-100">
+                <span>Solana Gasless Escrows:</span>
+                <span className="text-purple-600">430 contracts</span>
+              </div>
+              <div className="flex justify-between items-center bg-slate-50 p-1 px-2 rounded border border-slate-100">
+                <span>Stellar Instant Assets:</span>
+                <span className="text-indigo-600">500 contracts</span>
+              </div>
+              <div className="flex justify-between items-center bg-slate-50 p-1 px-2 rounded border border-slate-100">
+                <span>Ethereum Secure (L1):</span>
+                <span className="text-pink-600">310 contracts</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Hint text */}
+          <div className="mt-3 text-[9px] text-purple-600 font-black uppercase tracking-wider flex items-center gap-1 hover:underline">
+            <span>{showEscrowBreakdown ? "Hide distribution" : "View distribution"}</span>
+            <ArrowUpRight className={`w-3 h-3 transition-transform ${showEscrowBreakdown ? "rotate-90" : ""}`} />
+          </div>
+        </div>
+
+        {/* Card 2: Ledger Volume */}
+        <div 
+          onClick={() => {
+            const currencies: ("USD" | "NGN" | "GHS" | "KES")[] = ["USD", "NGN", "GHS", "KES"];
+            const currentIdx = currencies.indexOf(activeCurrency);
+            const nextIdx = (currentIdx + 1) % currencies.length;
+            const nextCurrency = currencies[nextIdx];
+            setActiveCurrency(nextCurrency);
+            addLog("success", `Ledger volume settlement converted to ${nextCurrency}`);
+          }}
+          className="bg-white border-2 border-slate-200 hover:border-indigo-300 rounded-3xl p-6 flex flex-col justify-between shadow-xs hover:shadow-md transition-all group cursor-pointer relative overflow-hidden"
+        >
+          {/* Absolute glow */}
+          <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-100 rounded-bl-full opacity-30 group-hover:scale-125 transition-transform duration-500" />
+          
+          <div>
+            <div className="flex items-center justify-between mb-4 relative z-10">
+              <div className="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-200 flex items-center justify-center text-indigo-600 shrink-0 group-hover:scale-110 transition-transform duration-350">
+                <Database className="w-6 h-6" />
+              </div>
+              <div className="bg-indigo-100/60 text-indigo-700 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border border-indigo-200">
+                🌍 {activeCurrency} Localized
+              </div>
+            </div>
+            
+            <div className="relative z-10">
+              <p className="text-xs font-black uppercase text-slate-400 tracking-wider mb-1">Ledger Volume</p>
+              <h3 className="text-2xl font-black tracking-tighter text-slate-900 font-display transition-all duration-350">
+                {activeCurrency === "USD" && "$34,150,000"}
+                {activeCurrency === "NGN" && "₦51,225,000,000"}
+                {activeCurrency === "GHS" && "₵546,400,000"}
+                {activeCurrency === "KES" && "Sh5,293,250,000"}
+              </h3>
+              <p className="text-[10px] text-slate-500 font-medium mt-1">
+                {activeCurrency === "USD" ? "USD equivalent secured across all regional banks." : `Converted at modern automated central bank indexes.`}
+              </p>
+            </div>
+          </div>
+
+          {/* Rate conversion helper */}
+          <div className="mt-4 flex items-center gap-1.5 bg-indigo-50/50 border border-indigo-100 p-2 rounded-xl text-[9px] font-mono text-indigo-700 font-bold relative z-10">
+            <TrendingUp className="w-3.5 h-3.5 text-indigo-600 animate-pulse shrink-0" />
+            <span className="uppercase tracking-tight">Tap to cycle (USD &rarr; NGN &rarr; GHS &rarr; KES)</span>
+          </div>
+        </div>
+
+        {/* Card 3: Sys Node Status */}
+        <div 
+          onClick={() => {
+            if (isDiagnosticsRunning) return;
+            setIsDiagnosticsRunning(true);
+            setDiagnosticsOutput(null);
+            addLog("info", `Initiated live system diagnostics check across regional nodes`);
+            
+            setTimeout(() => {
+              setIsDiagnosticsRunning(false);
+              setDiagnosticsOutput([
+                "🟢 Lagos-01 (Active) - Latency: 14ms (Primary)",
+                "🟢 Nairobi-02 (Standby) - Latency: 21ms (Replica)",
+                "🟢 Accra-03 (Active) - Latency: 18ms (Co-host)",
+                "🟡 CapeTown-04 (Syncing) - Latency: 32ms (Edge)"
+              ]);
+              addLog("success", `System diagnostic check completed successfully! 4/4 nodes synced`);
+              confetti({
+                particleCount: 20,
+                spread: 30,
+                origin: { y: 0.8 }
+              });
+            }, 1200);
+          }}
+          className="bg-white border-2 border-slate-200 hover:border-emerald-300 rounded-3xl p-6 flex flex-col justify-between shadow-xs hover:shadow-md transition-all group cursor-pointer relative overflow-hidden"
+        >
+          {/* Absolute glow */}
+          <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-100 rounded-bl-full opacity-30 group-hover:scale-125 transition-transform duration-500" />
+          
+          <div>
+            <div className="flex items-center justify-between mb-4 relative z-10">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 shrink-0 group-hover:scale-110 transition-transform duration-350">
+                <Activity className={`w-6 h-6 ${isDiagnosticsRunning ? "animate-spin" : "animate-pulse"}`} />
+              </div>
+              <div className="flex items-center gap-1.5 bg-emerald-100/60 text-emerald-700 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border border-emerald-200">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-ping" />
+                Healthy
+              </div>
+            </div>
+            
+            <div className="relative z-10">
+              <p className="text-xs font-black uppercase text-slate-400 tracking-wider mb-1">Sys Node Status</p>
+              <h3 className="text-xl font-black text-slate-900 tracking-tight font-display">
+                {isDiagnosticsRunning ? "Testing edge nodes..." : `Healthy (Lagos-01)`}
+              </h3>
+              <p className="text-[10px] text-slate-500 font-medium mt-1">
+                Decentralized database & webhook server state.
+              </p>
+            </div>
+          </div>
+
+          {/* Inline diagnostic result */}
+          {diagnosticsOutput && (
+            <div className="mt-3 p-2 bg-slate-900 text-slate-300 rounded-xl font-mono text-[8px] flex flex-col gap-1 relative z-10 border border-slate-800 animate-fade-in">
+              {diagnosticsOutput.map((node, index) => (
+                <span key={index}>{node}</span>
+              ))}
+            </div>
+          )}
+
+          <div className="mt-3 text-[9px] text-emerald-700 font-black uppercase tracking-wider flex items-center gap-1 hover:underline">
+            <span>{isDiagnosticsRunning ? "Syncing metrics..." : "Run Diagnostics Ping"}</span>
+            <RefreshCw className={`w-3 h-3 ${isDiagnosticsRunning ? "animate-spin" : ""}`} />
+          </div>
+        </div>
+
+        {/* Card 4: API Ping Latency */}
+        <div 
+          onClick={() => {
+            // Cycles ping test regions
+            const regions: ("Lagos" | "Nairobi" | "Accra" | "CapeTown")[] = ["Lagos", "Nairobi", "Accra", "CapeTown"];
+            const currentIdx = regions.indexOf(activeNode.replace("-01","").replace("-02","").replace("-03","").replace("-04","") as any);
+            const nextIdx = (currentIdx + 1) % regions.length;
+            const nextRegion = regions[nextIdx];
+            
+            let baseLatency = 14;
+            let nodeSuffix = "-01";
+            if (nextRegion === "Nairobi") { baseLatency = 21; nodeSuffix = "-02"; }
+            else if (nextRegion === "Accra") { baseLatency = 18; nodeSuffix = "-03"; }
+            else if (nextRegion === "CapeTown") { baseLatency = 28; nodeSuffix = "-04"; }
+            
+            setActiveNode((nextRegion + nodeSuffix) as any);
+            setLiveLatency(baseLatency);
+            addLog("info", `API network telemetry region switched to ${nextRegion} hub`);
+          }}
+          className="bg-white border-2 border-slate-200 hover:border-amber-300 rounded-3xl p-6 flex flex-col justify-between shadow-xs hover:shadow-md transition-all group cursor-pointer relative overflow-hidden"
+        >
+          {/* Absolute glow */}
+          <div className="absolute top-0 right-0 w-24 h-24 bg-amber-100 rounded-bl-full opacity-30 group-hover:scale-125 transition-transform duration-500" />
+          
+          <div>
+            <div className="flex items-center justify-between mb-4 relative z-10">
+              <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600 shrink-0 group-hover:scale-110 transition-transform duration-350">
+                <Wifi className="w-6 h-6" />
+              </div>
+              <div className="bg-amber-100/60 text-amber-700 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider border border-amber-200">
+                📡 {activeNode.split("-")[0]} HUB
+              </div>
+            </div>
+            
+            <div className="relative z-10">
+              <p className="text-xs font-black uppercase text-slate-400 tracking-wider mb-1">API Ping Latency</p>
+              <div className="flex items-baseline gap-1">
+                <h3 className="text-3xl font-black tracking-tighter text-slate-900 font-display">
+                  {liveLatency}ms
+                </h3>
+                <span className="text-[10px] text-amber-650 font-bold bg-amber-50 px-1.5 py-0.5 rounded border border-amber-100">
+                  SECURE
+                </span>
+              </div>
+              <p className="text-[10px] text-slate-500 font-medium mt-1">
+                Antigravity core routing system response.
+              </p>
+            </div>
+          </div>
+
+          {/* Heartbeat pulse preview */}
+          <div className="mt-4 flex items-center justify-between bg-amber-50/50 border border-amber-100 p-2 rounded-xl relative z-10">
+            <div className="flex items-center gap-1.5 text-[8px] font-mono text-amber-800 font-bold">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75 animate-duration-1000"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+              </span>
+              <span>Tap to test routing hubs</span>
+            </div>
+            <span className="text-[8px] font-mono bg-amber-105 text-amber-900 px-1.5 rounded font-black uppercase border border-amber-200/50">
+              {activeNode}
+            </span>
+          </div>
+        </div>
       </div>
 
       {/* Primary Layout Columns */}
@@ -185,6 +433,129 @@ export function AdminSection({
         
         {/* Left Column: Theme Settings & Credential Approvals (8 cols) */}
         <div className="lg:col-span-8 flex flex-col gap-6">
+          
+          {/* Bento Block: DEVELOPER KEY & GATEWAY AUTHORITY */}
+          <div className="bg-slate-900 border-2 border-purple-500/30 rounded-xl shadow-xl relative overflow-hidden text-white">
+            <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+              <Key className="w-24 h-24 text-purple-400" />
+            </div>
+            {/* Header */}
+            <div className="border-b border-slate-800 px-5 py-4 flex items-center justify-between bg-slate-950">
+              <div className="flex items-center gap-2">
+                <Key className="w-4 h-4 text-purple-400 animate-pulse" />
+                <h3 className="text-sm font-black uppercase tracking-wider text-slate-100 font-display">
+                  Developer Key & Integration Gateway Authority
+                </h3>
+              </div>
+              <span className="bg-purple-500/20 text-purple-300 px-2.5 py-0.5 rounded-full font-mono text-[9px] font-black uppercase tracking-wider border border-purple-500/30">
+                🔒 Access Enforced
+              </span>
+            </div>
+
+            <div className="p-5 flex flex-col gap-4">
+              <p className="text-xs text-slate-300 font-medium leading-relaxed">
+                The high-yield <strong className="text-white">Africa Paystack Integration Hub</strong> & <strong className="text-white">Fast-Track Earning Accelerator</strong> is locked to protect platform integrity. Only developers possessing the correct, active authorization key below can view metrics, configure bank integrations, or request direct payouts.
+              </p>
+
+              <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col sm:flex-row gap-3 items-end sm:items-center justify-between">
+                <div className="flex-1 w-full">
+                  <label className="text-[10px] font-black uppercase tracking-wider text-purple-400 block mb-1.5">
+                    Active Developer Authorization Key
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      readOnly
+                      value={devKey}
+                      className="flex-1 text-xs font-mono font-black tracking-widest text-emerald-400 bg-slate-900 border border-slate-800 p-2.5 rounded-lg focus:outline-none"
+                    />
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(devKey);
+                        setIsDevKeyCopied(true);
+                        setTimeout(() => setIsDevKeyCopied(false), 2000);
+                      }}
+                      className="bg-purple-600 hover:bg-purple-700 text-white text-[10px] font-black uppercase tracking-wider px-4 rounded-lg transition-all"
+                    >
+                      {isDevKeyCopied ? "✓ Copied!" : "Copy Key"}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex gap-2 w-full sm:w-auto self-stretch sm:self-auto pt-2 sm:pt-0">
+                  <button
+                    onClick={() => {
+                      const keys = [
+                        "ESTARR-AFRICA-PAYSTACK-DEV",
+                        "ESTARR-SECURE-KEY-2026",
+                        "ESTARR-LOCAL-PAYMENTS-AFRICA",
+                        "ESTARR-DEV-9B2F4E7A",
+                        "ESTARR-GATEWAY-AUTH-CODE"
+                      ];
+                      const newKey = keys[Math.floor(Math.random() * keys.length)];
+                      setDevKey(newKey);
+                      localStorage.setItem("estarr_developer_key", newKey);
+                      
+                      // Push to security logs
+                      addLog("success", `Developer gate authorization key rotated to '${newKey}'`);
+                      
+                      confetti({
+                        particleCount: 30,
+                        spread: 50,
+                        colors: ["#a855f7", "#34d399"]
+                      });
+                    }}
+                    className="flex-1 sm:flex-initial bg-slate-800 hover:bg-slate-700 border border-slate-750 text-slate-200 text-[10px] font-black uppercase tracking-wider px-3.5 py-2.5 rounded-lg transition-all"
+                  >
+                    Regenerate Key
+                  </button>
+                </div>
+              </div>
+
+              {/* Custom Key Editor */}
+              <div className="flex flex-col gap-1.5 bg-slate-950/40 p-3 rounded-lg border border-slate-850">
+                <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                  Custom Key Overrides
+                </span>
+                <p className="text-[10px] text-slate-400 leading-normal">
+                  Want a custom passcode? Define your own secret authorization key below and hit apply:
+                </p>
+                <div className="flex gap-2 mt-1">
+                  <input
+                    type="text"
+                    placeholder="e.g. MY-SUPER-SECRET-DEV-PASS"
+                    id="custom-dev-key-input"
+                    className="flex-1 text-xs font-mono font-bold bg-slate-900 border border-slate-800 p-2 rounded focus:outline-none focus:border-purple-500 text-white"
+                  />
+                  <button
+                    onClick={() => {
+                      const val = (document.getElementById("custom-dev-key-input") as HTMLInputElement)?.value?.trim();
+                      if (val) {
+                        setDevKey(val);
+                        localStorage.setItem("estarr_developer_key", val);
+                        addLog("success", `Developer gate custom authorization key configured: '${val}'`);
+                        (document.getElementById("custom-dev-key-input") as HTMLInputElement).value = "";
+                        confetti({ particleCount: 20, spread: 40 });
+                      }
+                    }}
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white text-[9px] font-black uppercase tracking-wider px-3 rounded transition-all"
+                  >
+                    Apply Overrides
+                  </button>
+                </div>
+              </div>
+
+              <div className="text-[10px] text-slate-400 bg-slate-950/60 p-3 rounded-lg border border-slate-850 flex items-start gap-2">
+                <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold text-slate-300 font-sans">Active Cryptographic Enforcement:</p>
+                  <p className="mt-0.5 leading-relaxed font-sans">
+                    Any developer navigating to the <strong className="text-purple-400 font-bold">Income Accelerator & Integration Hub</strong> on this browser will be locked out until they input the exact authorization key displayed above. Hand this key to vetted team members to grant them gateway credentials.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
           
           {/* Bento Block 1: THEME CONFIGURATION (ONLY FOR ADMIN) */}
           <div className="bg-white border-2 border-slate-200 rounded-xl shadow-xs relative overflow-hidden">

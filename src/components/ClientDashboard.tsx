@@ -22,7 +22,7 @@ export function ClientDashboard({
   ]);
   const [rejectedTalents, setRejectedTalents] = React.useState<Array<{ talent: {name: string, role: string, rating: string, bio: string, projectsCount: number, isVerified: boolean}, rejectedAt: Date }>>([]);
   const activeTasks = tasks.filter(t => t.status !== 'done');
-  const totalSpend = 2450.00; // Mock data for client
+  const totalSpend = 0.00; // Mock data for client
 
   const rejectTalent = (talent: typeof talents[0]) => {
     setTalents(talents.filter(t => t.name !== talent.name));
@@ -61,7 +61,12 @@ export function ClientDashboard({
   ];
 
   return (
-    <div className="flex flex-col gap-8 animate-fade-in">
+    <div className="flex flex-col gap-8 animate-fade-in relative min-h-screen isolate">
+      {/* Decorative background ambient glow circles */}
+      <div className="absolute -top-16 -left-16 w-96 h-96 bg-purple-300/25 rounded-full blur-3xl pointer-events-none -z-10" />
+      <div className="absolute top-1/3 right-0 w-96 h-96 bg-indigo-300/25 rounded-full blur-3xl pointer-events-none -z-10" />
+      <div className="absolute bottom-20 left-10 w-80 h-80 bg-pink-300/20 rounded-full blur-3xl pointer-events-none -z-10" />
+      <div className="absolute bottom-0 right-10 w-72 h-72 bg-purple-300/20 rounded-full blur-3xl pointer-events-none -z-10" />
       {/* Welcome Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -142,9 +147,18 @@ export function ClientDashboard({
                         </div>
                       </div>
                     </div>
-                    <div className="hidden sm:block">
+                    <div className="hidden sm:flex flex-col items-end justify-center gap-2">
                       <span className="px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-bold capitalize">
                         {task.status.replace('-', ' ')}
+                      </span>
+                      <span className={`text-[10px] font-mono font-black uppercase tracking-wider px-2 py-0.5 rounded-full flex items-center gap-1 ${
+                        task.status === 'inprogress' ? 'bg-emerald-50 text-emerald-600' :
+                        task.status === 'review' ? 'bg-indigo-50 text-indigo-600' :
+                        task.status === 'done' ? 'bg-sky-50 text-sky-600' :
+                        'bg-amber-50 text-amber-600'
+                      }`}>
+                        <ShieldCheck className="w-3 h-3" />
+                        {task.status === 'inprogress' ? 'Locked' : task.status === 'review' ? 'Verified' : task.status === 'done' ? 'Released' : 'Pending'}
                       </span>
                     </div>
                   </div>
@@ -168,9 +182,11 @@ export function ClientDashboard({
 
         {/* Sidebar */}
         <div className="space-y-6">
-          <div className="bg-slate-900 rounded-3xl p-6 text-white relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500 rounded-bl-full opacity-20" />
-            <div className="absolute bottom-0 left-0 w-24 h-24 bg-purple-500 rounded-tr-full opacity-20" />
+          <div className="bg-slate-900 rounded-3xl p-6 text-white relative overflow-hidden group shadow-xl">
+            {/* Glowing background circles */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500 rounded-bl-full opacity-25 group-hover:scale-125 transition-transform duration-500" />
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-purple-500 rounded-tr-full opacity-25 group-hover:scale-125 transition-transform duration-500" />
+            <div className="absolute top-1/2 left-1/3 w-16 h-16 bg-pink-500 rounded-full opacity-15 blur-xl group-hover:scale-150 transition-transform duration-700" />
             
             <div className="relative z-10 space-y-6">
               <div>
@@ -209,8 +225,13 @@ export function ClientDashboard({
             </div>
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
-            <h3 className="font-bold text-slate-900 mb-4">Top Talent Suggestions</h3>
+          <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm relative overflow-hidden group">
+            {/* Ambient background circles */}
+            <div className="absolute -top-10 -right-10 w-28 h-28 bg-purple-100/50 rounded-full opacity-60 group-hover:scale-125 transition-transform duration-500" />
+            <div className="absolute -bottom-6 -left-6 w-20 h-20 bg-indigo-100/50 rounded-full opacity-60 group-hover:scale-125 transition-transform duration-500" />
+            
+            <div className="relative z-10">
+              <h3 className="font-bold text-slate-900 mb-4">Top Talent Suggestions</h3>
             <div className="space-y-4">
               {talents.map((talent, i) => (
                 <div key={i} className="flex items-center justify-between bg-slate-50/50 border border-slate-100 p-3 rounded-2xl cursor-pointer hover:bg-white hover:border-slate-200 hover:shadow-sm transition-all group">
@@ -248,6 +269,7 @@ export function ClientDashboard({
                     </div>
                 </div>
             )}
+            </div>
           </div>
           {selectedTalent && <TalentDetailModal talent={selectedTalent} onClose={() => setSelectedTalent(null)} />}
         </div>

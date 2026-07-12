@@ -19,6 +19,7 @@ import {
   ChevronRight,
   User,
   AlertCircle,
+  HelpCircle,
   BookOpen,
   Tv,
   ShoppingBag,
@@ -62,7 +63,7 @@ export default function GigsSection({ userProfile, onOpenAiChat, initialCategory
       sellerRating: 5.0,
       reviewsCount: 128,
       deliveryDays: 3,
-      price: 45000,
+      price: 45,
       category: "Writing & Content",
       description: "ESTARR is built to ensure IT pros and creators can monetize their talents efficiently and reliably across the continent. By selecting IT Pro & Creator Priority, you get matched instantly with top-tier skilled pros who handle your media kits, technical deployment, escrow configuration, and direct partner pitching.",
       features: [
@@ -82,7 +83,7 @@ export default function GigsSection({ userProfile, onOpenAiChat, initialCategory
       sellerRating: 4.9,
       reviewsCount: 38,
       deliveryDays: 2,
-      price: 15000,
+      price: 15,
       category: "Creative Operations",
       description: "Get attention-grabbing hooks, retention-first text overlays, dynamic sound design, and custom timing optimized for short-form algorithms. I have edited videos pulling over 1M+ views in Nigeria and Ghana.",
       features: [
@@ -102,7 +103,7 @@ export default function GigsSection({ userProfile, onOpenAiChat, initialCategory
       sellerRating: 5.0,
       reviewsCount: 14,
       deliveryDays: 3,
-      price: 25000,
+      price: 25,
       category: "Creative Operations",
       description: "Pitching your startup or looking for brand sponsorships? I'll design a customized, highly modern Canva deck. No dull templates. Bold Swiss-style layouts, clean data charts, and beautiful typography.",
       features: [
@@ -122,7 +123,7 @@ export default function GigsSection({ userProfile, onOpenAiChat, initialCategory
       sellerRating: 4.8,
       reviewsCount: 29,
       deliveryDays: 1,
-      price: 12000,
+      price: 12,
       category: "Tech & Setup",
       description: "Stop spending hours explaining prices in DM. I will configure your WhatsApp Business profile, load up to 10 products into your catalog, construct structured auto-replies, and link digital payments.",
       features: [
@@ -142,7 +143,7 @@ export default function GigsSection({ userProfile, onOpenAiChat, initialCategory
       sellerRating: 4.7,
       reviewsCount: 22,
       deliveryDays: 2,
-      price: 18000,
+      price: 18,
       category: "Writing & Content",
       description: "Struggling with what to write when sliding into brand DMs or cold emailing sponsors? I will write 3 custom outreach templates, a professional creator bio, and a media kit value statement.",
       features: [
@@ -162,7 +163,7 @@ export default function GigsSection({ userProfile, onOpenAiChat, initialCategory
       sellerRating: 4.9,
       reviewsCount: 19,
       deliveryDays: 2,
-      price: 20000,
+      price: 20,
       category: "Agric & Business",
       description: "Maximize your flock survivability. I'll build a tailored broiler or layer calendar template tracking feed consumption weights, water treatments, vaccination days, and sanitization schedules.",
       features: [
@@ -182,7 +183,7 @@ export default function GigsSection({ userProfile, onOpenAiChat, initialCategory
       sellerRating: 5.0,
       reviewsCount: 412,
       deliveryDays: 7,
-      price: 250000,
+      price: 250,
       category: "Train AI",
       description: "Get high-quality human-annotated data for supervised fine-tuning and reinforcement learning from human feedback. We specialize in code, logic, and multi-dialect African languages.",
       features: [
@@ -202,7 +203,7 @@ export default function GigsSection({ userProfile, onOpenAiChat, initialCategory
       sellerRating: 4.9,
       reviewsCount: 86,
       deliveryDays: 14,
-      price: 1200000,
+      price: 1200,
       category: "Build AI",
       description: "Complete end-to-end development of custom AI agents using Retrieval-Augmented Generation (RAG). Includes vector database setup, LLM integration, and API deployment.",
       features: [
@@ -221,7 +222,7 @@ export default function GigsSection({ userProfile, onOpenAiChat, initialCategory
     {
       title: "Viral Short-Form Video Blueprint",
       category: "Creative Operations",
-      price: 25000,
+      price: 25,
       delivery: "2",
       desc: "Standardized high-retention viral video editing. Optimized for TikTok, Reels, and YouTube Shorts. Includes hooks, captions, and sound design.",
       features: "Hook development\nRetention-first captions\nSFX & Color Grading\n1x 60-second deliverable"
@@ -229,7 +230,7 @@ export default function GigsSection({ userProfile, onOpenAiChat, initialCategory
     {
       title: "Technical Cloud Infrastructure Setup",
       category: "Technical & Platform Engineering",
-      price: 150000,
+      price: 150,
       delivery: "5",
       desc: "Production-ready AWS/GCP infrastructure deployment. Includes VPC setup, S3 buckets, and CI/CD pipeline automation.",
       features: "Infrastructure as Code (Terraform)\nSecure VPC & IAM config\nGitHub Actions CI/CD\nPerformance monitoring"
@@ -237,7 +238,7 @@ export default function GigsSection({ userProfile, onOpenAiChat, initialCategory
     {
       title: "Corporate Brand Identity System",
       category: "Creative Operations",
-      price: 75000,
+      price: 75,
       delivery: "4",
       desc: "Comprehensive visual identity design. Logo system, typography, color palette, and usage guidelines.",
       features: "Logo Suite (SVG, PNG)\nColor System & Typography\nBrand Guidelines PDF\nSocial Media Kit"
@@ -373,8 +374,8 @@ export default function GigsSection({ userProfile, onOpenAiChat, initialCategory
   return (
     <div className="flex flex-col gap-6 animate-fade-in text-slate-800">
       <PageBanner
-        title="ESTARR AI & Creative Ops Marketplace"
-        subtitle="ELITE TALENT NODES"
+        title={<span className="whitespace-nowrap">ELITE TALENT NODES</span>}
+        subtitle="ESTARR AI & Creative Ops Marketplace"
         description="Hire skilled Gen Z creators and vocational experts, or sell your own skills as structured gigs. All orders are backed by ESTARR 100% Escrow Protection—payment stays safe until delivery is confirmed."
         icon={Briefcase}
         actions={
@@ -491,14 +492,14 @@ export default function GigsSection({ userProfile, onOpenAiChat, initialCategory
             <p className="text-[10px] leading-relaxed text-slate-400">
               Every job created is linked to an independent escrow contract. Funds are debited from the buyer but held securely until final files are uploaded and validated.
             </p>
-            <div className="border-t border-slate-900 pt-3 flex flex-col gap-1 text-[9px] font-mono">
-              <div className="flex justify-between">
-                <span className="text-slate-500">Total Active Escrows:</span>
-                <span className="text-emerald-400 font-bold">148 contracts</span>
+            <div className="border-t border-slate-900 pt-3 flex flex-col gap-2 text-[9px] font-mono">
+              <div className="flex justify-between items-center gap-2">
+                <span className="text-slate-500 leading-tight">Total Active Escrows:</span>
+                <span className="text-emerald-400 font-bold whitespace-nowrap">148 contracts</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-slate-500">Funded Value:</span>
-                <span className="text-white font-bold">$4.2M USD</span>
+              <div className="flex justify-between items-center gap-2">
+                <span className="text-slate-500 leading-tight">Funded Value:</span>
+                <span className="text-white font-bold whitespace-nowrap">$4.2M USD</span>
               </div>
             </div>
           </div>
@@ -624,11 +625,20 @@ export default function GigsSection({ userProfile, onOpenAiChat, initialCategory
                         <Clock className="w-3.5 h-3.5 text-slate-9000" />
                         <span>{gig.deliveryDays} Days delivery</span>
                       </div>
-                      <div className="text-right">
-                        <span className="text-[9px] font-mono text-slate-9000 uppercase block">Starting at</span>
-                        <span className="text-base font-black font-mono text-slate-900">
-                          ${gig.price.toLocaleString()}
-                        </span>
+                      <div className="text-right flex flex-col items-end">
+                        <span className="text-[9px] font-mono text-slate-400 uppercase block">Starting at</span>
+                        <div className="flex items-center gap-1">
+                          <span className="text-base font-black font-mono text-slate-900">
+                            ${gig.price.toLocaleString()}
+                          </span>
+                          <div className="relative group/tooltip inline-block">
+                            <HelpCircle className="w-3.5 h-3.5 text-slate-400 hover:text-purple-600 transition-colors cursor-help" />
+                            <div className="absolute right-0 bottom-full mb-2 hidden group-hover/tooltip:block w-48 bg-slate-900 text-white text-[10px] p-2.5 rounded-lg shadow-xl border border-slate-800 font-normal leading-normal text-left z-50 whitespace-normal">
+                              Payments are securely held in the ESTARR Escrow Protection system until delivery is verified.
+                              <div className="absolute top-full right-1.5 -mt-1 w-2 h-2 bg-slate-900 rotate-45 border-r border-b border-slate-800"></div>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>

@@ -28,38 +28,10 @@ export default function ChatDrawer({
   const [isLoading, setIsLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (initialPrompt) {
-      setInputMsg(initialPrompt);
-    }
-  }, [initialPrompt]);
+  const lastSentPromptRef = useRef<string | null>(null);
 
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isLoading]);
-
-    const handleRecordComplete = (audioUrl: string, duration: number) => {
-    const updatedMessages = [
-      ...messages,
-      { role: "user" as const, text: "🎤 Voice note", audioUrl, audioDuration: duration },
-    ];
-    setMessages(updatedMessages);
-    setIsLoading(true);
-    setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "model",
-          text: "I've received your audio note. I have logged this feedback. Do you want me to convert this into a structured task?",
-        },
-      ]);
-      setIsLoading(false);
-    }, 1500);
-  };
-
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const query = inputMsg.trim();
+  const sendMessageText = async (text: string) => {
+    const query = text.trim();
     if (!query || isLoading) return;
 
     // Append user message
@@ -78,7 +50,7 @@ export default function ChatDrawer({
         body: JSON.stringify({
           message: query,
           context: initialContext,
-          history: updatedMessages.slice(0, -1), // pass historical messages excluding the latest user query
+          history: updatedMessages.slice(0, -1), // pass historical messages
         }),
       });
 
@@ -102,6 +74,49 @@ export default function ChatDrawer({
     } finally {
       setIsLoading(false);
     }
+  };
+
+  useEffect(() => {
+    if (isOpen && initialPrompt) {
+      setInputMsg(initialPrompt);
+      if (lastSentPromptRef.current !== initialPrompt) {
+        lastSentPromptRef.current = initialPrompt;
+        const timer = setTimeout(() => {
+          sendMessageText(initialPrompt);
+        }, 300);
+        return () => clearTimeout(timer);
+      }
+    } else if (!isOpen) {
+      lastSentPromptRef.current = null;
+    }
+  }, [isOpen, initialPrompt]);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, isLoading]);
+
+  const handleRecordComplete = (audioUrl: string, duration: number) => {
+    const updatedMessages = [
+      ...messages,
+      { role: "user" as const, text: "🎤 Voice note", audioUrl, audioDuration: duration },
+    ];
+    setMessages(updatedMessages);
+    setIsLoading(true);
+    setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "model",
+          text: "I've received your audio note. I have logged this feedback. Do you want me to convert this into a structured task?",
+        },
+      ]);
+      setIsLoading(false);
+    }, 1500);
+  };
+
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await sendMessageText(inputMsg);
   };
 
   return (

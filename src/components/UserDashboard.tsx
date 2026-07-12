@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { 
   LayoutDashboard, 
   Briefcase, 
@@ -10,7 +10,20 @@ import {
   ShieldCheck,
   Cpu,
   Activity,
-  Download
+  Download,
+  DollarSign,
+  Award,
+  Sparkles,
+  Coins,
+  Lock,
+  FileCode,
+  CheckCircle2,
+  CheckCircle,
+  UserPlus,
+  Flame,
+  Rocket,
+  ChevronRight,
+  Info
 } from "lucide-react";
 import { UserProfile, ConsultancyTask, ActivityPost } from "../types";
 import { ClientDashboard } from "./ClientDashboard";
@@ -20,12 +33,16 @@ export function UserDashboard({
   userProfile, 
   tasks,
   posts,
-  onNavigate 
+  onNavigate,
+  onOpenAiChat,
+  onUpdateProfile
 }: { 
   userProfile: UserProfile;
   tasks: ConsultancyTask[];
   posts: ActivityPost[];
   onNavigate: (id: string) => void;
+  onOpenAiChat?: (prompt: string, context: string) => void;
+  onUpdateProfile?: (updated: UserProfile) => void;
 }) {
   const calculateCompletion = (profile: UserProfile) => {
     let percentage = 0;
@@ -97,8 +114,81 @@ export function UserDashboard({
 
   const recentMilestones = activeTasks.slice(0, 5);
 
+  // Dynamic ESTARR Intelligence & Rate Recommendation Engine
+  const calculateRateStats = () => {
+    let baseRate = 75;
+    const profession = (userProfile.profession || "Consultant").toLowerCase();
+    
+    if (profession.includes("architect") || profession.includes("principal")) {
+      baseRate = 135;
+    } else if (profession.includes("senior") || profession.includes("lead")) {
+      baseRate = 115;
+    } else if (profession.includes("engineer") || profession.includes("developer")) {
+      baseRate = 95;
+    } else if (profession.includes("designer") || profession.includes("product")) {
+      baseRate = 85;
+    } else if (profession.includes("marketing") || profession.includes("seo")) {
+      baseRate = 80;
+    }
+
+    const userSkills = userProfile.skills || [];
+    let skillsPremium = 0;
+    const skillsToHighlight: string[] = [];
+
+    // Analyze individual skills
+    userSkills.forEach(skill => {
+      const s = skill.toLowerCase().trim();
+      if (
+        s.includes("solidity") || 
+        s.includes("smart contract") || 
+        s.includes("blockchain") ||
+        s.includes("kubernetes") ||
+        s.includes("ai") ||
+        s.includes("machine learning") ||
+        s.includes("llm") ||
+        s.includes("rust")
+      ) {
+        skillsPremium += 15;
+        skillsToHighlight.push(skill);
+      } else if (s.length > 0) {
+        skillsPremium += 5;
+      }
+    });
+
+    const recommendedRate = baseRate + skillsPremium;
+
+    // Suggest highly valuable skills not currently present
+    const standardPremiumPool = [
+      { name: "Solidity Smart Contracts", rateBoost: 25 },
+      { name: "Enterprise SEO Frameworks", rateBoost: 15 },
+      { name: "Kubernetes Multi-Cluster Orchestration", rateBoost: 20 },
+      { name: "Gemini / OpenAI Agent Tooling", rateBoost: 25 },
+      { name: "Rust System Safety Architecture", rateBoost: 30 }
+    ];
+
+    const suggestions = standardPremiumPool.filter(
+      p => !userSkills.some(us => us.toLowerCase().includes(p.name.split(" ")[0].toLowerCase()))
+    ).slice(0, 2);
+
+    return {
+      recommendedRate,
+      skillsPremium,
+      highlightedSkills: skillsToHighlight,
+      suggestions,
+      totalSkillsCount: userSkills.length
+    };
+  };
+
+  const rateStats = calculateRateStats();
+
   return (
-    <div className="flex flex-col gap-8 animate-fade-in">
+    <div className="flex flex-col gap-8 animate-fade-in relative min-h-screen isolate">
+      {/* Decorative background ambient glow circles */}
+      <div className="absolute -top-16 -left-16 w-96 h-96 bg-purple-300/25 rounded-full blur-3xl pointer-events-none -z-10" />
+      <div className="absolute top-1/3 right-0 w-96 h-96 bg-indigo-300/25 rounded-full blur-3xl pointer-events-none -z-10" />
+      <div className="absolute bottom-20 left-10 w-80 h-80 bg-pink-300/20 rounded-full blur-3xl pointer-events-none -z-10" />
+      <div className="absolute bottom-0 right-10 w-72 h-72 bg-purple-300/20 rounded-full blur-3xl pointer-events-none -z-10" />
+
       {/* Welcome Header */}
       <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
         <div className="flex flex-col gap-2">
@@ -125,15 +215,18 @@ export function UserDashboard({
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat, i) => (
-          <div key={i} className="bg-white border border-slate-200 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all group">
-            <div className="flex items-center justify-between mb-3">
-              <div className={`p-2 rounded-xl ${stat.bg} ${stat.color} transition-colors`}>
-                <stat.icon className="w-5 h-5" />
+          <div key={i} className="bg-white border border-slate-200 rounded-3xl p-6 hover:shadow-md transition-all relative overflow-hidden group">
+            <div className="flex justify-between items-start mb-4 relative z-10">
+              <div className={`p-3 rounded-2xl ${stat.bg} ${stat.color} group-hover:scale-110 transition-transform`}>
+                <stat.icon className="w-6 h-6" />
               </div>
               <TrendingUp className="w-4 h-4 text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
-            <p className="text-[10px] uppercase font-black tracking-widest text-slate-400 mb-1">{stat.label}</p>
-            <p className="text-2xl font-black text-slate-900 tracking-tighter">{stat.value}</p>
+            <div className="relative z-10">
+              <p className="text-sm font-bold text-slate-500 mb-1">{stat.label}</p>
+              <h3 className="text-3xl font-black text-slate-900 tracking-tighter">{stat.value}</h3>
+            </div>
+            <div className={`absolute -right-6 -bottom-6 w-24 h-24 rounded-full ${stat.bg} opacity-50 group-hover:scale-150 transition-transform duration-500`} />
           </div>
         ))}
       </div>
@@ -236,61 +329,33 @@ export function UserDashboard({
 
         {/* Wallet & Activity / Right Column */}
         <div className="lg:col-span-4 flex flex-col gap-6">
-          <div className="bg-slate-950 text-white p-6 rounded-2xl relative overflow-hidden shadow-xl">
-            <div className="absolute top-0 right-0 p-4 opacity-10">
+          <div className="bg-slate-950 text-white p-6 rounded-3xl relative overflow-hidden shadow-xl group">
+            {/* Glowing background circles */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500 rounded-bl-full opacity-25 group-hover:scale-125 transition-transform duration-500" />
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-indigo-500 rounded-tr-full opacity-25 group-hover:scale-125 transition-transform duration-500" />
+            <div className="absolute top-1/2 left-1/3 w-16 h-16 bg-pink-500 rounded-full opacity-20 blur-xl group-hover:scale-150 transition-transform duration-700" />
+            
+            <div className="absolute top-0 right-0 p-4 opacity-10 relative z-0">
               <Activity className="w-24 h-24" />
             </div>
-            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-purple-400 mb-6">Financial Overview</h2>
             
-            <div className="space-y-6">
-              <div>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Available Balance</p>
-                <p className="text-3xl font-black text-white tracking-tighter">
-                  ${(userProfile.walletBalance ?? 0).toLocaleString()}
-                </p>
-              </div>
+            <div className="relative z-10">
+              <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-purple-400 mb-6">Financial Overview</h2>
               
-              <div className="pt-4 border-t border-slate-800">
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Recent Activity</p>
-                <div className="space-y-3">
-                  {(userProfile.history && userProfile.history.length > 0 ? userProfile.history : []).slice(0, 3).map((item, idx) => (
-                    <div key={idx} className="flex justify-between items-center">
-                      <div className="flex flex-col">
-                        <span className="text-[10px] font-bold text-slate-200">{item.desc}</span>
-                        <span className="text-[9px] text-slate-500">{item.date}</span>
-                      </div>
-                      <span className={`text-[10px] font-black ${item.type === 'payout' ? 'text-emerald-400' : 'text-slate-300'}`}>
-                        {item.type === 'payout' ? '+' : ''}${Math.abs(item.amount).toLocaleString()}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Escrow Protection Guard Info */}
-              <div className="mt-4 p-4 bg-white/5 rounded-xl border border-white/10">
-                <div className="flex items-center gap-2 mb-2">
-                  <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                  <span className="text-[9px] font-black uppercase tracking-widest text-emerald-400">Escrow Protection Guard</span>
-                </div>
-                <p className="text-[9px] text-slate-400 leading-relaxed">
-                  Your money stays securely locked in escrow until the supplier
-                  delivers your items or completes the service. Upon verification, the
-                  escrow automatically pays out. Absolutely risk-free!
+              <div className="space-y-4">
+                <p className="text-xs text-slate-400 leading-relaxed font-medium">
+                  Monitor ledger balances, trigger payouts, and sync transactions across secure payment gateways.
                 </p>
-              </div>
-
-              <div className="pt-4 border-t border-slate-800">
                 <div className="flex gap-2">
                   <button 
                     onClick={() => onNavigate("payments")}
-                    className="flex-1 py-2 bg-white/5 hover:bg-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest border border-white/10 transition-colors"
+                    className="flex-1 py-2 bg-white/5 hover:bg-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest border border-white/10 transition-colors cursor-pointer"
                   >
                     Manage Wallet
                   </button>
                   <button 
                     onClick={handleExport}
-                    className="px-3 py-2 bg-white/5 hover:bg-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest border border-white/10 transition-colors"
+                    className="px-3 py-2 bg-white/5 hover:bg-white/10 rounded-xl text-[9px] font-black uppercase tracking-widest border border-white/10 transition-colors cursor-pointer"
                   >
                     <Download className="w-3 h-3" />
                   </button>
@@ -299,20 +364,69 @@ export function UserDashboard({
             </div>
           </div>
 
-          <div className="bg-purple-50 border border-purple-100 p-6 rounded-2xl">
-            <h2 className="text-xs font-black uppercase tracking-widest text-purple-900 mb-3">AI Intelligence</h2>
-            <p className="text-sm font-medium text-purple-800 leading-relaxed mb-4">
-              {activeTasks.length > 0 
-                ? `"I've analyzed your ${activeTasks.length} active contracts. Focus on '${activeTasks[0].title}' to hit your delivery target."`
-                : `"Your profile is operational. I recommend adding more skills to your portfolio to match with premium $95/hr contracts."`
-              }
+          <div className="bg-purple-50 border border-purple-100 p-6 rounded-3xl relative overflow-hidden group">
+            {/* Ambient background circles */}
+            <div className="absolute -top-10 -right-10 w-28 h-28 bg-purple-200/50 rounded-full opacity-60 group-hover:scale-125 transition-transform duration-500" />
+            <div className="absolute -bottom-6 -left-6 w-20 h-20 bg-indigo-200/50 rounded-full opacity-60 group-hover:scale-125 transition-transform duration-500" />
+            
+            <div className="relative z-10">
+            <div className="flex items-center gap-2 mb-3">
+              <Sparkles className="w-4 h-4 text-purple-600 animate-pulse" />
+              <h2 className="text-xs font-black uppercase tracking-widest text-purple-900">
+                ESTARR Intelligence
+              </h2>
+            </div>
+
+            {/* Hourly Rate Recommendation Badge */}
+            <div className="flex items-center gap-3 bg-white border border-purple-100 rounded-xl p-3 mb-4 shadow-3xs">
+              <div className="p-2 bg-purple-100 text-purple-700 rounded-lg shrink-0">
+                <DollarSign className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="text-[9px] font-mono font-bold uppercase tracking-wider text-purple-500">Recommended Rate</div>
+                <div className="text-lg font-black text-slate-900 tracking-tight">
+                  ${rateStats.recommendedRate}/hr
+                </div>
+              </div>
+            </div>
+
+            <p className="text-xs font-medium text-purple-800 leading-relaxed mb-4">
+              Your profile as a <strong className="font-bold">{userProfile.profession || 'Consultant'}</strong> leveraging {rateStats.totalSkillsCount} registered skills is fully operational. ESTARR AI analyzed local contract supply and recommends a benchmark target rate of <strong className="font-bold">${rateStats.recommendedRate}/hr</strong>.
             </p>
+
+            {rateStats.suggestions.length > 0 && (
+              <div className="mb-4 bg-white/70 border border-purple-100 rounded-xl p-3">
+                <div className="text-[9px] font-mono font-black uppercase tracking-wider text-purple-700 mb-2 flex items-center gap-1">
+                  <Award className="w-3.5 h-3.5 text-purple-600" /> Premium Upgrades to Reach Next Tier
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  {rateStats.suggestions.map((s, idx) => (
+                    <div key={idx} className="flex justify-between items-center text-xs">
+                      <span className="text-purple-900 font-semibold text-[11px]">{s.name}</span>
+                      <span className="text-[9px] bg-emerald-50 border border-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-mono font-bold shrink-0">
+                        +{s.rateBoost}/hr
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <button 
-              onClick={() => onNavigate("home")} // Or just open AI drawer if we had the state here
-              className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2.5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-colors"
+              onClick={() => {
+                if (onOpenAiChat) {
+                  const defaultPrompt = `Hello! My profile as a ${userProfile.profession || 'Consultant'} is operational on ESTARR with skills: ${userProfile.skills?.slice(0, 5).join(', ') || 'none listed'}. ESTARR Intelligence recommends an hourly rate of $${rateStats.recommendedRate}/hr based on current listings. Can you analyze this portfolio and guide me step-by-step on how to add high-demand skills to unlock higher-paying $120+/hr contracts?`;
+                  onOpenAiChat(defaultPrompt, "portfolio");
+                } else {
+                  onNavigate("home");
+                }
+              }}
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2.5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:scale-[1.01] shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
             >
               Ask AI Co-Pilot
+              <ArrowRight className="w-3.5 h-3.5" />
             </button>
+            </div>
           </div>
         </div>
       </div>

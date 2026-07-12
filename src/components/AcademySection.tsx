@@ -586,7 +586,7 @@ export default function AcademySection({
                                     <div className="relative z-10 max-w-2xl">
               <div className="flex items-center gap-2 mb-4">
                 <span className="bg-emerald-500/20 text-emerald-400 text-[10px] font-bold font-mono px-3 py-1 rounded-full uppercase tracking-widest border border-emerald-500/30">
-                  AI Training Space
+                  Anonymous Talent Market
                 </span>
               </div>
               <h1 className="text-2xl lg:text-3xl font-black text-white tracking-tight mb-3 whitespace-nowrap">

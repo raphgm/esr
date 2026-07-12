@@ -36,7 +36,8 @@ export function ServicesCarousel({ onSelect }: ServicesCarouselProps) {
   const [activeTab, setActiveTab] = useState<"modules" | "brands">("modules");
   const [selectedService, setSelectedService] = useState<any>(null);
   const [selectedPartner, setSelectedPartner] = useState<any>(null);
-  
+  const [quickHireBounty, setQuickHireBounty] = useState<any>(null);
+
   // Custom interactive demo states for partner pitches
   const [pitchSent, setPitchSent] = useState(false);
   const [pitchText, setPitchText] = useState("");
@@ -114,7 +115,7 @@ export function ServicesCarousel({ onSelect }: ServicesCarouselProps) {
     },
     {
       id: "academy",
-      label: "AI Training Space",
+      label: "Anonymous Talent Market",
       desc: "Professional playbooks, expert classes, and skill licenses for IT pros and creative talent.",
       icon: Award,
       badge: "42 CLASSES LIVE",
@@ -154,13 +155,52 @@ export function ServicesCarousel({ onSelect }: ServicesCarouselProps) {
     },
     {
       id: "community",
-      label: "Creator Community",
+      label: "Estarr Community",
       desc: "Collaborative learning cohorts, group boards, and peer discussion hubs for scaling talent.",
       icon: Heart,
       badge: "COHORTS IN SESSION",
       color: "bg-pink-50 text-pink-600 border-pink-100 group-hover:bg-pink-600 group-hover:text-white",
       stats: "24 Active Circles",
       accent: "#EC4899"
+    }
+  ];
+
+  const liveBounties = [
+    {
+      id: "bounty-1",
+      title: "Machine Learning Engineer",
+      company: "Acme Corp",
+      bounty: "$5,000",
+      type: "Model Training",
+      desc: "Train and deploy custom vision models for automated quality control in manufacturing.",
+      tags: ["PyTorch", "Computer Vision", "MLOps"]
+    },
+    {
+      id: "bounty-2",
+      title: "AI Prompt Engineer",
+      company: "Nexus AI",
+      bounty: "$3,200",
+      type: "Milestone Escrow",
+      desc: "Fine-tune LLMs for customer support. Create, test, and optimize prompts across multiple domains.",
+      tags: ["LLMs", "Prompting", "AI"]
+    },
+    {
+      id: "bounty-3",
+      title: "RAG Pipeline Developer",
+      company: "DataFlow AI",
+      bounty: "$10,000",
+      type: "Implementation",
+      desc: "Design and build a scalable Retrieval-Augmented Generation pipeline connecting enterprise documents to a conversational AI.",
+      tags: ["Vector DB", "RAG", "LangChain"]
+    },
+    {
+      id: "bounty-4",
+      title: "AI Agent Architect",
+      company: "AutoAgents Inc",
+      bounty: "$4,500",
+      type: "Delivery Escrow",
+      desc: "Develop an autonomous agent framework for handling multi-step web research tasks and data synthesis.",
+      tags: ["Agents", "Automation", "LLMs"]
     }
   ];
 
@@ -292,89 +332,84 @@ export function ServicesCarousel({ onSelect }: ServicesCarouselProps) {
     }, 2500);
   };
 
-  const activeCollection = activeTab === "modules" ? services : partnerBrands;
+  const activeCollection = activeTab === "modules" ? services : liveBounties;
 
   return (
     <div id="services-carousel-root" className="relative w-[100vw] overflow-hidden pt-16 pb-20 left-[50%] right-[50%] -ml-[50vw] -mr-[50vw] bg-slate-50/50 border-y border-slate-100">
       <div className="max-w-7xl mx-auto px-4 md:px-8 w-full">
         
-        {/* Core Header Section */}
-        <div className="flex flex-col items-center text-center max-w-2xl mx-auto mb-10">
-          <span className="text-[10px] font-mono font-black text-violet-600 bg-violet-50 border border-violet-100 px-3 py-1 rounded-full uppercase tracking-widest inline-flex items-center gap-1.5 mb-3 shadow-xs">
-            <span className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-ping" />
-            <span>ESTARR Platform Ecosystem</span>
-          </span>
-          <h3 className="text-3xl md:text-4xl font-black tracking-tight text-slate-900 uppercase">
-            Explore Ecosystem
-          </h3>
-          <p className="text-xs md:text-sm text-slate-500 mt-2 leading-relaxed">
-            Configure automated escrow workflows, execute custom agreements, and verify talent milestones securely across local African tech nodes and global backers.
-          </p>
-        </div>
-
-        {/* Elegant Design Switcher: Tabbed Controller */}
-        <div className="flex justify-center mb-10">
-          <div className="bg-slate-200/60 p-1.5 rounded-2xl flex items-center gap-1 border border-slate-200 shadow-xs max-w-md w-full">
-            <button
-              id="tab-btn-modules"
-              type="button"
-              onClick={() => {
-                setActiveTab("modules");
-                if (scrollRef.current) scrollRef.current.scrollTo({ left: 0, behavior: "auto" });
-              }}
-              className={`flex-1 py-3 px-4 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer ${
-                activeTab === "modules"
-                  ? "bg-white text-slate-950 shadow-sm border border-slate-200/80 font-black"
-                  : "text-slate-500 hover:text-slate-800"
-              }`}
-            >
-              <Zap className={`w-3.5 h-3.5 ${activeTab === "modules" ? "text-violet-500" : ""}`} />
-              <span>Workspace Modules</span>
-            </button>
+        {/* Header & Controls Section */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-8 px-2">
+          <div className="max-w-xl">
+            <p className="text-lg text-slate-600 leading-relaxed font-medium mb-8">
+              Hire elite AI Talents, configure automated escrow workflows, execute custom agreements, and verify talent milestones securely across local African tech nodes and global backers.
+            </p>
             
-            <button
-              id="tab-btn-brands"
-              type="button"
-              onClick={() => {
-                setActiveTab("brands");
-                if (scrollRef.current) scrollRef.current.scrollTo({ left: 0, behavior: "auto" });
-              }}
-              className={`flex-1 py-3 px-4 text-xs font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer ${
-                activeTab === "brands"
-                  ? "bg-white text-slate-950 shadow-sm border border-slate-200/80 font-black"
-                  : "text-slate-500 hover:text-slate-800"
-              }`}
-            >
-              <Building2 className={`w-3.5 h-3.5 ${activeTab === "brands" ? "text-violet-500" : ""}`} />
-              <span>Corporate Partners</span>
-            </button>
+            <div className="flex items-center gap-6 border-b border-slate-200 pb-2">
+              <button
+                id="tab-btn-modules"
+                type="button"
+                onClick={() => {
+                  setActiveTab("modules");
+                  if (scrollRef.current) scrollRef.current.scrollTo({ left: 0, behavior: "auto" });
+                }}
+                className={`pb-4 text-sm font-bold transition-all relative cursor-pointer ${
+                  activeTab === "modules"
+                    ? "text-slate-900"
+                    : "text-slate-400 hover:text-slate-600"
+                }`}
+              >
+                Workspace Modules
+                {activeTab === "modules" && (
+                  <span className="absolute -bottom-[9px] left-0 right-0 h-[2px] bg-slate-900 rounded-full" />
+                )}
+              </button>
+              
+              <button
+                id="tab-btn-brands"
+                type="button"
+                onClick={() => {
+                  setActiveTab("brands");
+                  if (scrollRef.current) scrollRef.current.scrollTo({ left: 0, behavior: "auto" });
+                }}
+                className={`pb-4 text-sm font-bold transition-all relative cursor-pointer ${
+                  activeTab === "brands"
+                    ? "text-slate-900"
+                    : "text-slate-400 hover:text-slate-600"
+                }`}
+              >
+                Live Bounties
+                {activeTab === "brands" && (
+                  <span className="absolute -bottom-[9px] left-0 right-0 h-[2px] bg-slate-900 rounded-full" />
+                )}
+              </button>
+            </div>
           </div>
-        </div>
-
-        {/* Dynamic Controls Line */}
-        <div className="flex justify-between items-center mb-6 px-2">
-          <span className="text-[10px] font-mono font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Showing {activeCollection.length} verified {activeTab === "modules" ? "functional nodes" : "backed integrations"}</span>
-          </span>
           
-          <div className="flex gap-2">
-            <button
-              id="carousel-prev"
-              type="button"
-              onClick={() => scrollRef.current?.scrollBy({ left: -300, behavior: "smooth" })}
-              className="w-9 h-9 rounded-xl flex items-center justify-center border border-slate-200 bg-white hover:bg-slate-50 hover:text-violet-600 transition-all active:scale-95 shadow-xs cursor-pointer text-slate-600 text-sm font-bold"
-            >
-              &larr;
-            </button>
-            <button
-              id="carousel-next"
-              type="button"
-              onClick={() => scrollRef.current?.scrollBy({ left: 300, behavior: "smooth" })}
-              className="w-9 h-9 rounded-xl flex items-center justify-center border border-slate-200 bg-white hover:bg-slate-50 hover:text-violet-600 transition-all active:scale-95 shadow-xs cursor-pointer text-slate-600 text-sm font-bold"
-            >
-              &rarr;
-            </button>
+          <div className="flex flex-col items-end gap-4 shrink-0">
+            <span className="text-xs font-mono text-slate-500 uppercase tracking-widest flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              Showing {activeCollection.length} {activeTab === "modules" ? "verified functional nodes" : "active live bounties"}
+            </span>
+              
+            <div className="flex gap-2">
+              <button
+                id="carousel-prev"
+                type="button"
+                onClick={() => scrollRef.current?.scrollBy({ left: -300, behavior: "smooth" })}
+                className="w-10 h-10 rounded-full flex items-center justify-center border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 text-slate-600 transition-all active:scale-95 cursor-pointer shadow-sm"
+              >
+                &larr;
+              </button>
+              <button
+                id="carousel-next"
+                type="button"
+                onClick={() => scrollRef.current?.scrollBy({ left: 300, behavior: "smooth" })}
+                className="w-10 h-10 rounded-full flex items-center justify-center border border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50 text-slate-600 transition-all active:scale-95 cursor-pointer shadow-sm"
+              >
+                &rarr;
+              </button>
+            </div>
           </div>
         </div>
 
@@ -391,84 +426,129 @@ export function ServicesCarousel({ onSelect }: ServicesCarouselProps) {
               return (
                 <div
                   key={`service-item-${service.id}-${idx}`}
-                  className="w-full sm:w-[290px] flex-shrink-0 snap-start"
+                  className="w-full sm:w-[340px] flex-shrink-0 snap-start"
                 >
                   <div
                     onClick={() => setSelectedService(service)}
-                    className="p-5 h-full min-h-[240px] bg-white border border-slate-200/80 hover:border-violet-300 transition-all duration-300 cursor-pointer group shadow-xs hover:shadow-lg hover:-translate-y-1.5 rounded-2xl flex flex-col justify-between relative overflow-hidden"
+                    className="p-8 h-full min-h-[300px] bg-white border border-slate-200 hover:border-slate-300 transition-all duration-500 cursor-pointer group hover:shadow-xl hover:shadow-slate-200/40 rounded-[2rem] flex flex-col justify-between relative overflow-hidden"
                   >
-                    {/* Subtle aesthetic dotted background inside cards */}
-                    <div className="absolute inset-0 bg-radial-[circle_800px_at_50%_-100%] from-slate-50 to-transparent opacity-100 pointer-events-none" />
-                    <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-violet-100/10 to-transparent rounded-full blur-xl pointer-events-none" />
+                    {/* Subtle bottom-right colored circle */}
+                    <div 
+                      className="absolute -bottom-16 -right-16 w-48 h-48 rounded-full transition-transform duration-500 group-hover:scale-110 pointer-events-none"
+                      style={{ backgroundColor: `${service.accent}15` }}
+                    />
+                    
+                    <div className="relative z-10">
+                      <div 
+                        className="w-12 h-12 rounded-2xl mb-6 flex items-center justify-center transition-all duration-300 shadow-sm"
+                        style={{ backgroundColor: `${service.accent}15`, color: service.accent }}
+                      >
+                         <Icon className="w-6 h-6" />
+                      </div>
 
-                    <div>
-                      <div className="flex justify-between items-start mb-4 relative z-10">
-                        <div className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-all duration-300 shadow-xs ${service.color}`}>
-                          <Icon className="w-5 h-5 transition-transform group-hover:scale-110" />
-                        </div>
-                        <span className="text-[8px] font-mono font-bold tracking-wider text-slate-500 bg-slate-100/80 border border-slate-200 px-2 py-0.5 rounded-full flex items-center gap-1 group-hover:text-violet-600 group-hover:bg-violet-50 group-hover:border-violet-100 transition-all duration-300">
-                          <span className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+                      <div className="mb-4">
+                        <span className="text-[10px] font-mono font-bold tracking-widest text-slate-400 uppercase">
                           {service.badge}
                         </span>
                       </div>
 
-                      <h4 className="text-sm font-black uppercase tracking-tight text-slate-900 group-hover:text-violet-600 transition-colors duration-200 mb-2 relative z-10">
+                      <h4 className="text-xl font-display font-medium text-slate-900 group-hover:text-violet-600 transition-colors duration-200 mb-3">
                         {service.label}
                       </h4>
-                      <p className="text-[11px] leading-relaxed text-slate-500 min-h-[50px] line-clamp-3 relative z-10">
+                      <p className="text-sm leading-relaxed text-slate-500">
                         {service.desc}
                       </p>
                     </div>
 
-                    <div className="mt-4 pt-3.5 border-t border-slate-100 flex justify-between items-center relative z-10">
-                      <span className="text-[9px] font-mono font-bold text-slate-400 group-hover:text-slate-600 transition-colors">
-                        📊 {service.stats}
-                      </span>
-                      <span className="text-[9px] font-mono font-bold text-violet-500 group-hover:translate-x-1.5 transition-transform flex items-center gap-1">
-                        ENTER HUB <span className="text-[12px]">&rarr;</span>
-                      </span>
+                    <div className="mt-6 pt-6 border-t border-slate-100/60 flex flex-col gap-4 relative z-10">
+                      <div className="flex items-center gap-2">
+                         <span className="text-xs font-medium text-slate-700">
+                           {service.stats}
+                         </span>
+                      </div>
+                      <div className="flex items-center justify-between mt-auto">
+                        <span className="text-[11px] font-bold tracking-wider text-slate-900 uppercase group-hover:text-violet-600 transition-colors">
+                          Enter Hub
+                        </span>
+                        <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-violet-600 group-hover:translate-x-1 transition-all duration-300" />
+                      </div>
                     </div>
                   </div>
                 </div>
               );
             })
           ) : (
-            // Tab 2: Categorized Partner Ecosystem
-            (() => {
-              const groupedPartners = partnerBrands.reduce((acc, partner) => {
-                if (!acc[partner.category]) acc[partner.category] = [];
-                acc[partner.category].push(partner);
-                return acc;
-              }, {} as Record<string, typeof partnerBrands>);
-
-              return Object.entries(groupedPartners).map(([category, partners]) => (
-                <div key={category} className="w-full md:w-[350px] flex-shrink-0 snap-start bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
-                  <h4 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-6 border-b border-slate-100 pb-4">
-                    {category}
-                  </h4>
-                  <div className="space-y-4">
-                    {partners.map((partner, idx) => (
-                      <div
-                        key={`partner-item-${partner.id}-${idx}`}
-                        onClick={() => setSelectedPartner(partner)}
-                        className="group flex items-center gap-4 p-3 rounded-2xl hover:bg-slate-50 cursor-pointer transition-all border border-transparent hover:border-slate-100"
-                      >
-                        <div className="bg-slate-50 border border-slate-150 p-2 rounded-xl h-10 w-10 flex items-center justify-center shadow-2xs group-hover:bg-white transition-colors duration-300">
-                          {partner.logoSvg}
-                        </div>
-                        <div>
-                          <p className="text-xs font-bold text-slate-900 group-hover:text-emerald-700 transition-colors">
-                            {partner.name}
-                          </p>
-                          <p className="text-[10px] text-slate-400">{partner.metric}</p>
-                        </div>
-                        <ArrowRight className="w-3.5 h-3.5 text-slate-300 ml-auto group-hover:text-emerald-500 group-hover:translate-x-1 transition-all" />
+            // Tab 2: Live Bounties
+            liveBounties.map((bounty, idx) => (
+                <div
+                  key={`bounty-item-${bounty.id}-${idx}`}
+                  className="w-full sm:w-[340px] flex-shrink-0 snap-start"
+                >
+                  <div
+                    className="p-8 h-full min-h-[300px] bg-white border border-slate-200 hover:border-violet-300 transition-all duration-500 cursor-pointer group hover:shadow-xl hover:shadow-slate-200/40 rounded-[2rem] flex flex-col justify-between relative overflow-hidden"
+                  >
+                    {/* Hover Effect Overlay */}
+                    <div className="absolute inset-0 bg-slate-900/95 flex flex-col justify-center items-center p-6 text-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 backdrop-blur-sm">
+                      <span className="text-white text-xs font-bold mb-2 flex items-center gap-1.5">
+                        <svg className="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        Verified AI Talent
+                      </span>
+                      <p className="text-slate-300 text-[11px] mb-4">Top 5% of vetted developers. Escrow-ready for immediate hiring.</p>
+                      <div className="flex flex-wrap justify-center gap-2 mb-6">
+                        {bounty.tags.map(tag => (
+                          <span key={`overlay-${tag}`} className="bg-slate-800 text-slate-200 text-[10px] font-medium px-2.5 py-1 rounded-md border border-slate-700">
+                            {tag}
+                          </span>
+                        ))}
                       </div>
-                    ))}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setQuickHireBounty(bounty);
+                        }}
+                        className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-[11px] uppercase tracking-wider px-5 py-2.5 rounded-lg transition-all shadow-lg active:scale-95 flex items-center gap-2 cursor-pointer"
+                      >
+                        <Zap className="w-3.5 h-3.5" />
+                        Quick Hire
+                      </button>
+                    </div>
+
+                    <div>
+                      <div className="mb-4 flex justify-between items-start relative z-10">
+                        <span className="text-[10px] font-mono font-bold tracking-widest text-emerald-500 bg-emerald-50 px-2 py-1 rounded-full uppercase">
+                          {bounty.bounty}
+                        </span>
+                        <span className="text-[10px] font-mono font-medium text-slate-400">
+                          {bounty.company}
+                        </span>
+                      </div>
+
+                      <h4 className="text-xl font-display font-medium text-slate-900 group-hover:text-violet-600 transition-colors duration-200 mb-3 relative z-10">
+                        {bounty.title}
+                      </h4>
+                      <p className="text-sm leading-relaxed text-slate-500 relative z-10">
+                        {bounty.desc}
+                      </p>
+                    </div>
+
+                    <div className="mt-6 pt-6 border-t border-slate-100/60 flex flex-col gap-4 relative z-10">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {bounty.tags.map(tag => (
+                          <span key={tag} className="text-[10px] font-medium text-slate-500 bg-slate-100 px-2 py-1 rounded-md">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="flex items-center justify-between mt-auto pt-2">
+                        <span className="text-[11px] font-bold tracking-wider text-slate-900 uppercase group-hover:text-violet-600 transition-colors flex items-center gap-1.5">
+                          Apply Now
+                        </span>
+                        <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-violet-600 group-hover:translate-x-1 transition-all duration-300" />
+                      </div>
+                    </div>
                   </div>
                 </div>
-              ));
-            })()
+              ))
           )}
         </div>
 
@@ -661,6 +741,80 @@ export function ServicesCarousel({ onSelect }: ServicesCarouselProps) {
                     </div>
                   </form>
                 )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+
+        {/* Quick Hire Modal */}
+        {quickHireBounty && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xs"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-6 md:p-8 flex flex-col relative border border-slate-100"
+            >
+              <button
+                type="button"
+                onClick={() => setQuickHireBounty(null)}
+                className="absolute top-4 right-4 w-10 h-10 bg-slate-50 hover:bg-slate-100 rounded-full flex items-center justify-center text-slate-500 transition-colors border border-slate-200 active:scale-95 cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center">
+                  <ShieldCheck className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-black text-slate-900 leading-tight">Escrow Quick Hire</h3>
+                  <p className="text-xs font-mono text-emerald-600 font-bold uppercase tracking-wider">Secured Smart Contract</p>
+                </div>
+              </div>
+
+              <div className="bg-slate-50 rounded-2xl p-5 border border-slate-100 mb-6">
+                <h4 className="text-sm font-bold text-slate-800 mb-1">{quickHireBounty.title}</h4>
+                <p className="text-xs text-slate-500 mb-4">{quickHireBounty.company}</p>
+                
+                <div className="flex justify-between items-center border-t border-slate-200 pt-3">
+                  <span className="text-xs text-slate-400 font-mono uppercase">Compensation</span>
+                  <span className="text-sm font-black text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100">
+                    {quickHireBounty.bounty}
+                  </span>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <p className="text-sm text-slate-600">
+                  By proceeding, you will initiate a secure escrow contract. Funds will be held in a transparent smart contract until milestones are mutually approved.
+                </p>
+
+                <div className="flex gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setQuickHireBounty(null)}
+                    className="flex-1 bg-white hover:bg-slate-50 text-slate-700 py-3.5 rounded-xl text-sm font-bold transition-all cursor-pointer border border-slate-200"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      alert("Hire request submitted! Escrow contract initialized.");
+                      setQuickHireBounty(null);
+                    }}
+                    className="flex-[2] bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 rounded-xl text-sm font-bold transition-all cursor-pointer shadow-lg shadow-emerald-900/10 flex items-center justify-center gap-2"
+                  >
+                    <Lock className="w-4 h-4" />
+                    <span>Confirm & Submit Request</span>
+                  </button>
+                </div>
               </div>
             </motion.div>
           </motion.div>

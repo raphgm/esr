@@ -370,37 +370,36 @@ export function DjinniAnonymousSection({ userProfile, jobs, onUpdateProfile }: D
                     key={candidate.id}
                     className="bg-slate-950 border border-slate-800 hover:border-slate-700 rounded-2xl p-6 transition-all flex flex-col justify-between gap-5 relative overflow-hidden group hover:shadow-lg hover:shadow-blue-500/5"
                   >
-                    <div className="absolute top-0 right-0 p-3">
-                      <div className="flex items-center gap-1.5 bg-slate-900 border border-slate-800 text-[10px] font-bold px-2.5 py-1 rounded-lg">
-                        {isUnlocked ? (
-                          <>
-                            <Unlock className="w-3 h-3 text-emerald-400" />
-                            <span className="text-emerald-400 uppercase tracking-tight">Unlocked</span>
-                          </>
-                        ) : (
-                          <>
-                            <Lock className="w-3 h-3 text-blue-400 animate-pulse" />
-                            <span className="text-slate-400 uppercase tracking-tight">Anonymous</span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-
                     <div className="space-y-3">
-                      <div>
-                        <h4 className="font-bold text-base text-white tracking-tight leading-tight group-hover:text-blue-400 transition-colors">
-                          {candidate.anonymousTitle}
-                        </h4>
-                        <div className="flex flex-wrap items-center gap-3 text-[10px] font-mono text-slate-400 mt-2">
-                          <span className="flex items-center gap-1 bg-slate-900 text-blue-400 px-2 py-0.5 rounded-md border border-slate-800">
-                            <DollarSign className="w-3 h-3" /> {candidate.desiredSalary}/hr min
-                          </span>
-                          <span className="bg-slate-900 px-2 py-0.5 rounded-md border border-slate-800">
-                            {candidate.experienceYears} Years Exp
-                          </span>
-                          <span className="bg-slate-900 px-2 py-0.5 rounded-md border border-slate-800">
-                            {candidate.remotePreference}
-                          </span>
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <h4 className="font-bold text-base text-white tracking-tight leading-tight group-hover:text-blue-400 transition-colors">
+                            {candidate.anonymousTitle}
+                          </h4>
+                          <div className="flex flex-wrap items-center gap-3 text-[10px] font-mono text-slate-400 mt-2">
+                            <span className="flex items-center gap-1 bg-slate-900 text-blue-400 px-2 py-0.5 rounded-md border border-slate-800">
+                              <DollarSign className="w-3 h-3" /> {candidate.desiredSalary}/hr min
+                            </span>
+                            <span className="bg-slate-900 px-2 py-0.5 rounded-md border border-slate-800">
+                              {candidate.experienceYears} Years Exp
+                            </span>
+                            <span className="bg-slate-900 px-2 py-0.5 rounded-md border border-slate-800">
+                              {candidate.remotePreference}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1.5 bg-slate-900 border border-slate-800 text-[10px] font-bold px-2.5 py-1 rounded-lg shrink-0">
+                          {isUnlocked ? (
+                            <>
+                              <Unlock className="w-3 h-3 text-emerald-400" />
+                              <span className="text-emerald-400 uppercase tracking-tight">Unlocked</span>
+                            </>
+                          ) : (
+                            <>
+                              <Lock className="w-3 h-3 text-blue-400 animate-pulse" />
+                              <span className="text-slate-400 uppercase tracking-tight">Anonymous</span>
+                            </>
+                          )}
                         </div>
                       </div>
 
@@ -565,27 +564,26 @@ export function DjinniAnonymousSection({ userProfile, jobs, onUpdateProfile }: D
               Live Card Preview
             </span>
             <div className="bg-slate-950 border border-slate-800/80 rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between gap-5 min-h-[350px]">
-              <div className="absolute top-0 right-0 p-3">
-                <div className="flex items-center gap-1 bg-slate-900 border border-slate-800 text-[10px] font-mono font-bold px-2.5 py-1 rounded-lg text-slate-400">
-                  <Lock className="w-3 h-3 text-blue-400" /> Anonymous
-                </div>
-              </div>
-
               <div className="space-y-4">
-                <div>
-                  <h4 className="font-bold text-base text-blue-400 leading-tight">
-                    {formTitle || "Anonymous Professional Role"}
-                  </h4>
-                  <div className="flex flex-wrap items-center gap-2.5 text-[9px] font-mono text-slate-400 mt-2.5">
-                    <span className="bg-slate-900 text-blue-400 px-2 py-0.5 border border-slate-850 rounded">
-                      ${formSalary || 85}/hr min
-                    </span>
-                    <span className="bg-slate-900 px-2 py-0.5 border border-slate-850 rounded">
-                      {formExp || 3} Years Exp
-                    </span>
-                    <span className="bg-slate-900 px-2 py-0.5 border border-slate-850 rounded">
-                      {formRemote}
-                    </span>
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <h4 className="font-bold text-base text-blue-400 leading-tight">
+                      {formTitle || "Anonymous Professional Role"}
+                    </h4>
+                    <div className="flex flex-wrap items-center gap-2.5 text-[9px] font-mono text-slate-400 mt-2.5">
+                      <span className="bg-slate-900 text-blue-400 px-2 py-0.5 border border-slate-850 rounded">
+                        ${formSalary || 85}/hr min
+                      </span>
+                      <span className="bg-slate-900 px-2 py-0.5 border border-slate-850 rounded">
+                        {formExp || 3} Years Exp
+                      </span>
+                      <span className="bg-slate-900 px-2 py-0.5 border border-slate-850 rounded">
+                        {formRemote}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 bg-slate-900 border border-slate-800 text-[10px] font-mono font-bold px-2.5 py-1 rounded-lg text-slate-400 shrink-0">
+                    <Lock className="w-3 h-3 text-blue-400" /> Anonymous
                   </div>
                 </div>
 
@@ -655,41 +653,41 @@ export function DjinniAnonymousSection({ userProfile, jobs, onUpdateProfile }: D
                     key={pitch.id}
                     className="bg-slate-950 border border-slate-800 rounded-2xl p-6 flex flex-col md:flex-row justify-between gap-6 relative overflow-hidden"
                   >
-                    {/* Status Badge */}
-                    <div className="absolute top-4 right-4">
-                      {pitch.status === "pending" && (
-                        <span className="bg-amber-500/15 border border-amber-500/30 text-amber-500 text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full tracking-wider">
-                          Pending Review
-                        </span>
-                      )}
-                      {isAccepted && (
-                        <span className="bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full tracking-wider">
-                          Accepted & Unlocked
-                        </span>
-                      )}
-                      {isDeclined && (
-                        <span className="bg-rose-500/15 border border-rose-500/30 text-rose-400 text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full tracking-wider">
-                          Declined
-                        </span>
-                      )}
-                    </div>
-
                     <div className="flex-1 space-y-4">
                       {/* Employer Pitch Info */}
-                      <div>
-                        <div className="text-[10px] font-mono text-slate-500 uppercase">
-                          {isEmployer ? `OFFER SENT TO ANONYMOUS CANDIDATE` : `OFFER FROM ${pitch.employerName}`}
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1">
+                          <div className="text-[10px] font-mono text-slate-500 uppercase">
+                            {isEmployer ? `OFFER SENT TO ANONYMOUS CANDIDATE` : `OFFER FROM ${pitch.employerName}`}
+                          </div>
+                          <h4 className="font-bold text-lg text-white mt-1 leading-tight flex items-center gap-2">
+                            <Briefcase className="w-4 h-4 text-blue-500" /> {pitch.jobTitle}
+                          </h4>
+                          <div className="flex items-center gap-3 text-xs font-mono text-slate-400 mt-2">
+                            <span className="flex items-center gap-1 text-emerald-400 bg-slate-900 border border-slate-850 px-2 py-0.5 rounded">
+                              <DollarSign className="w-3 h-3" /> Proposed: {pitch.proposedSalary}
+                            </span>
+                            <span className="text-[11px] text-slate-500">
+                              Sent {new Date(pitch.createdAt).toLocaleDateString()}
+                            </span>
+                          </div>
                         </div>
-                        <h4 className="font-bold text-lg text-white mt-1 leading-tight flex items-center gap-2">
-                          <Briefcase className="w-4 h-4 text-blue-500" /> {pitch.jobTitle}
-                        </h4>
-                        <div className="flex items-center gap-3 text-xs font-mono text-slate-400 mt-2">
-                          <span className="flex items-center gap-1 text-emerald-400 bg-slate-900 border border-slate-850 px-2 py-0.5 rounded">
-                            <DollarSign className="w-3 h-3" /> Proposed: {pitch.proposedSalary}
-                          </span>
-                          <span className="text-[11px] text-slate-500">
-                            Sent {new Date(pitch.createdAt).toLocaleDateString()}
-                          </span>
+                        <div className="shrink-0 pt-1">
+                          {pitch.status === "pending" && (
+                            <span className="bg-amber-500/15 border border-amber-500/30 text-amber-500 text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full tracking-wider whitespace-nowrap">
+                              Pending Review
+                            </span>
+                          )}
+                          {isAccepted && (
+                            <span className="bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full tracking-wider whitespace-nowrap">
+                              Accepted & Unlocked
+                            </span>
+                          )}
+                          {isDeclined && (
+                            <span className="bg-rose-500/15 border border-rose-500/30 text-rose-400 text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full tracking-wider whitespace-nowrap">
+                              Declined
+                            </span>
+                          )}
                         </div>
                       </div>
 

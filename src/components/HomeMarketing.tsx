@@ -41,8 +41,8 @@ import confetti from "canvas-confetti";
 import { db } from "../lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
-import { PlatformTools } from "./PlatformTools";
 import { BackgroundDoodles } from "./BackgroundDoodles";
+import { KycModal } from "./KycModal";
 
 export function HomeMarketing({
   onStartEarning,
@@ -65,6 +65,8 @@ export function HomeMarketing({
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [quizCompleted, setQuizCompleted] = useState(false);
   const [quizScore, setQuizScore] = useState(0);
+
+  const [showKycModal, setShowKycModal] = useState(false);
 
   // Testimonial State
   const [activeTestimonial, setActiveTestimonial] = useState(0);
@@ -331,36 +333,35 @@ export function HomeMarketing({
   // Self-Assessment Quiz Questions
   const quizQuestions = [
     {
-      question: "Select your primary craft of expertise",
+      question: "How do you structure compensation for high-impact enterprise projects?",
       options: [
-        { label: "Software Engineering & Cloud Architecture", value: "eng", score: 30 },
-        { label: "High-Impact Video Production & UGC", value: "crt", score: 25 },
-        { label: "Modern UI/UX Figma Product Design", value: "dsg", score: 25 },
-        { label: "Growth Hacking & Digital Marketing Funnels", value: "mkt", score: 20 },
+        { label: "Fixed-price verbal agreements with invoices upon completion", value: "invoices", score: 5 },
+        { label: "Hourly billing tracked via manual timesheets", value: "hourly", score: 15 },
+        { label: "Strict milestone-based Escrow contracts with defined deliverables", value: "escrow", score: 30 },
       ]
     },
     {
-      question: "How many years of remote/contract experience do you have?",
+      question: "How do you handle client scope creep during an active milestone?",
       options: [
-        { label: "Less than 2 years", value: "junior", score: 10 },
-        { label: "2 to 5 years of verified delivery", value: "mid", score: 25 },
-        { label: "5+ years of leading premium contracts", value: "senior", score: 35 },
+        { label: "Accommodate minor requests silently to ensure positive reviews", value: "accommodate", score: 10 },
+        { label: "Halt all work and demand immediate renegotiation", value: "halt", score: 5 },
+        { label: "Submit a formal contract amendment requiring additional escrow funding", value: "amendment", score: 35 },
       ]
     },
     {
-      question: "Do you maintain a verified live portfolio or GitHub registry?",
+      question: "What is your standard protocol for final deliverable handoff?",
       options: [
-        { label: "Yes, fully documented on GitHub or creative hubs", value: "verified", score: 20 },
-        { label: "I have personal files but need to compile them", value: "partial", score: 10 },
-        { label: "I am ready to build and verify my portfolio now", value: "ready", score: 15 },
+        { label: "Direct email transfer of raw files and assets", value: "email", score: 5 },
+        { label: "Provide access via personal cloud drives (Google Drive/Dropbox)", value: "cloud", score: 10 },
+        { label: "Submit via the secure escrow portal to trigger automated release", value: "portal", score: 20 },
       ]
     },
     {
-      question: "Which describes your consultancy execution ownership?",
+      question: "In the event of a milestone dispute, what is your primary resolution strategy?",
       options: [
-        { label: "I deliver precise tasks under management", value: "task", score: 5 },
-        { label: "I can take product specifications and build independently", value: "independent", score: 15 },
-        { label: "Expert: I draft system architectures and consult directly", value: "expert", score: 15 },
+        { label: "Withhold all assets until the client yields", value: "withhold", score: 0 },
+        { label: "Provide comprehensive Git logs and time-stamped proofs of work", value: "proofs", score: 15 },
+        { label: "Invoke the platform's independent smart contract arbitration", value: "arbitration", score: 10 },
       ]
     }
   ];
@@ -758,8 +759,6 @@ export function HomeMarketing({
         })}
       </div>
 
-      <PlatformTools onNavigate={onNavigate} />
-
       {/* SECTION 3: INTERACTIVE ELITE SELF-ASSESSMENT WIZARD */}
       <div className="bg-gradient-to-br from-white to-slate-100 border border-slate-200 rounded-3xl p-6 md:p-10 relative overflow-hidden shadow-sm">
         <BackgroundDoodles />
@@ -842,6 +841,12 @@ export function HomeMarketing({
                   className="px-4 py-2.5 bg-white hover:bg-slate-100 text-slate-900 rounded-xl text-xs font-bold transition-all cursor-pointer border border-slate-200"
                 >
                   Retake
+                </button>
+                <button
+                  onClick={() => setShowKycModal(true)}
+                  className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm flex items-center gap-2"
+                >
+                  <ShieldCheck className="w-4 h-4" /> Verify Identity (KYC)
                 </button>
                 <button
                   onClick={onStartEarning}
@@ -1108,51 +1113,55 @@ export function HomeMarketing({
       </div>
 
       {/* SECTION 6: CLEAN MINIMAL NEWSLETTER DISPATCH */}
-      <div className="bg-slate-950 border border-slate-850 rounded-3xl p-8 md:p-10 text-white relative overflow-hidden flex flex-col lg:flex-row justify-between items-center gap-8">
+      <div className="bg-slate-950 border border-slate-850 rounded-2xl py-6 px-6 md:px-10 text-white relative overflow-hidden flex flex-col lg:flex-row justify-between items-center gap-6 shadow-xl">
         <div className="max-w-xl">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="w-2 h-2 rounded-full bg-purple-500 animate-ping" />
-            <span className="text-[9px] font-mono font-bold tracking-widest text-slate-400 uppercase">
+          <div className="flex items-center gap-2 mb-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-ping" />
+            <span className="text-[10px] font-mono font-bold tracking-widest text-slate-400 uppercase">
               STRR Dispatch
             </span>
           </div>
-          <h3 className="text-2xl md:text-3xl font-extrabold uppercase font-display leading-none text-slate-150 whitespace-nowrap">
+          <h3 className="text-xl md:text-2xl font-extrabold uppercase font-display leading-tight text-white mb-1.5">
             Get Verified Contract Alerts
           </h3>
-          <p className="text-slate-400 text-xs mt-2 leading-relaxed font-medium">
-            Subscribe to our off-chain dispatch to receive exclusive verified brand contracts, developer sponsorships, and high-payout remote opportunities directly to your inbox.
+          <p className="text-slate-400 text-xs leading-relaxed font-medium">
+            Subscribe to receive exclusive verified brand contracts and remote AI opportunities.
           </p>
         </div>
 
         {subscribed ? (
-          <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl text-center max-w-sm w-full animate-fade-in">
-            <div className="w-10 h-10 bg-emerald-950/60 border border-emerald-800 text-emerald-400 rounded-xl flex items-center justify-center mx-auto mb-3">
-              <Check className="w-5 h-5 stroke-[2.5]" />
+          <div className="bg-slate-900 border border-slate-800 py-3 px-5 rounded-xl text-center flex items-center justify-between w-full lg:w-auto min-w-[320px] animate-fade-in">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-emerald-950/60 border border-emerald-800 text-emerald-400 rounded-lg flex items-center justify-center">
+                <Check className="w-4 h-4 stroke-[2.5]" />
+              </div>
+              <div className="text-left">
+                <p className="text-xs font-bold text-white uppercase tracking-tight">Subscribed!</p>
+                <p className="text-[10px] text-slate-400 font-semibold">{email}</p>
+              </div>
             </div>
-            <p className="text-xs font-bold text-white uppercase tracking-tight">You've Subscribed!</p>
-            <p className="text-[10px] text-slate-400 mt-1 font-semibold">{email}</p>
             <button 
               onClick={() => { setSubscribed(false); setEmail(""); }}
-              className="mt-3 text-[9px] font-mono text-purple-400 hover:underline cursor-pointer uppercase font-black"
+              className="text-[9px] font-mono text-purple-400 hover:text-purple-300 transition-colors uppercase font-black"
             >
-              Change Email
+              Reset
             </button>
           </div>
         ) : (
-          <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto max-w-md">
+          <form onSubmit={handleSubscribe} className="flex flex-row gap-2 w-full lg:w-auto">
             <input
               type="email"
               placeholder="Enter your system email..."
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="bg-slate-900/60 border border-slate-800 hover:border-slate-700 focus:border-purple-500 text-white placeholder-slate-500 text-xs px-4 py-3 rounded-xl focus:outline-none transition-colors w-full sm:w-64 font-medium"
+              className="bg-slate-900/60 border border-slate-800 hover:border-slate-700 focus:border-purple-500 text-white placeholder-slate-500 text-xs px-4 py-3 rounded-lg focus:outline-none transition-colors w-full lg:w-64 font-medium"
             />
             <button
               type="submit"
-              className="bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs uppercase tracking-wider px-5 py-3 rounded-xl shadow-lg shadow-purple-500/10 hover:shadow-purple-500/20 active:scale-98 transition-all shrink-0 cursor-pointer"
+              className="bg-purple-600 hover:bg-purple-500 text-white font-bold text-[11px] uppercase tracking-wider px-5 py-3 rounded-lg shadow-lg shadow-purple-500/10 hover:shadow-purple-500/20 active:scale-95 transition-all shrink-0 cursor-pointer"
             >
-              Join Dispatch
+              Join
             </button>
           </form>
         )}
@@ -1311,6 +1320,16 @@ export function HomeMarketing({
           </div>
         </div>
       )}
+
+      {/* KYC Modal */}
+      <KycModal 
+        isOpen={showKycModal}
+        onClose={() => setShowKycModal(false)}
+        onComplete={() => {
+          confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+          if (onStartEarning) onStartEarning();
+        }}
+      />
     </div>
   );
 }

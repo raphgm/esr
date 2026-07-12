@@ -40,9 +40,11 @@ async function testConnection() {
       await getDocFromServer(doc(db, 'test', 'connection'));
       console.log("Firebase connection validated successfully.");
     }
-  } catch (error) {
-    if(error instanceof Error && (error.message.includes('the client is offline') || error.message.includes('network-request-failed'))) {
-      console.error("Firebase connection failed. Please check your network or Firebase configuration in the console. Error:", error.message);
+  } catch (error: any) {
+    if(error?.code === 'unavailable' || (error instanceof Error && (error.message.includes('the client is offline') || error.message.includes('network-request-failed')))) {
+      console.warn("Firebase client is currently offline or warming up. It will reconnect automatically.");
+    } else {
+      console.error("Firebase connection check failed:", error?.message || error);
     }
   }
 }
@@ -92,7 +94,7 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
     operationType,
     path
   };
-  console.error('Firestore Error: ', JSON.stringify(errInfo));
+  console.error('Firestore Error: ', errInfo);
   // DO NOT THROW. Throwing here causes unhandled promise rejections that crash the app when fetching data!
 }
 

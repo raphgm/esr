@@ -101,7 +101,7 @@ export function PortfolioClientSection({ userProfile, onUpdateProfile }: Portfol
       history: [
         { desc: "Integrated Gemini 1.5 Flash translation gateway with 40ms latency", date: "Jul 05" },
         { desc: "Launched PyTorch fine-tuning framework for retail prediction", date: "Jun 18" },
-        { desc: "Completed training on Vector embedding chunking structures", date: "May 29" }
+        { desc: "Completed training on Vector embedding chunking structures in the profile creation workflow", date: "May 29" }
       ]
     },
     {
@@ -405,26 +405,28 @@ export function PortfolioClientSection({ userProfile, onUpdateProfile }: Portfol
               exit={{ opacity: 0, scale: 0.95, y: 15 }}
               className="bg-white rounded-3xl max-w-4xl w-full border border-slate-200 shadow-2xl overflow-hidden relative flex flex-col max-h-[90vh] md:max-h-[85vh]"
             >
-              {/* Cover Pattern & Close */}
-              <div className="h-32 bg-gradient-to-r from-indigo-900 via-purple-950 to-slate-950 relative flex items-center justify-between px-6">
-                <span className="text-[10px] font-mono font-bold tracking-widest text-indigo-400 uppercase">
-                  ESTARR VERIFIED PARTNER PROGRAM
-                </span>
-                <button 
-                  onClick={() => setSelectedTalent(null)}
-                  className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center cursor-pointer transition-colors"
-                  aria-label="Close modal"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
               {/* Scrollable Container */}
-              <div className="flex-1 overflow-y-auto p-6 md:p-8">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                  {/* Left Column: Avatar & Mini Stats card */}
-                  <div className="lg:col-span-4 flex flex-col gap-6">
-                    <div className="flex flex-col items-center text-center -mt-20">
+              <div className="flex-1 overflow-y-auto">
+                {/* Cover Pattern & Close */}
+                <div className="h-32 bg-gradient-to-r from-indigo-900 via-purple-950 to-slate-950 relative z-0 flex items-center justify-between px-6">
+                  <span className="text-[10px] font-mono font-bold tracking-widest text-indigo-400 uppercase">
+                    ESTARR VERIFIED PARTNER PROGRAM
+                  </span>
+                  <button 
+                    onClick={() => setSelectedTalent(null)}
+                    className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center cursor-pointer transition-colors"
+                    aria-label="Close modal"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Main Content Area */}
+                <div className="p-6 md:p-8 relative z-10">
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                    {/* Left Column: Avatar & Mini Stats card */}
+                    <div className="lg:col-span-4 flex flex-col gap-6">
+                      <div className="flex flex-col items-center text-center -mt-20 relative z-20">
                       <div className="relative mb-4">
                         <img 
                           src={selectedTalent.avatar} 
@@ -673,6 +675,7 @@ export function PortfolioClientSection({ userProfile, onUpdateProfile }: Portfol
                   </div>
                 </div>
               </div>
+            </div>
 
               {/* Bottom Sticky Action Panel */}
               <div className="border-t border-slate-100 p-4 bg-slate-50 flex justify-end gap-3 shrink-0">

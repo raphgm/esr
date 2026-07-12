@@ -39,6 +39,7 @@ export interface UserProfile {
   role?: string;
   level?: string;
   points?: number;
+  referrals?: number;
   history?: any[];
   portfolio?: PortfolioItem[];
   handle?: string;

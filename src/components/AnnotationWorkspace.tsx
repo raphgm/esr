@@ -205,8 +205,22 @@ export function AnnotationWorkspace() {
                 <button onClick={() => setZoom(z => Math.min(2, z + 0.1))} className="p-1">+</button>
             </div>
             <button onClick={() => setShowAnnotations(!showAnnotations)} className={`p-2 rounded-lg ${showAnnotations ? 'bg-purple-100 text-purple-700' : 'bg-stone-100 text-stone-500'}`}>Layer</button>
-            <button onClick={() => dispatch({type: "UNDO"})} className="p-2 bg-stone-100 rounded-lg"><ChevronLeft className="w-4 h-4"/></button>
-            <button onClick={() => dispatch({type: "REDO"})} className="p-2 bg-stone-100 rounded-lg"><ChevronRight className="w-4 h-4"/></button>
+            <button 
+              onClick={() => dispatch({type: "UNDO"})} 
+              disabled={state.historyIndex === 0} 
+              className={`flex items-center gap-1 px-3 py-2 rounded-lg text-xs font-bold transition-all ${state.historyIndex === 0 ? 'bg-stone-50 text-stone-300 cursor-not-allowed' : 'bg-stone-100 text-stone-700 hover:bg-stone-200'}`}
+              title="Undo last action (Ctrl+Z)"
+            >
+              <ChevronLeft className="w-4 h-4"/> Undo
+            </button>
+            <button 
+              onClick={() => dispatch({type: "REDO"})} 
+              disabled={state.historyIndex >= state.history.length - 1} 
+              className={`flex items-center gap-1 px-3 py-2 rounded-lg text-xs font-bold transition-all ${state.historyIndex >= state.history.length - 1 ? 'bg-stone-50 text-stone-300 cursor-not-allowed' : 'bg-stone-100 text-stone-700 hover:bg-stone-200'}`}
+              title="Redo action (Ctrl+Y)"
+            >
+              Redo <ChevronRight className="w-4 h-4"/>
+            </button>
         </div>
       </div>
       
@@ -272,7 +286,18 @@ export function AnnotationWorkspace() {
       <div className="mt-4 p-4 border rounded-lg bg-stone-50">
         {state.selectedIds.length > 0 ? (
           <>
-            <h3 className="text-sm font-bold mb-2">Batch Operations ({state.selectedIds.length} selected)</h3>
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="text-sm font-bold text-stone-800">Batch Operations ({state.selectedIds.length} selected)</h3>
+              {state.historyIndex > 0 && (
+                <button 
+                  onClick={() => dispatch({type: "UNDO"})}
+                  className="text-xs bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 px-2.5 py-1 rounded-md font-bold transition-all flex items-center gap-1 active:scale-95"
+                  title="Revert the most recent operation"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" /> Undo Mistake
+                </button>
+              )}
+            </div>
             <div className="flex items-center gap-2">
               <Tag className="w-4 h-4 text-stone-500" />
               <input 
@@ -295,14 +320,32 @@ export function AnnotationWorkspace() {
             </div>
           </>
         ) : (
-          <p className="text-stone-500 text-sm">Select one or more annotations to perform batch operations.</p>
+          <div className="flex justify-between items-center">
+            <p className="text-stone-500 text-sm">Select one or more annotations to perform batch operations.</p>
+            {state.historyIndex > 0 && (
+              <button 
+                onClick={() => dispatch({type: "UNDO"})}
+                className="text-xs bg-stone-100 hover:bg-stone-200 text-stone-700 border border-stone-200 px-2.5 py-1 rounded-md font-bold transition-all flex items-center gap-1 active:scale-95"
+              >
+                <ChevronLeft className="w-3.5 h-3.5" /> Undo Last Action
+              </button>
+            )}
+          </div>
         )}
       </div>
       <div className="mt-4 flex gap-4">
         <button className="flex items-center gap-2 border border-stone-300 text-stone-700 px-4 py-2 rounded-lg text-sm" onClick={handleDownload}>
           <Download className="w-4 h-4" /> Download Dataset
         </button>
-        <button className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg text-sm" onClick={() => console.log(state.annotations)}>
+        {state.historyIndex > 0 && (
+          <button 
+            className="flex items-center gap-2 border border-amber-300 bg-amber-50 text-amber-800 px-4 py-2 rounded-lg text-sm hover:bg-amber-100 transition-colors font-semibold"
+            onClick={() => dispatch({type: "UNDO"})}
+          >
+            Undo Last Action
+          </button>
+        )}
+        <button className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg text-sm ml-auto" onClick={() => console.log(state.annotations)}>
           <Save className="w-4 h-4" /> Save Annotations
         </button>
       </div>
