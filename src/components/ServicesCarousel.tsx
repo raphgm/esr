@@ -118,7 +118,7 @@ export function ServicesCarousel({ onSelect, isAuthenticated, onAuthRequest }: S
     {
       id: "academy",
       label: "Anonymous Talent Market",
-      desc: "Professional playbooks, expert classes, and skill licenses for IT pros and creative talent.",
+      desc: "Access the Anonymous Talent Market enterprise environment. Professional playbooks, expert classes, and skill licenses for IT pros and creative talent. Orchestrate high-yield digital workflows, configure protected smart micro-agreements, and trace global milestones securely within the node ecosystem.",
       icon: Award,
       badge: "42 CLASSES LIVE",
       color: "bg-blue-50 text-blue-600 border-blue-100 group-hover:bg-blue-600 group-hover:text-white",
