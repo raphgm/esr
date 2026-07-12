@@ -37,23 +37,18 @@ interface ConsultancySectionProps {
 }
 
 // Transaction Feed to show realistic escrow updates
-const initialEscrowFeed = [
-  { id: "f1", text: "Enterprise Corp deposited $250,000 into Escrow for 'Distributed System Migration'", time: "10 mins ago", type: "deposit" },
-  { id: "f2", text: "FinTech Next released $180,000 to Chinedu Okafor's bank account", time: "1 hour ago", type: "release" },
-  { id: "f3", text: "Amo Feed Mills verified poultry vlog deliverables and released $200,000", time: "3 hours ago", type: "verify" },
-  { id: "f4", text: "Secured Escrow smart contract verified by ESTARR Node", time: "5 hours ago", type: "secure" }
-];
+const initialEscrowFeed: any[] = [];
 
 // Helper to extract rich contract details from a task object
-function parseTaskDetails(task: ConsultancyTask) {
-  let budget = 150000; // default 150k Dollars
+export function parseTaskDetails(task: ConsultancyTask) {
+  let budget = 0; // default 0 Dollars
   let client = task.assignee || "External Client";
   let cleanDesc = task.desc;
 
   if (task.desc.includes("||")) {
     const parts = task.desc.split("||");
     if (parts.length >= 3) {
-      budget = parseFloat(parts[0].replace(/[^0-9.]/g, "")) || 150000;
+      budget = parseFloat(parts[0].replace(/[^0-9.]/g, "")) || 0;
       client = parts[1].trim();
       cleanDesc = parts[2].trim();
     }

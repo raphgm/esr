@@ -22,7 +22,7 @@ import ConnectSection from "./components/ConnectSection";
 import { AILabSection } from "./components/AILabSection";
 import PortfolioSection from "./components/PortfolioSection";
 import MarketplaceSection from "./components/MarketplaceSection";
-import ConsultancySection from "./components/ConsultancySection";
+import ConsultancySection, { parseTaskDetails } from "./components/ConsultancySection";
 import GigsSection from "./components/GigsSection";
 import PaymentsSection from "./components/PaymentsSection";
 import EventsSection from "./components/EventsSection";
@@ -332,6 +332,8 @@ ActivityPost[]>(initialPosts);
   const [tasks, setTasks] = useState<ConsultancyTask[]>(initialTasks);
   const [jobs, setJobs] = useState<Job[]>(initialJobs);
   const [channels, setChannels] = useState<CommunityChannel[]>(initialChannels);
+
+  const totalEscrowLocked = tasks.filter(t => t.status === "inprogress" || t.status === "review").reduce((sum, t) => sum + parseTaskDetails(t).budget, 0);
 
   // LinkedIn OAuth
   const handleLinkedInLogin = async () => {
@@ -1986,7 +1988,7 @@ ActivityPost>("posts", initialPosts);
               <div className="mt-2 bg-emerald-500/10 border border-emerald-500/20 p-3 rounded-xl flex items-center justify-between">
                 <div className="flex flex-col gap-0.5">
                   <span className="text-[9px] font-mono uppercase text-emerald-700 font-bold">Total Escrow Locked</span>
-                  <span className="font-mono text-sm font-black text-emerald-600">$4,250,000</span>
+                  <span className="font-mono text-sm font-black text-emerald-600">${totalEscrowLocked.toLocaleString()}</span>
                 </div>
                 <ShieldCheck className="w-5 h-5 text-emerald-500" />
               </div>
@@ -2199,6 +2201,8 @@ ActivityPost>("posts", initialPosts);
 
               {/* Bottom Interactive Grid */}
               <ServicesCarousel
+                isAuthenticated={isAuthenticated}
+                onAuthRequest={() => { setAuthMode("signup"); setShowAuthModal(true); }}
                 onSelect={(tabId) => {
                   if (!isAuthenticated) {
                     setAuthMode("signup");
@@ -2364,7 +2368,7 @@ ActivityPost>("posts", initialPosts);
                 <div className="mt-2 bg-emerald-500/10 border border-emerald-500/20 p-3 rounded-xl flex items-center justify-between">
                   <div className="flex flex-col gap-0.5">
                     <span className="text-[9px] font-mono uppercase text-emerald-700 font-bold">Total Escrow Locked</span>
-                    <span className="font-mono text-sm font-black text-emerald-600">$4,250,000</span>
+                    <span className="font-mono text-sm font-black text-emerald-600">${totalEscrowLocked.toLocaleString()}</span>
                   </div>
                   <ShieldCheck className="w-5 h-5 text-emerald-500" />
                 </div>

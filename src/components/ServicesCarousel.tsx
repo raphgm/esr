@@ -30,9 +30,11 @@ import { motion, AnimatePresence } from "motion/react";
 
 interface ServicesCarouselProps {
   onSelect: (tab: any) => void;
+  isAuthenticated: boolean;
+  onAuthRequest: () => void;
 }
 
-export function ServicesCarousel({ onSelect }: ServicesCarouselProps) {
+export function ServicesCarousel({ onSelect, isAuthenticated, onAuthRequest }: ServicesCarouselProps) {
   const [activeTab, setActiveTab] = useState<"modules" | "brands">("modules");
   const [selectedService, setSelectedService] = useState<any>(null);
   const [selectedPartner, setSelectedPartner] = useState<any>(null);
@@ -806,8 +808,13 @@ export function ServicesCarousel({ onSelect }: ServicesCarouselProps) {
                   <button
                     type="button"
                     onClick={() => {
-                      alert("Hire request submitted! Escrow contract initialized.");
-                      setQuickHireBounty(null);
+                      if (!isAuthenticated) {
+                        onAuthRequest();
+                        setQuickHireBounty(null);
+                      } else {
+                        alert("Hire request submitted! Escrow contract initialized.");
+                        setQuickHireBounty(null);
+                      }
                     }}
                     className="flex-[2] bg-emerald-600 hover:bg-emerald-700 text-white py-3.5 rounded-xl text-sm font-bold transition-all cursor-pointer shadow-lg shadow-emerald-900/10 flex items-center justify-center gap-2"
                   >

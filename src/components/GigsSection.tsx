@@ -943,8 +943,8 @@ export default function GigsSection({ userProfile, onOpenAiChat, initialCategory
                           }`}
                         >
                           <span className="font-bold text-slate-800 block">ESTARR Wallet</span>
-                          <span className="text-[10px] font-mono font-bold text-purple-500 mt-1 block">
-                            Bal: $180,000
+                          <span className="text-[10px] font-mono font-bold text-slate-500 mt-1 block">
+                            Bal: $0.00
                           </span>
                         </button>
 
