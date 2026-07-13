@@ -31,6 +31,10 @@
     }
   },
   "firestore": {
+    "/globalConfig/{configId}": {
+      "schema": "object",
+      "description": "Global application configuration"
+    },
     "/users/{userId}": {
       "schema": "#/entities/User",
       "description": "User specific data"

@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { VettingProtocolModal } from './components/VettingProtocolModal';
 
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import confetti from "canvas-confetti";
 import { UserProfile, Course, Product, BrandCampaign, ConsultancyTask, Job, 
 ActivityPost, CommunityChannel } from "./types";
@@ -14,7 +14,7 @@ import {
   initialJobs,
   initialChannels
 } from "./mockData";
-import { auth, getUserProfile, saveUserProfile, getCollectionData, saveCollectionItem, deleteCollectionItem } from "./lib/firebase";
+import { auth, getUserProfile, saveUserProfile, getCollectionData, saveCollectionItem, deleteCollectionItem, subscribeToGlobalConfig, saveGlobalConfig } from "./lib/firebase";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut as firebaseSignOut, onAuthStateChanged } from "firebase/auth";
 
 // Components
@@ -37,6 +37,7 @@ import { JobsSection } from "./components/JobsSection";
 import { HowItWorksSection } from "./components/HowItWorksSection";
 import { RewardsSection } from "./components/RewardsSection";
 import { IntegrationsSection } from "./components/IntegrationsSection";
+import { HelpGuideSection } from "./components/HelpGuideSection";
 import { NotificationsDrawer } from "./components/NotificationsDrawer";
 import { BackgroundDoodles } from "./components/BackgroundDoodles";
 import { AdminSection } from "./components/AdminSection";
@@ -85,7 +86,7 @@ import {
   Globe,
   Cpu,
   
-  Target, Activity, BrainCircuit, Square
+  Target, Activity, BrainCircuit, Square, Check
 } from "lucide-react";
 
 const initialTasks: ConsultancyTask[] = [];
@@ -187,6 +188,7 @@ export default function App() {
   const [authEmail, setAuthEmail] = useState("chinedu@estarrapp.com");
   const [authPassword, setAuthPassword] = useState("password123");
   const [authName, setAuthName] = useState("Chinedu Okafor");
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success'>('idle');
   const [authBirthdate, setAuthBirthdate] = useState("");
   const [authAccountType, setAuthAccountType] = useState<"independent" | "jobOwner">("independent");
   const [authConfirmPassword, setAuthConfirmPassword] = useState("");
@@ -230,7 +232,7 @@ export default function App() {
 
   // Router State
   const [activeTab, setActiveTab] = useState<
-    "home" | "connect" | "ai-lab" | "marketplace" | "consultancy" | "gigs" | "ai-jobs" | "community" | "mobile" | "teams" | "careers" | "about" | "how-it-works" | "payments" | "events" | "admin" | "portfolio" | "rewards" | "integrations" | "annotation-workspace"
+    "home" | "connect" | "ai-lab" | "marketplace" | "consultancy" | "gigs" | "ai-jobs" | "community" | "mobile" | "teams" | "careers" | "about" | "how-it-works" | "payments" | "events" | "admin" | "portfolio" | "rewards" | "integrations" | "annotation-workspace" | "help-docs"
   >(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("survey")) return "ai-lab";
@@ -262,11 +264,22 @@ export default function App() {
     "Admin Controls": false,
   });
 
-  const [sidebarTheme, setSidebarTheme] = useState<"white" | "ivory" | "slate" | "indigo">("ivory");
+  const [sidebarTheme, setSidebarTheme] = useState<"white" | "ivory" | "slate" | "indigo" | "emerald" | "amber">("ivory");
 
-  const updateSidebarTheme = (theme: "white" | "ivory" | "slate" | "indigo") => {
-    setSidebarTheme(theme);
-    handleUpdateProfile({ ...userProfile, sidebarTheme: theme });
+  React.useEffect(() => {
+    const unsubscribe = subscribeToGlobalConfig("theme", (data: any) => {
+      if (data && data.sidebarTheme) {
+        setSidebarTheme(data.sidebarTheme);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const updateSidebarTheme = (theme: "white" | "ivory" | "slate" | "indigo" | "emerald" | "amber") => {
+    saveGlobalConfig("theme", { sidebarTheme: theme });
+    if (userProfile) {
+      handleUpdateProfile({ ...userProfile, sidebarTheme: theme });
+    }
   };
 
   const sidebarStyles = {
@@ -313,6 +326,28 @@ export default function App() {
       activeDescClass: "text-indigo-300",
       inactiveIconClass: "text-slate-500",
       activeIconClass: "text-indigo-400"
+    },
+    emerald: {
+      navClass: "bg-emerald-950 border border-emerald-900 text-emerald-200",
+      borderClass: "border-emerald-800/60",
+      sectionHeaderClass: "text-emerald-500 font-bold tracking-[0.2em] uppercase text-[9px]",
+      inactiveItemClass: "text-emerald-400 hover:bg-emerald-900/50 border-transparent hover:text-emerald-100",
+      activeItemClass: "bg-emerald-900 border-emerald-800 text-emerald-100 font-bold",
+      descClass: "text-emerald-600",
+      activeDescClass: "text-emerald-400",
+      inactiveIconClass: "text-emerald-600",
+      activeIconClass: "text-emerald-300"
+    },
+    amber: {
+      navClass: "bg-[#18181B] border border-[#27272A] text-slate-300",
+      borderClass: "border-[#27272A]/60",
+      sectionHeaderClass: "text-amber-600 font-bold tracking-[0.2em] uppercase text-[9px]",
+      inactiveItemClass: "text-slate-400 hover:bg-[#27272A]/50 border-transparent hover:text-amber-100",
+      activeItemClass: "bg-[#27272A] border-[#3F3F46] text-amber-400 font-bold",
+      descClass: "text-slate-500",
+      activeDescClass: "text-amber-500",
+      inactiveIconClass: "text-slate-500",
+      activeIconClass: "text-amber-400"
     }
   };
 
@@ -443,6 +478,19 @@ ActivityPost[]>(initialPosts);
     }
   };
 
+  const safeStringify = (obj: any) => {
+    const cache = new Set();
+    return JSON.stringify(obj, (key, value) => {
+      if (typeof value === 'object' && value !== null) {
+        if (cache.has(value)) {
+          return;
+        }
+        cache.add(value);
+      }
+      return value;
+    });
+  };
+
   const handleUpdatePosts = async (updatedPosts: 
 ActivityPost[]) => {
     setPosts(updatedPosts);
@@ -450,7 +498,7 @@ ActivityPost[]) => {
     const currentMap = new Map(posts.map(item => [item.id, item]));
     for (const newItem of updatedPosts) {
       const existing = currentMap.get(newItem.id);
-      if (!existing || JSON.stringify(existing) !== JSON.stringify(newItem)) {
+      if (!existing || safeStringify(existing) !== safeStringify(newItem)) {
         await saveCollectionItem("posts", newItem);
       }
     }
@@ -467,7 +515,7 @@ ActivityPost[]) => {
     const currentMap = new Map(courses.map(item => [item.id, item]));
     for (const newItem of updatedCourses) {
       const existing = currentMap.get(newItem.id);
-      if (!existing || JSON.stringify(existing) !== JSON.stringify(newItem)) {
+      if (!existing || safeStringify(existing) !== safeStringify(newItem)) {
         await saveCollectionItem("courses", newItem);
       }
     }
@@ -483,7 +531,7 @@ ActivityPost[]) => {
     const currentMap = new Map(products.map(item => [item.id, item]));
     for (const newItem of updatedProducts) {
       const existing = currentMap.get(newItem.id);
-      if (!existing || JSON.stringify(existing) !== JSON.stringify(newItem)) {
+      if (!existing || safeStringify(existing) !== safeStringify(newItem)) {
         await saveCollectionItem("products", newItem);
       }
     }
@@ -513,7 +561,7 @@ ActivityPost[]) => {
     const currentMap = new Map(oldTasks.map(item => [item.id, item]));
     for (const newItem of tasksToSave) {
       const existing = currentMap.get(newItem.id);
-      if (!existing || JSON.stringify(existing) !== JSON.stringify(newItem)) {
+      if (!existing || safeStringify(existing) !== safeStringify(newItem)) {
         await saveCollectionItem("tasks", newItem);
       }
     }
@@ -529,7 +577,7 @@ ActivityPost[]) => {
     const currentMap = new Map(channels.map(item => [item.id, item]));
     for (const newItem of updatedChannels) {
       const existing = currentMap.get(newItem.id);
-      if (!existing || JSON.stringify(existing) !== JSON.stringify(newItem)) {
+      if (!existing || safeStringify(existing) !== safeStringify(newItem)) {
         await saveCollectionItem("channels", newItem);
       }
     }
@@ -548,7 +596,7 @@ ActivityPost[]) => {
     const currentMap = new Map(oldJobs.map(item => [item.id, item]));
     for (const newItem of updatedJobs) {
       const existing = currentMap.get(newItem.id);
-      if (!existing || JSON.stringify(existing) !== JSON.stringify(newItem)) {
+      if (!existing || safeStringify(existing) !== safeStringify(newItem)) {
         await saveCollectionItem("jobs", newItem);
       }
     }
@@ -715,6 +763,7 @@ ActivityPost>("posts", initialPosts);
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSaveStatus('saving');
     const updatedProfile = {
       ...userProfile,
       bio: editBio,
@@ -731,8 +780,11 @@ ActivityPost>("posts", initialPosts);
       await saveUserProfile(auth.currentUser.uid, updatedProfile);
     }
     
-    setIsProfileOpen(false);
-    alert("Profile configurations updated successfully!");
+    setSaveStatus('success');
+    setTimeout(() => {
+      setIsProfileOpen(false);
+      setSaveStatus('idle');
+    }, 1500);
   };
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -918,6 +970,12 @@ ActivityPost>("posts", initialPosts);
         { id: "payments", label: "Digital Wallet", desc: "Transfers & distributions", icon: CreditCard },
         { id: "rewards", label: "Ambassadors", desc: "Earn Points & Rewards", icon: Gift }
       ]
+    },
+    {
+      title: "Help & Documentation",
+      items: [
+        { id: "help-docs", label: "Help & Docs", desc: "Guides and documentation", icon: HelpCircle }
+      ]
     }
   ];
 
@@ -953,6 +1011,12 @@ ActivityPost>("posts", initialPosts);
       title: "Developer & Sync",
       items: [
         { id: "integrations", label: "Integrations Hub", desc: "REST APIs & Webhooks", icon: Cpu }
+      ]
+    },
+    {
+      title: "Help & Documentation",
+      items: [
+        { id: "help-docs", label: "Help & Docs", desc: "Guides and documentation", icon: HelpCircle }
       ]
     }
   ];
@@ -2349,6 +2413,10 @@ ActivityPost>("posts", initialPosts);
             />
           )}
 
+          {activeTab === "help-docs" && (
+            <HelpGuideSection />
+          )}
+
           {activeTab === "annotation-workspace" && (
             <AnnotationWorkspace />
           )}
@@ -2612,9 +2680,41 @@ ActivityPost>("posts", initialPosts);
             <button
               id="btn-profile-save-submit"
               type="submit"
-              className="w-full bg-slate-950 hover:bg-gradient-to-r hover:from-violet-600 hover:via-indigo-500 hover:to-emerald-500 text-white py-3.5 rounded-xl font-semibold tracking-wide cursor-pointer transition-all shadow-sm"
+              disabled={saveStatus !== 'idle'}
+              className={`w-full text-white py-3.5 rounded-xl font-semibold tracking-wide cursor-pointer transition-all shadow-sm flex items-center justify-center ${
+                saveStatus === 'success' 
+                  ? 'bg-emerald-500 hover:bg-emerald-600' 
+                  : 'bg-slate-950 hover:bg-gradient-to-r hover:from-violet-600 hover:via-indigo-500 hover:to-emerald-500'
+              }`}
             >
-              Save Configurations
+              <AnimatePresence mode="wait">
+                {saveStatus === 'saving' && (
+                  <motion.span
+                    key="saving"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >Saving...</motion.span>
+                )}
+                {saveStatus === 'success' && (
+                  <motion.span
+                    key="success"
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                  >
+                    <Check className="w-5 h-5" />
+                  </motion.span>
+                )}
+                {saveStatus === 'idle' && (
+                  <motion.span
+                    key="idle"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                  >Save Configurations</motion.span>
+                )}
+              </AnimatePresence>
             </button>
           </form>
         </div>
@@ -2661,6 +2761,7 @@ ActivityPost>("posts", initialPosts);
             <button onClick={() => setActiveTab("teams")} className="hover:text-indigo-400 transition-colors uppercase cursor-pointer">Teams</button>
             <button onClick={() => setActiveTab("consultancy")} className="hover:text-indigo-400 transition-colors uppercase cursor-pointer">Consultancy & Services</button>
             <button onClick={() => setActiveTab("careers")} className="hover:text-indigo-400 transition-colors uppercase cursor-pointer">Jobs</button>
+            <button onClick={() => setActiveTab("help-docs")} className="hover:text-indigo-400 transition-colors uppercase cursor-pointer">Help & Documentation</button>
           </div>
           <div className="text-[10px] text-center md:text-right font-mono tracking-widest uppercase opacity-50">
             ESTARR • SSLABS 2026 ALL RIGHTS RESERVED • 100% OFF-CHAIN SECURED ECOSYSTEM

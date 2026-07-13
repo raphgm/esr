@@ -80,7 +80,7 @@ export interface UserProfile {
   badgeTheme?: "cosmic" | "emerald" | "amber" | "dark";
   badgeSize?: "small" | "medium" | "large";
   badgeType?: "client" | "talent";
-  sidebarTheme?: "white" | "ivory" | "slate" | "indigo";
+  sidebarTheme?: "white" | "ivory" | "slate" | "indigo" | "emerald" | "amber";
 }
 
 export interface ActivityPost {
@@ -177,7 +177,7 @@ export interface ConsultancyTask {
   status: "todo" | "inprogress" | "review" | "done" | "needs-verification";
   priority: "High" | "Medium" | "Low";
   assignee: string;
-  dueDate: string;
+  dueDate?: string;
   amount?: number;
   userId?: string;
   comments?: { id: string; author: string; text: string; audioUrl?: string; audioDuration?: number; time: string }[];
@@ -189,6 +189,7 @@ export interface ConsultancyTask {
   validationRules?: { minTags?: number; minDuration?: number };
   consensusResults?: { userId: string; result: any }[];
   annotations?: Annotation[];
+  blockingTaskIds?: string[];
 }
 
 export interface Job {
@@ -203,6 +204,7 @@ export interface Job {
   requirements?: string[];
   matchScore?: number;
   shareUrl?: string;
+  status?: "pending" | "approved";
 }
 
 export interface JobApplication {

@@ -604,6 +604,19 @@ export default function PortfolioSection({ userProfile, onUpdateProfile, isPubli
                 <Share2 className="w-4 h-4 text-purple-400" />
                 Share Portfolio
               </button>
+              <button
+                onClick={() => {
+                  const skills = userProfile.skills?.join(", ") || "various professional skills";
+                  const summary = encodeURIComponent(`Check out my professional portfolio and skills: ${skills}.`);
+                  const url = encodeURIComponent(window.location.href);
+                  const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}&summary=${summary}`;
+                  window.open(linkedInUrl, '_blank', 'noopener,noreferrer');
+                }}
+                className="flex items-center gap-2 bg-[#0A66C2] text-white px-5 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all hover:bg-[#004182] border border-[#0A66C2] cursor-pointer"
+              >
+                <Linkedin className="w-4 h-4" />
+                Share to LinkedIn
+              </button>
             </div>
           }
         />

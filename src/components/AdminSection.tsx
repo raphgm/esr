@@ -32,8 +32,8 @@ import { UserProfile } from "../types";
 interface AdminSectionProps {
   isAdmin: boolean;
   setIsAdmin: (val: boolean) => void;
-  sidebarTheme: "white" | "ivory" | "slate" | "indigo";
-  setSidebarTheme: (theme: "white" | "ivory" | "slate" | "indigo") => void;
+  sidebarTheme: "white" | "ivory" | "slate" | "indigo" | "emerald" | "amber";
+  setSidebarTheme: (theme: "white" | "ivory" | "slate" | "indigo" | "emerald" | "amber") => void;
   userProfile: UserProfile;
 }
 
@@ -99,6 +99,7 @@ export function AdminSection({
     () => localStorage.getItem("estarr_developer_key") || "ESTARR-GATE-2026"
   );
   const [isDevKeyCopied, setIsDevKeyCopied] = useState(false);
+  const [isGatewayExpanded, setIsGatewayExpanded] = useState(false);
 
   const handleRoleToggle = (userId: string) => {
     // Only authorized system admins can promote others in a real app
@@ -132,7 +133,7 @@ export function AdminSection({
     ]);
   };
 
-  const handleThemeChange = (newTheme: "white" | "ivory" | "slate" | "indigo") => {
+  const handleThemeChange = (newTheme: "white" | "ivory" | "slate" | "indigo" | "emerald" | "amber") => {
     if (!isAdmin) return;
     setSidebarTheme(newTheme);
     addLog("success", `Ecosystem Sidebar Theme updated to '${newTheme.toUpperCase()}'`);
@@ -253,121 +254,128 @@ export function AdminSection({
               <Key className="w-24 h-24 text-purple-400" />
             </div>
             {/* Header */}
-            <div className="border-b border-slate-800 px-5 py-4 flex items-center justify-between bg-slate-950">
+            <div 
+              className="border-b border-slate-800 px-5 py-4 flex items-center justify-between bg-slate-950 cursor-pointer hover:bg-slate-900 transition-colors"
+              onClick={() => setIsGatewayExpanded(!isGatewayExpanded)}
+            >
               <div className="flex items-center gap-2">
-                <Key className="w-4 h-4 text-purple-400 animate-pulse" />
+                <Key className={`w-4 h-4 text-purple-400 ${isGatewayExpanded ? "animate-pulse" : ""}`} />
                 <h3 className="text-sm font-black uppercase tracking-wider text-slate-100 font-display">
                   Developer Key & Integration Gateway Authority
                 </h3>
               </div>
-              <span className="bg-purple-500/20 text-purple-300 px-2.5 py-0.5 rounded-full font-mono text-[9px] font-black uppercase tracking-wider border border-purple-500/30">
-                🔒 Access Enforced
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="bg-purple-500/20 text-purple-300 px-2.5 py-0.5 rounded-full font-mono text-[9px] font-black uppercase tracking-wider border border-purple-500/30">
+                  {isGatewayExpanded ? "🔓 Access Unlocked" : "🔒 Access Locked"}
+                </span>
+              </div>
             </div>
 
-            <div className="p-5 flex flex-col gap-4">
-              <p className="text-xs text-slate-300 font-medium leading-relaxed">
-                The high-yield <strong className="text-white">Africa Paystack Integration Hub</strong> & <strong className="text-white">Fast-Track Earning Accelerator</strong> is locked to protect platform integrity. Only developers possessing the correct, active authorization key below can view metrics, configure bank integrations, or request direct payouts.
-              </p>
+            {isGatewayExpanded && (
+              <div className="p-5 flex flex-col gap-4">
+                <p className="text-xs text-slate-300 font-medium leading-relaxed">
+                  The high-yield <strong className="text-white">Africa Paystack Integration Hub</strong> & <strong className="text-white">Fast-Track Earning Accelerator</strong> is locked to protect platform integrity. Only developers possessing the correct, active authorization key below can view metrics, configure bank integrations, or request direct payouts.
+                </p>
 
-              <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col sm:flex-row gap-3 items-end sm:items-center justify-between">
-                <div className="flex-1 w-full">
-                  <label className="text-[10px] font-black uppercase tracking-wider text-purple-400 block mb-1.5">
-                    Active Developer Authorization Key
-                  </label>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      readOnly
-                      value={devKey}
-                      className="flex-1 text-xs font-mono font-black tracking-widest text-emerald-400 bg-slate-900 border border-slate-800 p-2.5 rounded-lg focus:outline-none"
-                    />
+                <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col sm:flex-row gap-3 items-end sm:items-center justify-between">
+                  <div className="flex-1 w-full">
+                    <label className="text-[10px] font-black uppercase tracking-wider text-purple-400 block mb-1.5">
+                      Active Developer Authorization Key
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        readOnly
+                        value={devKey}
+                        className="flex-1 text-xs font-mono font-black tracking-widest text-emerald-400 bg-slate-900 border border-slate-800 p-2.5 rounded-lg focus:outline-none"
+                      />
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(devKey);
+                          setIsDevKeyCopied(true);
+                          setTimeout(() => setIsDevKeyCopied(false), 2000);
+                        }}
+                        className="bg-purple-600 hover:bg-purple-700 text-white text-[10px] font-black uppercase tracking-wider px-4 rounded-lg transition-all"
+                      >
+                        {isDevKeyCopied ? "✓ Copied!" : "Copy Key"}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2 w-full sm:w-auto self-stretch sm:self-auto pt-2 sm:pt-0">
                     <button
                       onClick={() => {
-                        navigator.clipboard.writeText(devKey);
-                        setIsDevKeyCopied(true);
-                        setTimeout(() => setIsDevKeyCopied(false), 2000);
+                        const keys = [
+                          "ESTARR-AFRICA-PAYSTACK-DEV",
+                          "ESTARR-SECURE-KEY-2026",
+                          "ESTARR-LOCAL-PAYMENTS-AFRICA",
+                          "ESTARR-DEV-9B2F4E7A",
+                          "ESTARR-GATEWAY-AUTH-CODE"
+                        ];
+                        const newKey = keys[Math.floor(Math.random() * keys.length)];
+                        setDevKey(newKey);
+                        localStorage.setItem("estarr_developer_key", newKey);
+                        
+                        // Push to security logs
+                        addLog("success", `Developer gate authorization key rotated to '${newKey}'`);
+                        
+                        confetti({
+                          particleCount: 30,
+                          spread: 50,
+                          colors: ["#a855f7", "#34d399"]
+                        });
                       }}
-                      className="bg-purple-600 hover:bg-purple-700 text-white text-[10px] font-black uppercase tracking-wider px-4 rounded-lg transition-all"
+                      className="flex-1 sm:flex-initial bg-slate-800 hover:bg-slate-700 border border-slate-750 text-slate-200 text-[10px] font-black uppercase tracking-wider px-3.5 py-2.5 rounded-lg transition-all"
                     >
-                      {isDevKeyCopied ? "✓ Copied!" : "Copy Key"}
+                      Regenerate Key
                     </button>
                   </div>
                 </div>
 
-                <div className="flex gap-2 w-full sm:w-auto self-stretch sm:self-auto pt-2 sm:pt-0">
-                  <button
-                    onClick={() => {
-                      const keys = [
-                        "ESTARR-AFRICA-PAYSTACK-DEV",
-                        "ESTARR-SECURE-KEY-2026",
-                        "ESTARR-LOCAL-PAYMENTS-AFRICA",
-                        "ESTARR-DEV-9B2F4E7A",
-                        "ESTARR-GATEWAY-AUTH-CODE"
-                      ];
-                      const newKey = keys[Math.floor(Math.random() * keys.length)];
-                      setDevKey(newKey);
-                      localStorage.setItem("estarr_developer_key", newKey);
-                      
-                      // Push to security logs
-                      addLog("success", `Developer gate authorization key rotated to '${newKey}'`);
-                      
-                      confetti({
-                        particleCount: 30,
-                        spread: 50,
-                        colors: ["#a855f7", "#34d399"]
-                      });
-                    }}
-                    className="flex-1 sm:flex-initial bg-slate-800 hover:bg-slate-700 border border-slate-750 text-slate-200 text-[10px] font-black uppercase tracking-wider px-3.5 py-2.5 rounded-lg transition-all"
-                  >
-                    Regenerate Key
-                  </button>
-                </div>
-              </div>
-
-              {/* Custom Key Editor */}
-              <div className="flex flex-col gap-1.5 bg-slate-950/40 p-3 rounded-lg border border-slate-850">
-                <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
-                  Custom Key Overrides
-                </span>
-                <p className="text-[10px] text-slate-400 leading-normal">
-                  Want a custom passcode? Define your own secret authorization key below and hit apply:
-                </p>
-                <div className="flex gap-2 mt-1">
-                  <input
-                    type="text"
-                    placeholder="e.g. MY-SUPER-SECRET-DEV-PASS"
-                    id="custom-dev-key-input"
-                    className="flex-1 text-xs font-mono font-bold bg-slate-900 border border-slate-800 p-2 rounded focus:outline-none focus:border-purple-500 text-white"
-                  />
-                  <button
-                    onClick={() => {
-                      const val = (document.getElementById("custom-dev-key-input") as HTMLInputElement)?.value?.trim();
-                      if (val) {
-                        setDevKey(val);
-                        localStorage.setItem("estarr_developer_key", val);
-                        addLog("success", `Developer gate custom authorization key configured: '${val}'`);
-                        (document.getElementById("custom-dev-key-input") as HTMLInputElement).value = "";
-                        confetti({ particleCount: 20, spread: 40 });
-                      }
-                    }}
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white text-[9px] font-black uppercase tracking-wider px-3 rounded transition-all"
-                  >
-                    Apply Overrides
-                  </button>
-                </div>
-              </div>
-
-              <div className="text-[10px] text-slate-400 bg-slate-950/60 p-3 rounded-lg border border-slate-850 flex items-start gap-2">
-                <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-bold text-slate-300 font-sans">Active Cryptographic Enforcement:</p>
-                  <p className="mt-0.5 leading-relaxed font-sans">
-                    Any developer navigating to the <strong className="text-purple-400 font-bold">Income Accelerator & Integration Hub</strong> on this browser will be locked out until they input the exact authorization key displayed above. Hand this key to vetted team members to grant them gateway credentials.
+                {/* Custom Key Editor */}
+                <div className="flex flex-col gap-1.5 bg-slate-950/40 p-3 rounded-lg border border-slate-850">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
+                    Custom Key Overrides
+                  </span>
+                  <p className="text-[10px] text-slate-400 leading-normal">
+                    Want a custom passcode? Define your own secret authorization key below and hit apply:
                   </p>
+                  <div className="flex gap-2 mt-1">
+                    <input
+                      type="text"
+                      placeholder="e.g. MY-SUPER-SECRET-DEV-PASS"
+                      id="custom-dev-key-input"
+                      className="flex-1 text-xs font-mono font-bold bg-slate-900 border border-slate-800 p-2 rounded focus:outline-none focus:border-purple-500 text-white"
+                    />
+                    <button
+                      onClick={() => {
+                        const val = (document.getElementById("custom-dev-key-input") as HTMLInputElement)?.value?.trim();
+                        if (val) {
+                          setDevKey(val);
+                          localStorage.setItem("estarr_developer_key", val);
+                          addLog("success", `Developer gate custom authorization key configured: '${val}'`);
+                          (document.getElementById("custom-dev-key-input") as HTMLInputElement).value = "";
+                          confetti({ particleCount: 20, spread: 40 });
+                        }
+                      }}
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white text-[9px] font-black uppercase tracking-wider px-3 rounded transition-all"
+                    >
+                      Apply Overrides
+                    </button>
+                  </div>
+                </div>
+
+                <div className="text-[10px] text-slate-400 bg-slate-950/60 p-3 rounded-lg border border-slate-850 flex items-start gap-2">
+                  <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-bold text-slate-300 font-sans">Active Cryptographic Enforcement:</p>
+                    <p className="mt-0.5 leading-relaxed font-sans">
+                      Any developer navigating to the <strong className="text-purple-400 font-bold">Income Accelerator & Integration Hub</strong> on this browser will be locked out until they input the exact authorization key displayed above. Hand this key to vetted team members to grant them gateway credentials.
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
           
           {/* Bento Block 1: THEME CONFIGURATION (ONLY FOR ADMIN) */}
@@ -435,6 +443,26 @@ export function AdminSection({
                     textClass: "text-slate-850",
                     accentBg: "bg-purple-600",
                     badgeColor: "text-purple-600 bg-purple-50"
+                  },
+                  {
+                    id: "emerald" as const,
+                    name: "Emerald Forest",
+                    desc: "Lush green ambient tech aesthetic",
+                    bgClass: "bg-emerald-950",
+                    borderClass: "border-emerald-900",
+                    textClass: "text-emerald-50",
+                    accentBg: "bg-emerald-600",
+                    badgeColor: "text-emerald-300 bg-emerald-950"
+                  },
+                  {
+                    id: "amber" as const,
+                    name: "Sunset Gold",
+                    desc: "Warm amber and honey sunset tones",
+                    bgClass: "bg-amber-950",
+                    borderClass: "border-amber-900",
+                    textClass: "text-amber-50",
+                    accentBg: "bg-amber-600",
+                    badgeColor: "text-amber-300 bg-amber-950"
                   }
                 ].map((t) => (
                   <button

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { EmailTemplate } from '../types';
 import { Mail, Plus, X, Send, Edit2, Trash2 } from 'lucide-react';
 
@@ -36,11 +37,17 @@ export function EmailTemplatesManager({ templates, onUpdate, token }: {
   };
 
   const handleSend = async (template: EmailTemplate, recipientEmail: string) => {
-    if (!token) {
-      alert("Please sign in with Google to send emails.");
-      return;
+    try {
+      await axios.post('/api/send-email', {
+        to: recipientEmail,
+        subject: template.subject,
+        body: template.body.replace("{{name}}", "Candidate")
+      });
+      alert(`Email "${template.name}" sent successfully to ${recipientEmail}!`);
+    } catch (error) {
+      console.error('Failed to send email:', error);
+      alert('Failed to send email.');
     }
-    alert(`Sending ${template.name} to ${recipientEmail}...`);
   };
 
   return (

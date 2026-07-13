@@ -343,7 +343,7 @@ export function ServicesCarousel({ onSelect, isAuthenticated, onAuthRequest }: S
         {/* Header & Controls Section */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-8 px-2">
           <div className="max-w-xl">
-            <p className="text-lg text-slate-600 leading-relaxed font-medium mb-8">
+            <p className="text-lg text-slate-600 leading-relaxed font-medium mb-8 mt-12">
               Hire elite AI Talents, configure automated escrow workflows, execute custom agreements, and verify talent milestones securely across local African tech nodes and global backers.
             </p>
             

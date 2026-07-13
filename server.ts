@@ -142,6 +142,28 @@ Make your answers concise, structured, action-oriented, encouraging, and highly 
   }
 });
 
+app.post("/api/send-email", async (req, res) => {
+  const { to, subject, body } = req.body;
+  const transporter = getSMTPTransporter();
+  if (!transporter) {
+    return res.status(400).json({ 
+      error: "SMTP transporter not configured. Please check your environment variables (SMTP_USER, SMTP_PASS)." 
+    });
+  }
+  try {
+    await transporter.sendMail({
+      from: process.env.SMTP_USER,
+      to,
+      subject,
+      text: body,
+    });
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Error sending email:", error);
+    res.status(500).json({ error: "Failed to send email" });
+  }
+});
+
 // API: Creator AI Course Architect
 app.post("/api/creator/generate-outline", async (req, res) => {
   try {

@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
 import { PageBanner } from "./PageBanner";
 import { UserProfile, Job, InterviewSlot, EmailTemplate } from "../types";
-import { Briefcase, MapPin, X, Sparkles, DollarSign, Check, Copy, MessageSquare, RefreshCw, ShieldCheck, PenTool, Plus, CheckCircle, Code, ShieldAlert } from "lucide-react";
+import { Briefcase, MapPin, X, Sparkles, DollarSign, Check, Copy, MessageSquare, RefreshCw, ShieldCheck, PenTool, Plus, CheckCircle, Code, ShieldAlert, Bold, Italic, List } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { DjinniAnonymousSection } from "./DjinniAnonymousSection";
 import ReactMarkdown from 'react-markdown';
@@ -29,9 +30,9 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile, 
 
   // Pipeline state
   const [pipeline, setPipeline] = useState([
-    { id: 1, name: "Chinedu Okafor", stage: "Screening", role: "DevOps Engineer" },
-    { id: 2, name: "Aisha Mohammed", stage: "Interview", role: "Full-Stack Dev" },
-    { id: 3, name: "Samuel Tunde", stage: "Offer", role: "Data Scientist" },
+    { id: 1, name: "Chinedu Okafor", stage: "Screening", role: "DevOps Engineer", email: "chinedu@example.com" },
+    { id: 2, name: "Aisha Mohammed", stage: "Interview", role: "Full-Stack Dev", email: "aisha@example.com" },
+    { id: 3, name: "Samuel Tunde", stage: "Offer", role: "Data Scientist", email: "samuel@example.com" },
   ]);
   const stages = ["Screening", "Interview", "Offer", "Hired"];
 
@@ -121,6 +122,31 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile, 
   const [newLocation, setNewLocation] = useState("");
   const [newSalary, setNewSalary] = useState("");
   const [newDesc, setNewDesc] = useState("");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleFormat = (type: 'bold' | 'italic' | 'list') => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    let formattedText = text;
+
+    if (type === 'bold') {
+      formattedText = text.substring(0, start) + '**' + text.substring(start, end) + '**' + text.substring(end);
+    } else if (type === 'italic') {
+      formattedText = text.substring(0, start) + '*' + text.substring(start, end) + '*' + text.substring(end);
+    } else if (type === 'list') {
+      const selectedText = text.substring(start, end);
+      const lines = selectedText.split('\n');
+      const formattedLines = lines.map(line => line.trim().startsWith('- ') ? line : `- ${line}`);
+      formattedText = text.substring(0, start) + formattedLines.join('\n') + text.substring(end);
+    }
+
+    setNewDesc(formattedText);
+    textarea.focus();
+  };
 
   // Cloud Talent Solution Search States
   const [ctsSearchQuery, setCtsSearchQuery] = useState("");
@@ -165,7 +191,8 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile, 
         salary: newSalary || "Negotiable",
         description: newDesc || "No description provided",
         skillsRequired: [],
-        shareUrl: `${window.location.origin}/jobs?id=job-${Date.now()}`
+        shareUrl: `${window.location.origin}/jobs?id=job-${Date.now()}`,
+        status: 'pending'
       };
 
       // Call Talent Solution API
@@ -217,11 +244,11 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile, 
     setTimeout(() => setPitchCopied(false), 2000);
   };
 
-  const talentPool = [
-    { name: "Chinedu Okafor", role: "Senior DevOps Engineer", matchScore: 98, capstone: "Automated CI/CD Pipeline for Microservices", status: "Verified on-chain" },
-    { name: "Aisha Mohammed", role: "Full-Stack Developer", matchScore: 92, capstone: "Real-time E-commerce Marketplace", status: "Verified on-chain" },
-    { name: "Samuel Tunde", role: "Data Scientist", matchScore: 85, capstone: "Predictive AI Model for Logistics", status: "Verified on-chain" },
-  ];
+  const [talentPoolState, setTalentPoolState] = useState([
+    { id: 1, name: "Chinedu Okafor", role: "Senior DevOps Engineer", matchScore: 98, capstone: "Automated CI/CD Pipeline for Microservices", status: "pending", email: "chinedu@example.com", verified: false, isExpanded: false, githubUrl: "https://github.com/chinedu/pipeline" },
+    { id: 2, name: "Aisha Mohammed", role: "Full-Stack Developer", matchScore: 92, capstone: "Real-time E-commerce Marketplace", status: "pending", email: "aisha@example.com", verified: false, isExpanded: false, githubUrl: "https://github.com/aisha/ecommerce" },
+    { id: 3, name: "Samuel Tunde", role: "Data Scientist", matchScore: 85, capstone: "Predictive AI Model for Logistics", status: "pending", email: "samuel@example.com", verified: false, isExpanded: false, githubUrl: "https://github.com/samuel/ai-model" },
+  ]);
 
   const filteredJobs = viewMode === "listings" 
     ? jobs 
@@ -351,35 +378,90 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile, 
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {talentPool.map((talent, i) => (
-              <div key={i} className="border border-slate-200 p-5 rounded-2xl flex flex-col hover:border-purple-300 hover:shadow-md transition-all cursor-pointer bg-slate-50 hover:bg-white">
+            {talentPoolState.map((talent, i) => (
+              <div key={talent.id} 
+                onClick={() => setTalentPoolState(talentPoolState.map(t => t.id === talent.id ? {...t, isExpanded: !t.isExpanded} : t))}
+                className="border border-slate-200 p-5 rounded-2xl flex flex-col hover:border-purple-300 hover:shadow-md transition-all cursor-pointer bg-slate-50 hover:bg-white"
+              >
                 <div className="flex justify-between items-start mb-3">
                   <div>
                     <h4 className="font-bold text-slate-900">{talent.name}</h4>
                     <p className="text-xs text-slate-500">{talent.role}</p>
                   </div>
-                  <div className="bg-emerald-100 text-emerald-700 px-2 py-1 rounded-lg text-xs font-bold flex items-center gap-1">
+                  <div className="bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded-md text-[10px] font-bold flex items-center gap-1">
                     <Sparkles className="w-3 h-3" /> {talent.matchScore}% Match
                   </div>
                 </div>
                 <div className="mt-2 pt-3 border-t border-slate-200">
-                  <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">Verified Capstone</p>
-                  <p className="text-sm font-medium text-slate-700 leading-tight">{talent.capstone}</p>
-                </div>
-                <div className="mt-4 flex items-center justify-between">
-                  <div className="flex items-center gap-1 text-xs text-purple-600 font-bold">
-                    <CheckCircle className="w-3.5 h-3.5" /> {talent.status}
-                  </div>
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      alert(`Invite sent to ${talent.name} for an interview based on their capstone consultancy.`);
-                    }}
-                    className="bg-purple-100 hover:bg-purple-200 text-purple-700 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors"
+                  <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">Verified Project</p>
+                  <a 
+                    href={talent.githubUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="text-sm font-medium text-purple-600 hover:text-purple-800 leading-tight block hover:underline"
                   >
-                    <MessageSquare className="w-3.5 h-3.5" /> Invite
-                  </button>
+                    {talent.capstone}
+                  </a>
+                  {talent.verified ? (
+                    <div className="mt-2 flex items-center gap-1 text-[10px] font-bold text-emerald-600">
+                        <CheckCircle className="w-3 h-3" /> Verified on-chain
+                    </div>
+                  ) : (
+                    <button
+                        onClick={(e) => { e.stopPropagation(); setTalentPoolState(talentPoolState.map(t => t.id === talent.id ? {...t, verified: true} : t))}}
+                        className="mt-2 text-[10px] font-bold text-indigo-600 hover:text-indigo-800"
+                    >
+                        Verify on-chain
+                    </button>
+                  )}
                 </div>
+                {talent.isExpanded && (
+                    <div className="mt-4 pt-4 border-t border-slate-200 flex items-center justify-end gap-3">
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${talent.status === 'approved' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                        {talent.status || 'pending'}
+                      </span>
+                      
+                      <div className="flex items-center gap-1">
+                        {talent.status !== 'approved' && (
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); setTalentPoolState(talentPoolState.map(t => t.id === talent.id ? {...t, status: 'approved'} : t))}}
+                            className="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 px-2 py-1 rounded-md text-[10px] font-bold flex items-center gap-1 transition-colors"
+                          >
+                            <CheckCircle className="w-3 h-3" /> Approve
+                          </button>
+                        )}
+                        <button 
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            setTalentPoolState(talentPoolState.filter(t => t.id !== talent.id));
+                          }}
+                          className="text-rose-400 hover:text-rose-600 p-1 transition-colors"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                        <button 
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            try {
+                              await axios.post('/api/send-email', {
+                                to: talent.email,
+                                subject: 'Interview Invitation',
+                                body: `Hi ${talent.name}, we would like to invite you to an interview based on your capstone consultancy.`
+                              });
+                              alert(`Invite sent to ${talent.name} for an interview based on their capstone consultancy.`);
+                            } catch (error) {
+                              console.error('Failed to send email:', error);
+                              alert('Failed to send email.');
+                            }
+                          }}
+                          className="bg-purple-100 hover:bg-purple-200 text-purple-700 px-3 py-2 rounded-md text-[10px] font-bold flex items-center gap-1 transition-colors"
+                        >
+                          <MessageSquare className="w-3 h-3" /> Invite
+                        </button>
+                      </div>
+                    </div>
+                )}
               </div>
             ))}
           </div>
@@ -594,7 +676,7 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile, 
                       </div>
                       {stage === "Interview" && (
                         <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-                          <InterviewScheduler token={token} candidateName={candidate.name} />
+                          <InterviewScheduler token={token} candidateName={candidate.name} candidateEmail={candidate.email} />
                         </div>
                       )}
                       <div className="flex gap-2 justify-end flex-wrap pt-3 border-t border-slate-100">
@@ -671,7 +753,12 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile, 
             
             <div className="flex flex-col gap-1.5">
                 <label className="text-[10px] font-bold text-slate-900 uppercase tracking-wide">Description</label>
-                <textarea required rows={4} value={newDesc} onChange={e => setNewDesc(e.target.value)} placeholder="Describe the responsibilities and requirements..." className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-sm focus:outline-none focus:border-purple-500 resize-none" />
+                <div className="flex gap-2 mb-1">
+                  <button type="button" onClick={() => handleFormat('bold')} className="p-1.5 bg-slate-100 hover:bg-slate-200 rounded text-slate-700"><Bold className="w-3 h-3" /></button>
+                  <button type="button" onClick={() => handleFormat('italic')} className="p-1.5 bg-slate-100 hover:bg-slate-200 rounded text-slate-700"><Italic className="w-3 h-3" /></button>
+                  <button type="button" onClick={() => handleFormat('list')} className="p-1.5 bg-slate-100 hover:bg-slate-200 rounded text-slate-700"><List className="w-3 h-3" /></button>
+                </div>
+                <textarea ref={textareaRef} required rows={4} value={newDesc} onChange={e => setNewDesc(e.target.value)} placeholder="Describe the responsibilities and requirements..." className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-sm focus:outline-none focus:border-purple-500 resize-none" />
             </div>
             <button type="submit" className="bg-purple-600 hover:bg-purple-700 text-white px-5 py-2.5 rounded-xl text-xs font-bold w-fit mt-2 cursor-pointer transition-colors shadow-sm">
               Publish Job
@@ -750,6 +837,9 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile, 
                 <h3 className="font-bold uppercase text-lg mb-1">{job.title}</h3>
                 <div className="flex items-center gap-4 text-xs text-slate-500 font-medium font-mono">
                   <span className="text-purple-600 font-bold">{job.company}</span>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${job.status === 'approved' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                    {job.status || 'pending'}
+                  </span>
                   <span className="flex items-center gap-1">
                     <MapPin className="w-3.5 h-3.5" /> {job.location}
                   </span>
@@ -778,12 +868,22 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile, 
                 </span>
                 
                 {userProfile.accountType === 'jobOwner' && (
-                  <button
-                    onClick={() => onUpdateJobs(jobs.filter(j => j.id !== job.id))}
-                    className="bg-rose-50 text-rose-600 px-4 py-2 rounded-xl text-xs font-bold hover:bg-rose-100"
-                  >
-                    Delete Job
-                  </button>
+                  <div className="flex gap-2">
+                    {job.status !== 'approved' && (
+                      <button
+                        onClick={() => onUpdateJobs(jobs.map(j => j.id === job.id ? {...j, status: 'approved'} : j))}
+                        className="bg-emerald-50 text-emerald-600 px-4 py-2 rounded-xl text-xs font-bold hover:bg-emerald-100"
+                      >
+                        Approve
+                      </button>
+                    )}
+                    <button
+                      onClick={() => onUpdateJobs(jobs.filter(j => j.id !== job.id))}
+                      className="bg-rose-50 text-rose-600 px-4 py-2 rounded-xl text-xs font-bold hover:bg-rose-100"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 )}
                 
                 {userProfile.accountType !== 'jobOwner' && (

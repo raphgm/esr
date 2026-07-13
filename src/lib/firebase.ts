@@ -77,8 +77,8 @@ export interface FirestoreErrorInfo {
   }
 }
 
-export function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null): void {
-  console.error(`Firestore Error [${operationType}] at ${path}:`, JSON.stringify(error));
+export function handleFirestoreError(error: unknown, operationType: string, path: string | null): void {
+  console.error(`Firestore Error [${operationType}] at ${path}:`, error);
   const errInfo: FirestoreErrorInfo = {
     error: error instanceof Error ? error.message : String(error),
     authInfo: {
@@ -95,7 +95,7 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
     operationType,
     path
   };
-  console.error('Detailed Firestore Error Info: ', JSON.stringify(errInfo));
+  console.error('Detailed Firestore Error Info: ', errInfo);
   // DO NOT THROW. Throwing here causes unhandled promise rejections that crash the app when fetching data!
 }
 
@@ -254,6 +254,24 @@ export function subscribeToCollection<T extends { id: string }>(
     callback(items);
   }, (error) => {
     handleFirestoreError(error, OperationType.GET, collectionName);
+  });
+}
+
+export async function saveGlobalConfig(docId: string, data: any) {
+  try {
+    await setDoc(doc(db, "globalConfig", docId), data, { merge: true });
+  } catch (error) {
+    handleFirestoreError(error, OperationType.WRITE, `globalConfig/${docId}`);
+  }
+}
+
+export function subscribeToGlobalConfig(docId: string, callback: (data: any) => void) {
+  return onSnapshot(doc(db, "globalConfig", docId), (snapshot) => {
+    if (snapshot.exists()) {
+      callback(snapshot.data());
+    }
+  }, (error) => {
+    handleFirestoreError(error, OperationType.GET, `globalConfig/${docId}`);
   });
 }
 

@@ -1,17 +1,23 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { Calendar, Plus, Clock } from 'lucide-react';
 
-export function InterviewScheduler({ token, candidateName }: { token: string | null, candidateName: string }) {
+export function InterviewScheduler({ token, candidateName, candidateEmail }: { token: string | null, candidateName: string, candidateEmail: string }) {
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
 
   const handleSchedule = async () => {
-    if (!token) {
-      alert("Please sign in with Google to schedule interviews.");
-      return;
+    try {
+      await axios.post('/api/send-email', {
+        to: candidateEmail,
+        subject: "Interview Scheduled",
+        body: `Interview scheduled for ${candidateName} on ${date} at ${time}.`
+      });
+      alert(`Interview scheduled and invitation sent for ${candidateName} on ${date} at ${time}.`);
+    } catch (error) {
+      console.error('Failed to schedule interview:', error);
+      alert('Failed to schedule interview.');
     }
-    // Implement API call to Google Calendar API
-    alert(`Scheduling interview for ${candidateName} on ${date} at ${time}...`);
   };
 
   return (

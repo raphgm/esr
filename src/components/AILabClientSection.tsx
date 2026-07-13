@@ -901,7 +901,11 @@ export const AILabClientSection: React.FC<AILabClientSectionProps> = ({ userProf
           {activeTab === "active" ? (
             clientTasks.length > 0 ? (
               clientTasks.map(task => (
-                <div key={task.id} className="p-6 hover:bg-slate-50 transition-colors flex flex-col md:flex-row gap-6 items-start md:items-center">
+                <div 
+                  key={task.id} 
+                  onClick={() => setActiveTask(task)}
+                  className="p-6 hover:bg-slate-50 transition-colors flex flex-col md:flex-row gap-6 items-start md:items-center cursor-pointer"
+                >
                   <div className={`p-4 rounded-2xl shrink-0 ${task.bg} ${task.color}`}>
                     <task.icon className="w-8 h-8" />
                   </div>
