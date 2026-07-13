@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Briefcase, Users, TrendingUp, Clock, ArrowRight, ShieldCheck, CreditCard, Plus, X } from "lucide-react";
 import { UserProfile, ConsultancyTask } from "../types";
 import { AnnotationManagement } from "./AnnotationManagement";
@@ -8,11 +8,13 @@ import { TalentDetailModal } from "./TalentDetailModal";
 export function ClientDashboard({ 
   userProfile, 
   tasks,
-  onNavigate 
+  onNavigate,
+  token
 }: { 
   userProfile: UserProfile;
   tasks: ConsultancyTask[];
   onNavigate: (id: string) => void;
+  token: string | null;
 }) {
   const [selectedTalent, setSelectedTalent] = React.useState<{ name: string, role: string, rating: string, bio: string, projectsCount: number, isVerified: boolean } | null>(null);
   const [talents, setTalents] = React.useState([
@@ -21,6 +23,7 @@ export function ClientDashboard({
     { name: "Elena R.", role: "Full Stack Dev", rating: "4.8", bio: "Building scalable web applications with a focus on performant data visualization.", projectsCount: 15, isVerified: false }
   ]);
   const [rejectedTalents, setRejectedTalents] = React.useState<Array<{ talent: {name: string, role: string, rating: string, bio: string, projectsCount: number, isVerified: boolean}, rejectedAt: Date }>>([]);
+  
   const activeTasks = tasks.filter(t => t.status !== 'done');
   const totalSpend = 0.00; // Mock data for client
 
@@ -113,6 +116,7 @@ export function ClientDashboard({
 
       <ManagerAnalyticsDashboard tasks={tasks} />
       <AnnotationManagement />
+
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Active Projects */}

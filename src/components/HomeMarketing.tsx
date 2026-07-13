@@ -311,6 +311,7 @@ export function HomeMarketing({
   // Mock Open Jobs Board data
   const jobPositions = [
     { id: "job1", title: "Senior Full-Stack Developer (React & Node)", category: "Engineering", location: "Remote (Global)", type: "Contract (Escrow)", rate: "$95/hr", skills: ["React", "TypeScript", "Node.js", "Express"] },
+    { id: "sslab-internship", title: "Internship — SSLab Deployment", category: "Engineering", location: "Remote", type: "Internship", rate: "$100", skills: ["Linux", "Git", "Azure", "CI/CD", "WebRTC"] },
     { id: "job-ai-1", title: "RLHF Data Trainer (Hausa/Swahili Dialects)", category: "AI Services", location: "Remote (Africa)", type: "Contract", rate: "$45/hr", skills: ["RLHF", "Data Labeling", "Linguistics"] },
     { id: "job-ai-2", title: "AI Agent Engineer (LangChain & Pinecone)", category: "Engineering", location: "Remote (Global)", type: "Full-Time", rate: "$120/hr", skills: ["Python", "LangChain", "Vector DBs", "RAG"] },
     { id: "job2", title: "UGC Video Content Specialist & Editor", category: "Creative", location: "Remote (UK/US)", type: "Freelance", rate: "$70/hr", skills: ["CapCut", "Video Editing", "UGC", "Mobile Production"] },

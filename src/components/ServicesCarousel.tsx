@@ -118,7 +118,7 @@ export function ServicesCarousel({ onSelect, isAuthenticated, onAuthRequest }: S
     {
       id: "academy",
       label: "Anonymous Talent Market",
-      desc: "Access the Anonymous Talent Market enterprise environment. Professional playbooks, expert classes, and skill licenses for IT pros and creative talent. Orchestrate high-yield digital workflows, configure protected smart micro-agreements, and trace global milestones securely within the node ecosystem.",
+      desc: "Access the Anonymous Talent Market enterprise environment. Professional playbooks, expert classes, and skill licenses for IT pros and creative talent. Orchestrate high-yield digital workflows, configure protected smart micro-agreements, and trace global milestones securely within the distributed ecosystem.",
       icon: Award,
       badge: "42 CLASSES LIVE",
       color: "bg-blue-50 text-blue-600 border-blue-100 group-hover:bg-blue-600 group-hover:text-white",
@@ -432,7 +432,7 @@ export function ServicesCarousel({ onSelect, isAuthenticated, onAuthRequest }: S
                 >
                   <div
                     onClick={() => setSelectedService(service)}
-                    className="p-8 h-full min-h-[300px] bg-white border border-slate-200 hover:border-slate-300 transition-all duration-500 cursor-pointer group hover:shadow-xl hover:shadow-slate-200/40 rounded-[2rem] flex flex-col justify-between relative overflow-hidden"
+                    className="p-6 h-full min-h-[250px] bg-white border border-slate-200 hover:border-slate-300 transition-all duration-500 cursor-pointer group hover:shadow-xl hover:shadow-slate-200/40 rounded-[2rem] flex flex-col justify-between relative overflow-hidden"
                   >
                     {/* Subtle bottom-right colored circle */}
                     <div 
@@ -487,7 +487,7 @@ export function ServicesCarousel({ onSelect, isAuthenticated, onAuthRequest }: S
                   className="w-full sm:w-[340px] flex-shrink-0 snap-start"
                 >
                   <div
-                    className="p-8 h-full min-h-[300px] bg-white border border-slate-200 hover:border-violet-300 transition-all duration-500 cursor-pointer group hover:shadow-xl hover:shadow-slate-200/40 rounded-[2rem] flex flex-col justify-between relative overflow-hidden"
+                    className="p-6 h-full min-h-[250px] bg-white border border-slate-200 hover:border-violet-300 transition-all duration-500 cursor-pointer group hover:shadow-xl hover:shadow-slate-200/40 rounded-[2rem] flex flex-col justify-between relative overflow-hidden"
                   >
                     {/* Hover Effect Overlay */}
                     <div className="absolute inset-0 bg-slate-900/95 flex flex-col justify-center items-center p-6 text-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20 backdrop-blur-sm">
@@ -606,10 +606,10 @@ export function ServicesCarousel({ onSelect, isAuthenticated, onAuthRequest }: S
               <div className="space-y-4 mb-8">
                 <p className="text-slate-600 text-xs leading-relaxed">
                   Access the <strong>{selectedService.label}</strong> enterprise environment. 
-                  {selectedService.desc} Orchestrate high-yield digital workflows, configure protected smart micro-agreements, and trace global milestones securely within the node ecosystem.
+                  {selectedService.desc} Orchestrate high-yield digital workflows, configure protected smart micro-agreements, and trace global milestones securely within the distributed ecosystem.
                 </p>
                 <div className="bg-slate-50 p-4 border border-slate-150 rounded-xl flex justify-between items-center text-xs">
-                  <span className="font-mono text-slate-400">Node Ecosystem Metric</span>
+                  <span className="font-mono text-slate-400">System Ecosystem Metric</span>
                   <span className="font-mono font-black text-violet-600">{selectedService.stats}</span>
                 </div>
               </div>

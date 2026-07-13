@@ -1,6 +1,6 @@
 {
   "name": "ESTARR",
-  "description": "Access the Anonymous Talent Market enterprise environment. Professional playbooks, expert classes, and skill licenses for IT pros and creative talent. Orchestrate high-yield digital workflows, configure protected smart micro-agreements, and trace global milestones securely within the node ecosystem.",
+  "description": "Access the Anonymous Talent Market enterprise environment. Professional playbooks, expert classes, and skill licenses for IT pros and creative talent. Orchestrate high-yield digital workflows, configure protected smart micro-agreements, and trace global milestones securely within the distributed ecosystem.",
   "requestFramePermissions": ["camera", "microphone"],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

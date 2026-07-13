@@ -1,3 +1,10 @@
+export interface PipelineCandidate {
+  id: number;
+  name: string;
+  stage: "Screening" | "Interview" | "Offer" | "Hired";
+  role: string;
+}
+
 export interface PortfolioItem {
   id: string;
   title: string;
@@ -188,12 +195,39 @@ export interface Job {
   id: string;
   title: string;
   company: string;
-  type: "Full-time" | "Internship" | "Apprenticeship" | "Independent";
+  type: "Full-time" | "Internship" | "Apprenticeship" | "Independent" | "Freelance";
   location: string;
   salary: string;
   description: string;
   skillsRequired: string[];
+  requirements?: string[];
   matchScore?: number;
+  shareUrl?: string;
+}
+
+export interface JobApplication {
+  id: string;
+  jobId: string;
+  candidateName: string;
+  candidateId: string;
+  status: "applied" | "reviewing" | "interview" | "offered" | "rejected";
+  createdAt: string;
+}
+
+export interface InterviewSlot {
+  id: string;
+  jobId: string;
+  candidateId: string;
+  startTime: string; // ISO string
+  endTime: string;   // ISO string
+  status: "available" | "scheduled" | "cancelled";
+}
+
+export interface EmailTemplate {
+  id: string;
+  name: string;
+  subject: string;
+  body: string;
 }
 
 export interface InventoryItem {

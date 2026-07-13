@@ -1,7 +1,7 @@
 import { PageBanner } from "./PageBanner";
 import React, { useState } from "react";
 import confetti from "canvas-confetti";
-import { ConsultancyTask, UserProfile, BrandCampaign } from "../types";
+import { ConsultancyTask, UserProfile, BrandCampaign, Job } from "../types";
 import {
   Plus,
   Search,
@@ -21,6 +21,7 @@ import {
   ArrowRight,
   Clock,
   Building,
+  LineChart,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, ResponsiveContainer, Legend } from "recharts";
@@ -30,7 +31,9 @@ import { MessageSquare } from "lucide-react";
 interface ConsultancySectionProps {
   userProfile: UserProfile;
   tasks: ConsultancyTask[];
+  jobs: Job[];
   onUpdateTasks: (tasks: ConsultancyTask[]) => void;
+  onUpdateJobs: (jobs: Job[]) => void;
   onOpenAiChat: (prompt: string, context: string) => void;
   onNavigate?: (tab: string) => void;
   campaigns?: BrandCampaign[];
@@ -75,13 +78,15 @@ import { ConsultancyDashboard } from "./ConsultancyDashboard";
 export default function ConsultancySection({
   userProfile,
   tasks,
+  jobs,
   onUpdateTasks,
+  onUpdateJobs,
   onOpenAiChat,
   onNavigate,
   campaigns,
 }: ConsultancySectionProps) {
   if (userProfile?.accountType === "jobOwner") {
-    return <ConsultancyClientSection userProfile={userProfile} tasks={tasks} onNavigate={onNavigate} />;
+    return <ConsultancyClientSection userProfile={userProfile} tasks={tasks} jobs={jobs} onUpdateTasks={onUpdateTasks} onUpdateJobs={onUpdateJobs} onNavigate={onNavigate} />;
   }
 
   const [activeTab, setActiveTab] = useState<"board" | "deal-builder" | "escrow-feed" | "dashboard">("board");
@@ -408,33 +413,23 @@ export default function ConsultancySection({
         </div>
       </div>
 
-      {/* Financial Escrow Metrics Bar */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-slate-900 text-white rounded-3xl p-6 border-2 border-slate-800 shadow-sm">
+      {/* Financial Metrics */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6 bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
         <div className="flex flex-col gap-1">
-          <span className="text-[9px] font-mono tracking-wider uppercase text-slate-9000">Total Contract Value</span>
-          <span className="text-xl md:text-2xl font-display font-black text-white">${stats.total.toLocaleString()}</span>
-          <span className="text-[10px] text-slate-500 font-medium">Bids + Active Work</span>
+          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total Value</span>
+          <span className="text-2xl font-black text-slate-900">${stats.total.toLocaleString()}</span>
         </div>
-        <div className="flex flex-col gap-1 border-l border-slate-800 pl-4">
-          <span className="text-[9px] font-mono tracking-wider uppercase text-emerald-400 flex items-center gap-1">
-            <Lock className="w-2.5 h-2.5 text-emerald-400" /> Locked In Escrow
-          </span>
-          <span className="text-xl md:text-2xl font-display font-black text-emerald-400">${stats.escrowed.toLocaleString()}</span>
-          <span className="text-[10px] text-slate-500 font-medium">Client Deposited</span>
+        <div className="flex flex-col gap-1">
+          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Locked In Escrow</span>
+          <span className="text-2xl font-black text-emerald-600">${stats.escrowed.toLocaleString()}</span>
         </div>
-        <div className="flex flex-col gap-1 border-l border-slate-800 pl-4">
-          <span className="text-[9px] font-mono tracking-wider uppercase text-purple-500 flex items-center gap-1">
-            <ShieldCheck className="w-2.5 h-2.5 text-purple-500" /> Under Review
-          </span>
-          <span className="text-xl md:text-2xl font-display font-black text-purple-500">${stats.pendingRelease.toLocaleString()}</span>
-          <span className="text-[10px] text-slate-500 font-medium">Milestones Submitted</span>
+        <div className="flex flex-col gap-1">
+          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Under Review</span>
+          <span className="text-2xl font-black text-amber-600">${stats.pendingRelease.toLocaleString()}</span>
         </div>
-        <div className="flex flex-col gap-1 border-l border-slate-800 pl-4">
-          <span className="text-[9px] font-mono tracking-wider uppercase text-sky-400 flex items-center gap-1">
-            <Wallet className="w-2.5 h-2.5 text-sky-400" /> Disbursed & Earned
-          </span>
-          <span className="text-xl md:text-2xl font-display font-black text-sky-400">${stats.disbursed.toLocaleString()}</span>
-          <span className="text-[10px] text-slate-500 font-medium">Paid to Bank Account</span>
+        <div className="flex flex-col gap-1">
+          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Disbursed</span>
+          <span className="text-2xl font-black text-sky-600">${stats.disbursed.toLocaleString()}</span>
         </div>
       </div>
 
@@ -443,47 +438,10 @@ export default function ConsultancySection({
         <div className="lg:col-span-4 flex flex-col gap-6">
           
           {/* Section Navigation Tabs */}
-          <div className="bg-white border border-slate-200 rounded-3xl p-2.5 shadow-sm grid grid-cols-2 md:grid-cols-4 gap-1.5">
-            <button
-              onClick={() => setActiveTab("board")}
-              className={`py-2 rounded-xl text-[11px] font-extrabold transition-all cursor-pointer text-center ${
-                activeTab === "board"
-                  ? "bg-slate-900 text-white"
-                  : "text-slate-500 hover:bg-slate-50"
-              }`}
-            >
-              📋 Contracts
-            </button>
-            <button
-              onClick={() => setActiveTab("deal-builder")}
-              className={`py-2 rounded-xl text-[11px] font-extrabold transition-all cursor-pointer flex items-center justify-center gap-1 ${
-                activeTab === "deal-builder"
-                  ? "bg-slate-900 text-white"
-                  : "text-slate-500 hover:bg-slate-50"
-              }`}
-            >
-              <Sparkles className="w-3 h-3 text-purple-500 animate-pulse" /> AI Builder
-            </button>
-            <button
-              onClick={() => setActiveTab("escrow-feed")}
-              className={`py-2 rounded-xl text-[11px] font-extrabold transition-all cursor-pointer text-center ${
-                activeTab === "escrow-feed"
-                  ? "bg-slate-900 text-white"
-                  : "text-slate-500 hover:bg-slate-50"
-              }`}
-            >
-              🔒 Escrow Logs
-            </button>
-            <button
-              onClick={() => setActiveTab("dashboard")}
-              className={`py-2 rounded-xl text-[11px] font-extrabold transition-all cursor-pointer text-center ${
-                activeTab === "dashboard"
-                  ? "bg-slate-900 text-white"
-                  : "text-slate-500 hover:bg-slate-50"
-              }`}
-            >
-              📊 Performance
-            </button>
+          <div className="bg-white border border-slate-200 rounded-3xl p-4 shadow-sm">
+            <h2 className="text-sm font-black text-slate-900 flex items-center gap-2">
+              <FileText className="w-4 h-4" /> Contracts
+            </h2>
           </div>
 
           {/* Tab 1: AI Deal Estimator & Pitch Writer */}

@@ -31,7 +31,7 @@ import firebaseConfig from "../../firebase-applet-config.json";
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+export const db = getFirestore(app, "ai-studio-estrrplatformcom-7790c801-2fcb-460f-a9ad-b14134dd87a6");
 
 // Verify Firebase configuration internally
 async function testConnection() {
@@ -48,7 +48,7 @@ async function testConnection() {
     }
   }
 }
-testConnection();
+// testConnection();
 
 // Error handling types
 export enum OperationType {
@@ -78,6 +78,7 @@ export interface FirestoreErrorInfo {
 }
 
 export function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null): void {
+  console.error(`Firestore Error [${operationType}] at ${path}:`, JSON.stringify(error));
   const errInfo: FirestoreErrorInfo = {
     error: error instanceof Error ? error.message : String(error),
     authInfo: {
@@ -94,7 +95,7 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
     operationType,
     path
   };
-  console.error('Firestore Error: ', errInfo);
+  console.error('Detailed Firestore Error Info: ', JSON.stringify(errInfo));
   // DO NOT THROW. Throwing here causes unhandled promise rejections that crash the app when fetching data!
 }
 

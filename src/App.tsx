@@ -179,6 +179,7 @@ const translations = {
 export default function App() {
   // Authentication State
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [token, setToken] = useState<string | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showVettingModal, setShowVettingModal] = useState(false);
@@ -330,7 +331,9 @@ ActivityPost[]>(initialPosts);
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [campaigns, setCampaigns] = useState<BrandCampaign[]>(initialCampaigns);
   const [tasks, setTasks] = useState<ConsultancyTask[]>(initialTasks);
+  const tasksRef = useRef<ConsultancyTask[]>(initialTasks);
   const [jobs, setJobs] = useState<Job[]>(initialJobs);
+  const jobsRef = useRef<Job[]>(initialJobs);
   const [channels, setChannels] = useState<CommunityChannel[]>(initialChannels);
 
   const totalEscrowLocked = tasks.filter(t => t.status === "inprogress" || t.status === "review").reduce((sum, t) => sum + parseTaskDetails(t).budget, 0);
@@ -504,14 +507,17 @@ ActivityPost[]) => {
     });
 
     setTasks(tasksToSave);
-    const currentMap = new Map(tasks.map(item => [item.id, item]));
+    const oldTasks = tasksRef.current;
+    tasksRef.current = tasksToSave;
+
+    const currentMap = new Map(oldTasks.map(item => [item.id, item]));
     for (const newItem of tasksToSave) {
       const existing = currentMap.get(newItem.id);
       if (!existing || JSON.stringify(existing) !== JSON.stringify(newItem)) {
         await saveCollectionItem("tasks", newItem);
       }
     }
-    for (const oldItem of tasks) {
+    for (const oldItem of oldTasks) {
       if (!tasksToSave.some(item => item.id === oldItem.id)) {
         await deleteCollectionItem("tasks", oldItem.id);
       }
@@ -536,14 +542,17 @@ ActivityPost[]) => {
 
   const handleUpdateJobs = async (updatedJobs: Job[]) => {
     setJobs(updatedJobs);
-    const currentMap = new Map(jobs.map(item => [item.id, item]));
+    const oldJobs = jobsRef.current;
+    jobsRef.current = updatedJobs;
+
+    const currentMap = new Map(oldJobs.map(item => [item.id, item]));
     for (const newItem of updatedJobs) {
       const existing = currentMap.get(newItem.id);
       if (!existing || JSON.stringify(existing) !== JSON.stringify(newItem)) {
         await saveCollectionItem("jobs", newItem);
       }
     }
-    for (const oldItem of jobs) {
+    for (const oldItem of oldJobs) {
       if (!updatedJobs.some(item => item.id === oldItem.id)) {
         await deleteCollectionItem("jobs", oldItem.id);
       }
@@ -652,6 +661,7 @@ ActivityPost>("posts", initialPosts);
           setCampaigns(validCampaigns);
 
           const fetchedTasks = await getCollectionData<ConsultancyTask>("tasks", []);
+          tasksRef.current = fetchedTasks;
           
           // Cleanup mock tasks
           const mockTaskTitles = ["Distributed System Migration", "AI Agent Orchestration Pipeline", "Cloud Native Security Audit", "TikTok Meme Ad", "Instagram Reels", "UGC Styling"];
@@ -662,9 +672,11 @@ ActivityPost>("posts", initialPosts);
             }
           });
           setTasks(validTasks);
+          tasksRef.current = validTasks;
 
           const fetchedJobs = await getCollectionData<Job>("jobs", initialJobs);
           setJobs(fetchedJobs);
+          jobsRef.current = fetchedJobs;
 
           const fetchedChannels = await getCollectionData<CommunityChannel>("channels", initialChannels);
           setChannels(fetchedChannels);
@@ -679,7 +691,9 @@ ActivityPost>("posts", initialPosts);
         setProducts(initialProducts);
         setCampaigns(initialCampaigns);
         setTasks(initialTasks);
+        tasksRef.current = initialTasks;
         setJobs(initialJobs);
+        jobsRef.current = initialJobs;
         setChannels(initialChannels);
         setIsAdmin(false);
       }
@@ -877,6 +891,12 @@ ActivityPost>("posts", initialPosts);
       ]
     },
     {
+      title: "Consultancy & Services",
+      items: [
+        { id: "consultancy", label: "Consultancy Dashboard", desc: "Manage projects", icon: Briefcase },
+      ]
+    },
+    {
       title: "Gig Market & Escrow Services",
       items: [
         { id: "gigs", label: "AI Gig Builder", desc: "Draft & list your services", icon: Sparkles },
@@ -907,7 +927,13 @@ ActivityPost>("posts", initialPosts);
       items: [
         { id: "home", label: "Dashboard", desc: "Manage projects & spend", icon: Home },
         { id: "ai-lab", label: "Post AI Task", desc: "Hire for AI training", icon: BrainCircuit },
-        { id: "consultancy", label: "Post IT Project", desc: "Hire for IT consultancy", icon: Briefcase },
+      ]
+    },
+    {
+      title: "Consultancy & Services",
+      items: [
+        { id: "consultancy", label: "Consultancy Dashboard", desc: "Manage projects & milestones", icon: Briefcase },
+        { id: "careers", label: "Jobs Board", desc: "Full-time & remote roles", icon: Compass },
       ]
     },
     {
@@ -2079,9 +2105,11 @@ ActivityPost>("posts", initialPosts);
                   userProfile={userProfile} 
                   tasks={tasks}
                   posts={posts}
+                  jobs={jobs}
                   onNavigate={(tab) => setActiveTab(tab as any)} 
                   onOpenAiChat={handleOpenAi}
                   onUpdateProfile={handleUpdateProfile}
+                  onUpdateJobs={handleUpdateJobs}
                 />
               ) : (
                 <>
@@ -2265,16 +2293,22 @@ ActivityPost>("posts", initialPosts);
             />
           )}
 
-          {activeTab === "consultancy" && (
+          {activeTab === "consultancy" && userProfile?.accountType === "jobOwner" ? (
             <ConsultancySection
               userProfile={userProfile}
               tasks={tasks}
+              jobs={jobs}
               onUpdateTasks={handleUpdateTasks}
+              onUpdateJobs={handleUpdateJobs}
               onOpenAiChat={handleOpenAi}
               onNavigate={(tab) => setActiveTab(tab as any)}
               campaigns={campaigns}
             />
-          )}
+          ) : activeTab === "consultancy" ? (
+            <div className="flex-1 flex items-center justify-center p-8 text-slate-500">
+                Access to Consultancy Dashboard is restricted to Clients.
+            </div>
+          ) : null}
 
           {activeTab === "gigs" && (
             <GigsSection
@@ -2339,7 +2373,7 @@ ActivityPost>("posts", initialPosts);
 
           {activeTab === "about" && <AboutSection />}
           {activeTab === "teams" && <TeamsSection />}
-          {activeTab === "careers" && <JobsSection userProfile={userProfile} jobs={jobs} onUpdateJobs={handleUpdateJobs} onUpdateProfile={handleUpdateProfile} />}
+          {activeTab === "careers" && <JobsSection userProfile={userProfile} jobs={jobs} onUpdateJobs={handleUpdateJobs} onUpdateProfile={handleUpdateProfile} token={token} />}
           {activeTab === "how-it-works" && <HowItWorksSection />}
         </main>
       </div>

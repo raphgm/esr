@@ -25,25 +25,64 @@ import {
   ChevronRight,
   Info
 } from "lucide-react";
-import { UserProfile, ConsultancyTask, ActivityPost } from "../types";
+import { initializeApp } from 'firebase/app';
+import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, User } from 'firebase/auth';
+import { UserProfile, ConsultancyTask, ActivityPost, Job } from "../types";
 import { ClientDashboard } from "./ClientDashboard";
 import { ContributorAnalyticsDashboard } from "./ContributorAnalyticsDashboard";
+
+// Auth logic (should be in a separate file, but adding here for now as per instructions)
+// Reuse existing firebase config if possible, or initialize with config
+const firebaseConfig = { /* ... your config ... */ }; // Need actual config. I'll use a placeholder or read if needed.
+// Actually, I should probably check if I can import a config file.
+// The instructions said "The Firebase project is already provisioned for the applet — the config lives in firebase-applet-config.json".
+import firebaseConfigData from '../../firebase-applet-config.json';
+const app = initializeApp(firebaseConfigData);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+provider.addScope('https://www.googleapis.com/auth/calendar.events');
+provider.addScope('https://www.googleapis.com/auth/gmail.send');
 
 export function UserDashboard({ 
   userProfile, 
   tasks,
   posts,
+  jobs,
   onNavigate,
   onOpenAiChat,
-  onUpdateProfile
+  onUpdateProfile,
+  onUpdateJobs
 }: { 
   userProfile: UserProfile;
   tasks: ConsultancyTask[];
   posts: ActivityPost[];
+  jobs: Job[];
   onNavigate: (id: string) => void;
   onOpenAiChat?: (prompt: string, context: string) => void;
   onUpdateProfile?: (updated: UserProfile) => void;
+  onUpdateJobs: (jobs: Job[]) => void;
 }) {
+  const [token, setToken] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        // @ts-ignore
+        const token = await user.getIdToken(true);
+        // This is a simplified auth flow.
+      }
+    });
+  }, []);
+
+  const handleSignIn = async () => {
+    try {
+      const result = await signInWithPopup(auth, provider);
+      // @ts-ignore
+      setToken(result._tokenResponse.oauthAccessToken);
+    } catch (err) {
+      console.error(err);
+    }
+  };
   const calculateCompletion = (profile: UserProfile) => {
     let percentage = 0;
     if (profile.name) percentage += 10;
@@ -75,7 +114,7 @@ export function UserDashboard({
   };
 
   if (userProfile?.accountType === "jobOwner") {
-    return <ClientDashboard userProfile={userProfile} tasks={tasks} onNavigate={onNavigate} />;
+    return <ClientDashboard userProfile={userProfile} tasks={tasks} onNavigate={onNavigate} token={token} />;
   }
 
   const activeTasks = tasks.filter(t => t.status !== 'done');

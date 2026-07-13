@@ -1,21 +1,44 @@
 import React, { useState, useEffect } from "react";
 import { PageBanner } from "./PageBanner";
-import { UserProfile, Job } from "../types";
-import { Briefcase, MapPin, Plus, DollarSign, X, Sparkles, CheckCircle, Code, ShieldCheck, PenTool, Copy, Check, MessageSquare, RefreshCw, ShieldAlert } from "lucide-react";
+import { UserProfile, Job, InterviewSlot, EmailTemplate } from "../types";
+import { Briefcase, MapPin, X, Sparkles, DollarSign, Check, Copy, MessageSquare, RefreshCw, ShieldCheck, PenTool, Plus, CheckCircle, Code, ShieldAlert } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { DjinniAnonymousSection } from "./DjinniAnonymousSection";
+import ReactMarkdown from 'react-markdown';
+import { EmailTemplatesManager } from "./EmailTemplatesManager";
+import { InterviewScheduler } from "./InterviewScheduler";
 
 interface JobsSectionProps {
   userProfile: UserProfile;
   jobs: Job[];
   onUpdateJobs: (jobs: Job[]) => void;
   onUpdateProfile?: (profile: UserProfile) => void;
+  token: string | null;
 }
 
-export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile }: JobsSectionProps) {
+export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile, token }: JobsSectionProps) {
   const [showPostJob, setShowPostJob] = useState(false);
-  const [viewMode, setViewMode] = useState<"listings" | "proof-of-skills" | "anonymous-market">("listings");
+  const [viewMode, setViewMode] = useState<"listings" | "proof-of-skills" | "anonymous-market" | "pipeline" | "greenhouse">("listings");
   const [activeCategory, setActiveCategory] = useState<"All" | "Apprenticeship" | "Freelance" | "Full-time">("All");
+  
+  useEffect(() => {
+    if (viewMode === "pipeline" && userProfile.accountType !== "jobOwner") {
+      setViewMode("listings");
+    }
+  }, [viewMode, userProfile.accountType]);
+
+  // Pipeline state
+  const [pipeline, setPipeline] = useState([
+    { id: 1, name: "Chinedu Okafor", stage: "Screening", role: "DevOps Engineer" },
+    { id: 2, name: "Aisha Mohammed", stage: "Interview", role: "Full-Stack Dev" },
+    { id: 3, name: "Samuel Tunde", stage: "Offer", role: "Data Scientist" },
+  ]);
+  const stages = ["Screening", "Interview", "Offer", "Hired"];
+
+  // Scheduling and Email Templates State
+  const [emailTemplates, setEmailTemplates] = useState<EmailTemplate[]>([
+    { id: "1", name: "Interview Invite", subject: "Interview Invitation", body: "Hi {{name}}, would you like to schedule an interview?" },
+  ]);
 
   // Dynamic Matcher Skill selector tags
   const [selectedMatcherSkills, setSelectedMatcherSkills] = useState<string[]>(["React Architecture", "TypeScript", "Vite & Build Tooling"]);
@@ -141,7 +164,8 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile }
         location: newLocation || "Remote",
         salary: newSalary || "Negotiable",
         description: newDesc || "No description provided",
-        skillsRequired: []
+        skillsRequired: [],
+        shareUrl: `${window.location.origin}/jobs?id=job-${Date.now()}`
       };
 
       // Call Talent Solution API
@@ -162,6 +186,7 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile }
       }
 
       onUpdateJobs([newJob, ...jobs]);
+      alert(`Job Posted Successfully! Share this link: ${newJob.shareUrl}`);
       setShowPostJob(false);
       setNewTitle("");
       setNewCompany("");
@@ -199,7 +224,7 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile }
   ];
 
   const filteredJobs = viewMode === "listings" 
-    ? jobs.filter(job => activeCategory === "All" || job.type === activeCategory)
+    ? jobs 
     : [];
 
   return (
@@ -230,6 +255,14 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile }
           >
             Job Listings
           </button>
+          {userProfile.accountType === "jobOwner" && (
+            <button
+              onClick={() => setViewMode("pipeline")}
+              className={`px-4 py-2 rounded-lg text-xs font-bold transition-all ${viewMode === "pipeline" ? "bg-white shadow-sm text-purple-600" : "text-slate-500 hover:text-slate-700"}`}
+            >
+              Pipeline
+            </button>
+          )}
           <button
             onClick={() => setViewMode("proof-of-skills")}
             className={`px-4 py-2 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${viewMode === "proof-of-skills" ? "bg-white shadow-sm text-purple-600" : "text-slate-500 hover:text-slate-700"}`}
@@ -538,6 +571,63 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile }
         );
       })()}
 
+      {viewMode === "pipeline" && userProfile.accountType === "jobOwner" && (
+        <div className="space-y-8">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
+            {["Screening", "Interview", "Offer"].map(stage => (
+              <div key={stage} className="bg-slate-50 border border-slate-200 rounded-3xl p-6">
+                <h4 className="text-base font-bold text-slate-900 mb-6 flex items-center justify-between">
+                  {stage}
+                  <span className="bg-white text-slate-500 px-3 py-1 rounded-xl border border-slate-200 text-xs font-mono">{pipeline.filter(p => p.stage === stage).length}</span>
+                </h4>
+                <div className="space-y-4">
+                  {pipeline.filter(p => p.stage === stage).map(candidate => (
+                    <div key={candidate.id} className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col gap-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-sm">
+                          {candidate.name.split(' ').map(n => n[0]).join('')}
+                        </div>
+                        <div>
+                          <p className="font-bold text-slate-900 text-sm">{candidate.name}</p>
+                          <p className="text-xs text-slate-500">{candidate.role}</p>
+                        </div>
+                      </div>
+                      {stage === "Interview" && (
+                        <div className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                          <InterviewScheduler token={token} candidateName={candidate.name} />
+                        </div>
+                      )}
+                      <div className="flex gap-2 justify-end flex-wrap pt-3 border-t border-slate-100">
+                        {["Screening", "Interview", "Offer"].map(s => s !== stage && (
+                          <button
+                            key={s}
+                            onClick={() => setPipeline(prev => prev.map(c => c.id === candidate.id ? {...c, stage: s} : c))}
+                            className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 transition-colors"
+                          >
+                            → {s}
+                          </button>
+                        ))}
+                        {stage === "Offer" && (
+                          <button
+                            onClick={() => setPipeline(prev => prev.map(c => c.id === candidate.id ? {...c, stage: "Hired"} : c))}
+                            className="px-3 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-xs font-bold text-white transition-colors"
+                          >
+                            Hire
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+            <EmailTemplatesManager templates={emailTemplates} onUpdate={setEmailTemplates} token={token} />
+          </div>
+        </div>
+      )}
+
       {viewMode === "listings" && showPostJob && (
         <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm mb-6 relative">
           <button 
@@ -615,7 +705,9 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile }
                     <DollarSign className="w-3.5 h-3.5" /> {job.salary}
                   </span>
                 </div>
-                <p className="text-sm mt-3 text-slate-600 leading-relaxed max-w-3xl">{job.description}</p>
+                <div className="text-sm mt-3 text-slate-600 leading-relaxed max-w-3xl space-y-2 markdown-body">
+                  <ReactMarkdown>{job.description}</ReactMarkdown>
+                </div>
               </div>
               
               <div className="flex flex-col gap-2 shrink-0 w-full md:w-auto md:items-end self-center md:self-start">
@@ -665,7 +757,9 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile }
                     <DollarSign className="w-3.5 h-3.5" /> {job.salary}
                   </span>
                 </div>
-                <p className="text-sm mt-3 text-slate-600 leading-relaxed max-w-3xl">{job.description}</p>
+                <div className="text-sm mt-3 text-slate-600 leading-relaxed max-w-3xl space-y-2 markdown-body">
+                  <ReactMarkdown>{job.description}</ReactMarkdown>
+                </div>
                 
                 {job.skillsRequired && job.skillsRequired.length > 0 && (
                   <div className="flex flex-wrap gap-2 mt-4">
@@ -683,6 +777,15 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile }
                   {job.type}
                 </span>
                 
+                {userProfile.accountType === 'jobOwner' && (
+                  <button
+                    onClick={() => onUpdateJobs(jobs.filter(j => j.id !== job.id))}
+                    className="bg-rose-50 text-rose-600 px-4 py-2 rounded-xl text-xs font-bold hover:bg-rose-100"
+                  >
+                    Delete Job
+                  </button>
+                )}
+                
                 {userProfile.accountType !== 'jobOwner' && (
                   <div className="flex flex-col sm:flex-row gap-2 w-full">
                     <button 
@@ -692,7 +795,9 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile }
                       <Sparkles className="w-4 h-4" />
                       AI Pitch Writer
                     </button>
-                    <button className="bg-slate-900 text-white px-6 py-2 rounded-xl text-xs font-bold hover:bg-slate-800 transition-colors flex items-center justify-center">
+                    <button 
+                      onClick={() => alert("Application submitted for this role.")}
+                      className="bg-slate-900 text-white px-6 py-2 rounded-xl text-xs font-bold hover:bg-slate-800 transition-colors flex items-center justify-center">
                       Apply Now
                     </button>
                   </div>
