@@ -88,6 +88,69 @@ function getTaskProgress(desc: string) {
   return Math.round((completed / subtasks.length) * 100);
 }
 
+function getMilestonesForTask(task: ConsultancyTask) {
+  const { cleanDesc } = parseTaskDetails(task);
+  const lines = cleanDesc.split("\n").map(l => l.trim()).filter(l => l.length > 0);
+  
+  // Find lines starting with "Milestone" or "- " or "- [" or containing numeric milestone indicators
+  let milestoneLines = lines.filter(line => {
+    const lower = line.toLowerCase();
+    return lower.startsWith("milestone") || line.startsWith("- ") || line.startsWith("- [");
+  });
+
+  if (milestoneLines.length === 0) {
+    if (lines.length > 0 && cleanDesc.length > 20) {
+      milestoneLines = lines.slice(0, 4); // Use first few lines
+    } else {
+      // Default fallback milestones
+      milestoneLines = [
+        "Milestone 1: Contract Kickoff & Strategy Sign-off (30% Escrow)",
+        "Milestone 2: Core Execution & Implementation (50% Escrow)",
+        "Milestone 3: Final Production Handoff & Release (20% Escrow)"
+      ];
+    }
+  }
+
+  const total = milestoneLines.length;
+  const milestones = milestoneLines.map((text, idx) => {
+    let cleanText = text.replace(/^-\s*\[[ xX]\]\s*/, "").replace(/^-\s*/, "");
+    
+    // Determine milestone status dynamically based on task status and its index
+    let mStatus: "todo" | "inprogress" | "review" | "done" = "todo";
+    
+    if (task.status === "done") {
+      mStatus = "done";
+    } else if (task.status === "review" || task.status === "needs-verification") {
+      if (idx < total - 1) {
+        mStatus = "done";
+      } else {
+        mStatus = "review"; // Last milestone is in review
+      }
+    } else if (task.status === "inprogress") {
+      if (idx === 0) {
+        mStatus = "done"; // First milestone done
+      } else if (idx === 1) {
+        mStatus = "inprogress"; // Second one active
+      } else {
+        mStatus = "todo";
+      }
+    } else {
+      mStatus = "todo";
+    }
+
+    return {
+      title: cleanText,
+      status: mStatus
+    };
+  });
+
+  // Calculate overall percentage of total milestone completion
+  const completedCount = milestones.filter(m => m.status === "done").length;
+  const percent = total > 0 ? Math.round((completedCount / total) * 100) : 0;
+
+  return { milestones, percent, completedCount, total };
+}
+
 function getCountdown(dueDate?: string) {
   if (!dueDate) return null;
   const diff = Math.ceil((new Date(dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
@@ -959,6 +1022,7 @@ export default function ConsultancySection({
                     {statusTasks.map((task) => {
                       const { budget, client, cleanDesc } = parseTaskDetails(task);
                       const progress = getTaskProgress(cleanDesc);
+                      const { percent: milestonePercent, completedCount, total: totalMilestones } = getMilestonesForTask(task);
                       
                       const isDueSoon = task.dueDate && task.status !== "done" ? (new Date(task.dueDate).getTime() - new Date().getTime()) / (1000 * 60 * 60) <= 48 : false;
                                             const categoryColors: Record<string, string> = {
@@ -1024,10 +1088,20 @@ export default function ConsultancySection({
                             <span className="text-[9px] font-mono font-bold text-slate-9000">
                               Client: {client}
                             </span>
-                            <div className="w-full bg-slate-100 rounded-full h-1.5 mt-1">
-                              <div className="bg-purple-600 h-1.5 rounded-full" style={{ width: `${progress}%` }}></div>
+                            
+                            {/* Milestone Progress Bar & Percentage Indicator */}
+                            <div className="flex flex-col gap-1 mt-1 bg-slate-50 border border-slate-100 p-2.5 rounded-xl">
+                              <div className="flex justify-between items-center text-[10px] font-bold">
+                                <span className="text-slate-500 font-mono uppercase tracking-wider">Milestones Completed</span>
+                                <span className="text-purple-600 font-black">{completedCount}/{totalMilestones} ({milestonePercent}%)</span>
+                              </div>
+                              <div className="w-full bg-slate-200/60 rounded-full h-1.5 mt-0.5 overflow-hidden border border-slate-100/50 shadow-inner">
+                                <div 
+                                  className="bg-purple-500 h-full rounded-full transition-all duration-500 ease-out" 
+                                  style={{ width: `${milestonePercent}%` }}
+                                ></div>
+                              </div>
                             </div>
-                            <span className="text-[9px] text-slate-500 font-mono">{progress}% Complete</span>
                           </div>
 
                           <p className="text-[11px] text-slate-500 line-clamp-3 leading-relaxed border-t border-slate-100 pt-2">

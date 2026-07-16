@@ -77,7 +77,7 @@ export interface FirestoreErrorInfo {
   }
 }
 
-export function handleFirestoreError(error: unknown, operationType: string, path: string | null): void {
+export function handleFirestoreError(error: unknown, operationType: OperationType, path: string | null): void {
   console.error(`Firestore Error [${operationType}] at ${path}:`, error);
   const errInfo: FirestoreErrorInfo = {
     error: error instanceof Error ? error.message : String(error),

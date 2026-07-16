@@ -81,6 +81,10 @@ export interface UserProfile {
   badgeSize?: "small" | "medium" | "large";
   badgeType?: "client" | "talent";
   sidebarTheme?: "white" | "ivory" | "slate" | "indigo" | "emerald" | "amber";
+  theme?: "light" | "dark" | "system";
+  isVetted24h?: boolean;
+  vettedUntil?: string;
+  staySignedIn24h?: boolean;
 }
 
 export interface ActivityPost {

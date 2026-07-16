@@ -835,6 +835,142 @@ app.get("/api/v1/vetting/report/sanya", (req, res) => {
   });
 });
 
+// REST API endpoint: Real-time Gemini Technical Interview Proctor
+app.post("/api/vetting/interview", async (req, res) => {
+  try {
+    const { role, persona, transcript = [], currentStep, userResponse } = req.body;
+    const ai = getGenAI();
+
+    // Map roles & personas to context to guide Gemini
+    const systemInstruction = `You are conducting a professional AI-led technical cognitive vetting assessment on the ESTARR platform.
+ESTARR is an elite platform helping global companies vet top-tier technical and AI developers.
+You should act as either Maya (Lead Technical Interviewer, focused on System Design, performance patterns, and clean architecture) or Marcus (Principal DevOps / Smart Contract Auditor, focused on memory footprint, algorithmic Big-O optimization, and security vectors).
+The current candidate is applying for the role: ${role || "Full Stack AI Developer"}.
+Current persona: ${persona || "Maya (System Design Lead)"}.
+You are at step ${currentStep + 1} of 3.
+
+Your objectives:
+1. Review the user's latest technical answer and provide a professional, deeply technical critique feedback (2-3 concise sentences). Mention what was strong, or what vulnerabilities/inefficiencies exist in their approach.
+2. If this is step 1 or step 2 (0-indexed currentStep is 0 or 1):
+   - Generate "nextQuestion" which is a dynamic, highly challenging follow-up question or new topic matching their previous answers. It should test their technical depth rather than high-level talk.
+   - Set "isCompleted" to false.
+3. If this is step 3 (0-indexed currentStep is 2):
+   - Set "isCompleted" to true.
+   - Generate a comprehensive, multi-angle grading scorecard report as "report", containing:
+     - "overallScore": Integer score from 50 to 100 based on their performance across all questions.
+     - "coding": Integer score (50-100)
+     - "systemDesign": Integer score (50-100)
+     - "communication": Integer score (50-100)
+     - "cognitive": Integer score (50-100)
+     - "summary": A very detailed assessment breakdown summarizing their technical strengths, flaws, and overall fit.
+     - "badge": "Alpha-Cohort Elite" (if overallScore >= 93) or "Vetted Expert" (if overallScore >= 85) or "Certified Practitioner" (if overallScore < 85).
+
+You MUST output your response strictly as a single JSON object with no markdown wrapping and no backticks.
+Format:
+{
+  "feedback": "Your critique of their response here.",
+  "nextQuestion": "The next challenging technical question (only if isCompleted is false, otherwise empty string).",
+  "isCompleted": true/false,
+  "report": { // only if isCompleted is true, otherwise null
+    "overallScore": 92,
+    "coding": 94,
+    "systemDesign": 90,
+    "communication": 88,
+    "cognitive": 93,
+    "summary": "Detailed overall assessment of the candidate...",
+    "badge": "Vetted Expert"
+  }
+}`;
+
+    // Format chat history for the prompt
+    let conversationHistory = "";
+    transcript.forEach((turn: any) => {
+      const actor = turn.role === "ai" ? "Interviewer" : "Candidate";
+      conversationHistory += `${actor}: ${turn.text}\n`;
+    });
+
+    const prompt = `Here is the current conversation history so far:
+${conversationHistory}
+
+Latest Candidate Response to evaluate:
+"${userResponse}"
+
+Evaluate their latest response, provide your critique feedback, and determine the next step.
+If we are at the end (step 3/currentStep=2), generate their final certification report card.
+Return valid JSON matching the exact schema above.`;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-3.5-flash",
+      contents: prompt,
+      config: {
+        systemInstruction,
+        responseMimeType: "application/json"
+      }
+    });
+
+    const resJson = JSON.parse(response.text?.trim() || "{}");
+    res.json(resJson);
+  } catch (error: any) {
+    console.error("Vetting interview error:", error);
+    res.status(500).json({ error: "Failed to process vetting interview step.", details: error.message });
+  }
+});
+
+// REST API endpoint: Real-time Gemini Code Auditor Node
+app.post("/api/vetting/audit", async (req, res) => {
+  try {
+    const { code } = req.body;
+    if (!code) {
+      return res.status(400).json({ error: "Code is required for auditing." });
+    }
+
+    const ai = getGenAI();
+    const systemInstruction = `You are the ESTARR AI Vetting Proctor Node, a world-class code quality, performance, and security auditor.
+Your job is to critically analyze the submitted code block, identify memory leaks, security flaws (like SQL injection, XSS, Reentrancy, or unhandled exceptions), and calculate standard performance Big-O complexity metrics.
+
+Evaluate the code and output a structured JSON report.
+Be extremely rigorous. If there is a security risk, name it and give it a "critical" severity finding.
+If the code is clean, reward the user with positive findings.
+
+You must return strictly a single JSON object.
+Schema:
+{
+  "score": 92, // overall code quality score (1-100)
+  "grade": "A+ Secure", // descriptive grade (e.g., "A+ Secure", "B- Inefficient", "C- Vulnerable", "F Fatal")
+  "findings": [
+    {
+      "severity": "critical" | "high" | "medium" | "info" | "success",
+      "desc": "Detail description of finding, vulnerability, or success check. For example: 'SQL Injection vulnerability discovered. Avoid string concats in raw queries; bind params correctly.'"
+    }
+  ],
+  "metrics": {
+    "redundancy": "0.1% Leak Risk", // estimate memory leak risk
+    "complexity": "O(N) linear", // Big-O complexity notation
+    "modularity": "High / Modular" // modularity rating
+  }
+}`;
+
+    const response = await ai.models.generateContent({
+      model: "gemini-3.5-flash",
+      contents: `Audit the following codebase and generate findings, metrics, score, and grade:
+\`\`\`
+${code}
+\`\`\`
+Return valid JSON conforming to the exact schema.`,
+      config: {
+        systemInstruction,
+        responseMimeType: "application/json"
+      }
+    });
+
+    const resJson = JSON.parse(response.text?.trim() || "{}");
+    res.json(resJson);
+  } catch (error: any) {
+    console.error("Vetting audit error:", error);
+    res.status(500).json({ error: "Failed to execute code vetting audit.", details: error.message });
+  }
+});
+
 // Webhook Proxy Trigger Route (Dispatches a real HTTP request with signatures!)
 app.post("/api/v1/webhooks/trigger", async (req, res) => {
   try {

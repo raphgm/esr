@@ -20,11 +20,113 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
-/* Base custom styles */
+/* Base custom styles with support for global transitions */
 body {
   font-family: var(--font-sans);
   background-color: #f8fafc;
   color: #0f172a;
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+/* Smooth global theme transition on key layout classes */
+.bg-white, .card-blocky, .bg-slate-50, .bg-slate-100, input, textarea, select {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+/* --- ESTARR PREMIUM DARK MODE OVERRIDES --- */
+html.dark body {
+  background-color: #0b0f19 !important; /* ultra-modern deep tech canvas */
+  color: #f8fafc !important;
+}
+
+/* Card and Container Backgrounds in Dark Mode */
+html.dark .bg-white,
+html.dark .card-blocky,
+html.dark .bg-slate-50\/40,
+html.dark .bg-slate-50\/50,
+html.dark .bg-slate-100\/50,
+html.dark .bg-slate-200\/10 {
+  background-color: #111827 !important; /* dark card background */
+  border-color: #1f2937 !important;
+}
+
+html.dark .bg-slate-50,
+html.dark .bg-slate-100 {
+  background-color: #1f2937 !important; /* mid-dark panel background */
+  border-color: #374151 !important;
+}
+
+/* Text Colors in Dark Mode */
+html.dark .text-slate-900,
+html.dark .text-gray-900,
+html.dark .text-slate-800,
+html.dark .text-gray-800,
+html.dark .text-slate-950,
+html.dark .text-slate-900 {
+  color: #f8fafc !important;
+}
+
+html.dark .text-slate-700,
+html.dark .text-gray-700,
+html.dark .text-slate-600,
+html.dark .text-gray-600 {
+  color: #cbd5e1 !important;
+}
+
+html.dark .text-slate-500,
+html.dark .text-gray-500,
+html.dark .text-slate-400,
+html.dark .text-gray-400 {
+  color: #94a3b8 !important;
+}
+
+/* Inputs, Textareas, and Selects in Dark Mode */
+html.dark input,
+html.dark textarea,
+html.dark select {
+  background-color: #1f2937 !important;
+  color: #f8fafc !important;
+  border-color: #374151 !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #64748b !important;
+}
+
+/* Borders and Dividers in Dark Mode */
+html.dark .border,
+html.dark .border-b,
+html.dark .border-t,
+html.dark .border-r,
+html.dark .border-l,
+html.dark .border-slate-100,
+html.dark .border-slate-200,
+html.dark .border-slate-300,
+html.dark .border-gray-100,
+html.dark .border-gray-200 {
+  border-color: #1f2937 !important;
+}
+
+html.dark .divide-y > :not([hidden]) ~ :not([hidden]) {
+  border-color: #1f2937 !important;
+}
+
+/* Fix specific widgets to look crisp in dark mode */
+html.dark .bg-purple-50 {
+  background-color: rgba(168, 85, 247, 0.1) !important;
+  color: #d8b4fe !important;
+}
+html.dark .text-purple-700 {
+  color: #d8b4fe !important;
+}
+html.dark .bg-emerald-50 {
+  background-color: rgba(16, 185, 129, 0.1) !important;
+}
+html.dark .text-emerald-800 {
+  color: #a7f3d0 !important;
+}
+html.dark .text-emerald-600 {
+  color: #34d399 !important;
 }
 h1, h2, h3, h4, .font-display {
   font-family: var(--font-display);

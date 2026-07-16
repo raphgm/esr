@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { PageBanner } from "./PageBanner";
 import { UserProfile, Job, InterviewSlot, EmailTemplate } from "../types";
-import { Briefcase, MapPin, X, Sparkles, DollarSign, Check, Copy, MessageSquare, RefreshCw, ShieldCheck, PenTool, Plus, CheckCircle, Code, ShieldAlert, Bold, Italic, List } from "lucide-react";
+import { Briefcase, MapPin, X, Sparkles, DollarSign, Check, Copy, MessageSquare, RefreshCw, ShieldCheck, PenTool, Plus, CheckCircle, Code, ShieldAlert, Bold, Italic, List, Share2, Twitter, Linkedin, Facebook, Send } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { DjinniAnonymousSection } from "./DjinniAnonymousSection";
 import ReactMarkdown from 'react-markdown';
@@ -21,6 +21,8 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile, 
   const [showPostJob, setShowPostJob] = useState(false);
   const [viewMode, setViewMode] = useState<"listings" | "proof-of-skills" | "anonymous-market" | "pipeline" | "greenhouse">("listings");
   const [activeCategory, setActiveCategory] = useState<"All" | "Apprenticeship" | "Freelance" | "Full-time">("All");
+  const [selectedShareJob, setSelectedShareJob] = useState<Job | null>(null);
+  const [shareCopied, setShareCopied] = useState(false);
   
   useEffect(() => {
     if (viewMode === "pipeline" && userProfile.accountType !== "jobOwner") {
@@ -801,12 +803,23 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile, 
                 <span className="px-3 py-1 rounded-full text-[10px] font-bold tracking-wide w-fit md:mb-2 bg-indigo-100 text-indigo-700">
                   {job.type}
                 </span>
-                <button 
-                  onClick={() => generatePitch(job)}
-                  className="bg-indigo-600 text-white px-6 py-2.5 rounded-xl text-xs font-bold hover:bg-indigo-500 transition-all shadow-md shadow-indigo-600/10 flex items-center justify-center gap-2"
-                >
-                  Apply via ESTARR
-                </button>
+                <div className="flex gap-2 w-full md:w-auto">
+                  <button 
+                    type="button"
+                    onClick={() => setSelectedShareJob(job)}
+                    className="p-2.5 bg-slate-50 hover:bg-indigo-50 border border-slate-200 text-slate-500 hover:text-indigo-600 rounded-xl transition-all flex items-center justify-center shrink-0"
+                    title="Share Job Listing"
+                  >
+                    <Share2 className="w-4 h-4" />
+                  </button>
+                  <button 
+                    type="button"
+                    onClick={() => generatePitch(job)}
+                    className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl text-xs font-bold hover:bg-indigo-500 transition-all shadow-md shadow-indigo-600/10 flex items-center justify-center gap-1.5 flex-1 md:flex-none"
+                  >
+                    Apply via ESTARR
+                  </button>
+                </div>
               </div>
             </div>
           ))}
@@ -868,7 +881,15 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile, 
                 </span>
                 
                 {userProfile.accountType === 'jobOwner' && (
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 items-center">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedShareJob(job)}
+                      className="p-2.5 bg-slate-50 hover:bg-indigo-50 border border-slate-200 text-slate-500 hover:text-indigo-600 rounded-xl transition-all flex items-center justify-center shrink-0"
+                      title="Share Job Listing"
+                    >
+                      <Share2 className="w-4 h-4" />
+                    </button>
                     {job.status !== 'approved' && (
                       <button
                         onClick={() => onUpdateJobs(jobs.map(j => j.id === job.id ? {...j, status: 'approved'} : j))}
@@ -888,16 +909,24 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile, 
                 
                 {userProfile.accountType !== 'jobOwner' && (
                   <div className="flex flex-col sm:flex-row gap-2 w-full">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedShareJob(job)}
+                      className="p-2.5 bg-slate-50 hover:bg-indigo-50 border border-slate-200 text-slate-500 hover:text-indigo-600 rounded-xl transition-all flex items-center justify-center shrink-0"
+                      title="Share Job Listing"
+                    >
+                      <Share2 className="w-4 h-4" />
+                    </button>
                     <button 
                       onClick={() => generatePitch(job)}
-                      className="bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200 px-4 py-2 rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-1.5"
+                      className="bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-200 px-4 py-2 rounded-xl text-xs font-bold transition-colors flex items-center justify-center gap-1.5 flex-1"
                     >
                       <Sparkles className="w-4 h-4" />
                       AI Pitch Writer
                     </button>
                     <button 
                       onClick={() => alert("Application submitted for this role.")}
-                      className="bg-slate-900 text-white px-6 py-2 rounded-xl text-xs font-bold hover:bg-slate-800 transition-colors flex items-center justify-center">
+                      className="bg-slate-900 text-white px-6 py-2 rounded-xl text-xs font-bold hover:bg-slate-800 transition-colors flex items-center justify-center flex-1">
                       Apply Now
                     </button>
                   </div>
@@ -1182,6 +1211,224 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile, 
           </div>
         </div>
       )}
+
+      {/* Social Media Sharing Modal */}
+      <AnimatePresence>
+        {selectedShareJob && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-3xl shadow-2xl max-w-xl w-full p-6 md:p-8 flex flex-col max-h-[90vh] border border-slate-100 overflow-y-auto text-slate-800"
+            >
+              {/* Header */}
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h3 className="font-display font-black tracking-tight text-xl text-slate-900 flex items-center gap-2">
+                    <Share2 className="w-5 h-5 text-indigo-600" />
+                    Share Job Listing
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-1">
+                    Spread the word across your social channels to find elite talent.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedShareJob(null);
+                    setShareCopied(false);
+                  }}
+                  className="w-8 h-8 bg-slate-100 hover:bg-slate-200 rounded-full flex items-center justify-center text-slate-500 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Preview Card Mockup */}
+              <div className="bg-gradient-to-br from-indigo-900 to-slate-900 text-white rounded-2xl p-5 mb-6 relative overflow-hidden shadow-lg shadow-indigo-950/10 border border-indigo-950">
+                <div className="absolute top-0 right-0 translate-x-8 -translate-y-8 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl" />
+                
+                <div className="flex justify-between items-start gap-4 relative z-10">
+                  <div>
+                    <span className="text-[9px] font-black uppercase tracking-widest text-indigo-300 bg-indigo-950/60 px-2 py-0.5 rounded border border-indigo-800">
+                      🌐 ESTARR EXCELLENCE
+                    </span>
+                    <h4 className="font-display font-black text-lg mt-2 uppercase tracking-tight text-white leading-tight">
+                      {selectedShareJob.title}
+                    </h4>
+                    <p className="text-xs text-indigo-200 font-medium font-mono mt-1">
+                      {selectedShareJob.company} • {selectedShareJob.location}
+                    </p>
+                  </div>
+                  <span className="px-2 py-0.5 bg-white/10 text-white text-[9px] font-bold tracking-wide rounded-md uppercase shrink-0 border border-white/5">
+                    {selectedShareJob.type}
+                  </span>
+                </div>
+
+                <div className="mt-4 pt-4 border-t border-indigo-800/60 flex justify-between items-center relative z-10">
+                  <span className="text-[10px] text-indigo-300 font-mono flex items-center gap-1">
+                    Verified Escrow Contract Salary: <strong className="text-emerald-400 font-sans text-xs">{selectedShareJob.salary}</strong>
+                  </span>
+                  <span className="text-[8px] text-slate-400 font-mono tracking-tighter">
+                    ESTARR.WORKSPACE
+                  </span>
+                </div>
+              </div>
+
+              {/* Share Channels */}
+              <div className="space-y-4">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">
+                  Select Share Destination
+                </span>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* LinkedIn */}
+                  <a
+                    href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
+                      selectedShareJob.shareUrl || `${window.location.origin}/jobs?id=${selectedShareJob.id}`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 p-3 border border-slate-200 hover:border-blue-200 hover:bg-blue-50/20 rounded-2xl text-xs font-bold text-slate-700 transition-all hover:translate-y-[-1px]"
+                  >
+                    <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white shrink-0">
+                      <Linkedin className="w-4 h-4 fill-white text-blue-600" />
+                    </div>
+                    <div>
+                      <span className="block text-slate-900">LinkedIn</span>
+                      <span className="text-[10px] text-slate-400 font-normal block mt-0.5">Share to professional feed</span>
+                    </div>
+                  </a>
+
+                  {/* Twitter / X */}
+                  <a
+                    href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
+                      `Check out this incredible job opening on ESTARR: ${selectedShareJob.title} at ${selectedShareJob.company}! 🚀 #ESTARR #Web3Jobs`
+                    )}&url=${encodeURIComponent(
+                      selectedShareJob.shareUrl || `${window.location.origin}/jobs?id=${selectedShareJob.id}`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 p-3 border border-slate-200 hover:border-slate-800 hover:bg-slate-50 rounded-2xl text-xs font-bold text-slate-700 transition-all hover:translate-y-[-1px]"
+                  >
+                    <div className="w-8 h-8 rounded-xl bg-black flex items-center justify-center text-white shrink-0">
+                      <Twitter className="w-4 h-4 fill-white text-black" />
+                    </div>
+                    <div>
+                      <span className="block text-slate-900">Twitter / X</span>
+                      <span className="text-[10px] text-slate-400 font-normal block mt-0.5">Tweet to followers</span>
+                    </div>
+                  </a>
+
+                  {/* WhatsApp */}
+                  <a
+                    href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+                      `Check out this exciting job opening: ${selectedShareJob.title} at ${selectedShareJob.company} - ${
+                        selectedShareJob.shareUrl || `${window.location.origin}/jobs?id=${selectedShareJob.id}`
+                      }`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 p-3 border border-slate-200 hover:border-emerald-200 hover:bg-emerald-50/20 rounded-2xl text-xs font-bold text-slate-700 transition-all hover:translate-y-[-1px]"
+                  >
+                    <div className="w-8 h-8 rounded-xl bg-emerald-500 flex items-center justify-center text-white shrink-0">
+                      <Send className="w-4 h-4 text-white rotate-[-30deg]" />
+                    </div>
+                    <div>
+                      <span className="block text-slate-900">WhatsApp</span>
+                      <span className="text-[10px] text-slate-400 font-normal block mt-0.5">Send to contact / group</span>
+                    </div>
+                  </a>
+
+                  {/* Facebook */}
+                  <a
+                    href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+                      selectedShareJob.shareUrl || `${window.location.origin}/jobs?id=${selectedShareJob.id}`
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 p-3 border border-slate-200 hover:border-blue-100 hover:bg-blue-50/10 rounded-2xl text-xs font-bold text-slate-700 transition-all hover:translate-y-[-1px]"
+                  >
+                    <div className="w-8 h-8 rounded-xl bg-blue-800 flex items-center justify-center text-white shrink-0">
+                      <Facebook className="w-4 h-4 fill-white text-blue-800" />
+                    </div>
+                    <div>
+                      <span className="block text-slate-900">Facebook</span>
+                      <span className="text-[10px] text-slate-400 font-normal block mt-0.5">Post on Timeline</span>
+                    </div>
+                  </a>
+                </div>
+              </div>
+
+              {/* Copyable Link Input */}
+              <div className="mt-6 pt-6 border-t border-slate-100 space-y-2">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block">
+                  Listing Web Link
+                </span>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value={selectedShareJob.shareUrl || `${window.location.origin}/jobs?id=${selectedShareJob.id}`}
+                    className="flex-1 bg-slate-50 border border-slate-200/85 px-4 py-2.5 rounded-xl text-xs text-slate-500 font-mono focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const url = selectedShareJob.shareUrl || `${window.location.origin}/jobs?id=${selectedShareJob.id}`;
+                      navigator.clipboard.writeText(url);
+                      setShareCopied(true);
+                      setTimeout(() => setShareCopied(false), 2000);
+                    }}
+                    className={`px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shrink-0 ${
+                      shareCopied 
+                        ? "bg-emerald-500 text-white shadow-md shadow-emerald-500/20" 
+                        : "bg-slate-900 hover:bg-slate-800 text-white"
+                    }`}
+                  >
+                    {shareCopied ? (
+                      <>
+                        <Check className="w-4 h-4" />
+                        Copied!
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-4 h-4" />
+                        Copy Link
+                      </>
+                    )}
+                  </button>
+                </div>
+                
+                {/* Mobile Web Share API Fallback */}
+                {typeof navigator !== "undefined" && navigator.share && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const url = selectedShareJob.shareUrl || `${window.location.origin}/jobs?id=${selectedShareJob.id}`;
+                      navigator.share({
+                        title: selectedShareJob.title,
+                        text: `Apply for ${selectedShareJob.title} at ${selectedShareJob.company} on ESTARR Workspace!`,
+                        url: url,
+                      }).catch(() => {});
+                    }}
+                    className="w-full mt-3 py-2.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5"
+                  >
+                    <Share2 className="w-4 h-4" />
+                    Use Mobile System Share
+                  </button>
+                )}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
     </div>
   );

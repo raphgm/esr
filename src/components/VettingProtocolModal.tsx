@@ -102,12 +102,20 @@ export function VettingProtocolModal({ onClose, onApply }: VettingProtocolModalP
                 <Activity className="w-4 h-4 text-purple-500" />
                 Vetting Engine Active • Verified on-chain
               </div>
-              <button 
-                onClick={onApply}
-                className="w-full sm:w-auto bg-slate-950 hover:bg-purple-600 text-white px-6 py-3 rounded-xl font-bold text-sm transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
-              >
-                Apply to Enter Protocol <ChevronRight className="w-4 h-4" />
-              </button>
+              <div className="flex flex-col sm:flex-row items-stretch gap-2 w-full sm:w-auto">
+                <button 
+                  onClick={onClose}
+                  className="px-4 py-2 border border-slate-200 hover:bg-slate-100 text-slate-600 rounded-xl font-bold text-sm transition-all text-center cursor-pointer"
+                >
+                  Skip for Now
+                </button>
+                <button 
+                  onClick={onApply}
+                  className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  Instant 24h Express Pass (Unblock) <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </div>
         </div>

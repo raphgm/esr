@@ -35,6 +35,17 @@ import { AboutSection } from "./components/AboutSection";
 import { TeamsSection } from "./components/TeamsSection";
 import { JobsSection } from "./components/JobsSection";
 import { HowItWorksSection } from "./components/HowItWorksSection";
+import { 
+  DecentralizedEscrowsSection, 
+  ProgramGuidelinesSection, 
+  EscrowFaqsSection, 
+  ContractorDirectorySection, 
+  PlatformStatusSection, 
+  TermsConditionsSection, 
+  PrivacyCookiesSection, 
+  DataCollectionPolicySection, 
+  ComplianceAuditsSection 
+} from "./components/LegalAndResourceSections";
 import { RewardsSection } from "./components/RewardsSection";
 import { IntegrationsSection } from "./components/IntegrationsSection";
 import { HelpGuideSection } from "./components/HelpGuideSection";
@@ -43,6 +54,8 @@ import { BackgroundDoodles } from "./components/BackgroundDoodles";
 import { AdminSection } from "./components/AdminSection";
 import { UserDashboard } from "./components/UserDashboard";
 import { AnnotationWorkspace } from "./components/AnnotationWorkspace";
+import MvpLandingPage from "./components/MvpLandingPage";
+import { AIVettingCenter } from "./components/AIVettingCenter";
 
 // Icons
 import {
@@ -86,7 +99,7 @@ import {
   Globe,
   Cpu,
   
-  Target, Activity, BrainCircuit, Square, Check
+  Target, Activity, BrainCircuit, Square, Check, Sun, Moon, Monitor
 } from "lucide-react";
 
 const initialTasks: ConsultancyTask[] = [];
@@ -196,6 +209,8 @@ export default function App() {
   const [authError, setAuthError] = useState<string | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState(false);
   const [isLinkCopied, setIsLinkCopied] = useState(false);
+  const [staySignedIn24h, setStaySignedIn24h] = useState(true);
+  const [fastTrackVetting, setFastTrackVetting] = useState(true);
 
   // Global Settings States
   const [globalCurrency, setGlobalCurrency] = useState<"USD" | "EUR" | "GBP" | "NGN" | "KES" | "INR">("USD");
@@ -232,7 +247,8 @@ export default function App() {
 
   // Router State
   const [activeTab, setActiveTab] = useState<
-    "home" | "connect" | "ai-lab" | "marketplace" | "consultancy" | "gigs" | "ai-jobs" | "community" | "mobile" | "teams" | "careers" | "about" | "how-it-works" | "payments" | "events" | "admin" | "portfolio" | "rewards" | "integrations" | "annotation-workspace" | "help-docs"
+    "home" | "connect" | "ai-lab" | "ai-vetting" | "marketplace" | "consultancy" | "gigs" | "ai-jobs" | "community" | "mobile" | "teams" | "careers" | "about" | "how-it-works" | "payments" | "events" | "admin" | "portfolio" | "rewards" | "integrations" | "annotation-workspace" | "help-docs" |
+    "decentralized-escrows" | "program-guidelines" | "escrow-faqs" | "contractor-directory" | "platform-status" | "terms-conditions" | "privacy-cookies" | "data-collection" | "compliance-audits"
   >(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("survey")) return "ai-lab";
@@ -360,6 +376,36 @@ export default function App() {
 
   // Core App states
   const [userProfile, setUserProfile] = useState<UserProfile>(initialProfile);
+
+  // Apply theme class to document element on theme change
+  React.useEffect(() => {
+    const applyTheme = () => {
+      const selectedTheme = userProfile.theme || "light";
+      const root = document.documentElement;
+      
+      if (selectedTheme === "dark") {
+        root.classList.add("dark");
+      } else if (selectedTheme === "light") {
+        root.classList.remove("dark");
+      } else if (selectedTheme === "system") {
+        const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        if (isDark) {
+          root.classList.add("dark");
+        } else {
+          root.classList.remove("dark");
+        }
+      }
+    };
+
+    applyTheme();
+
+    if (userProfile.theme === "system") {
+      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+      const handleMediaChange = () => applyTheme();
+      mediaQuery.addEventListener("change", handleMediaChange);
+      return () => mediaQuery.removeEventListener("change", handleMediaChange);
+    }
+  }, [userProfile.theme]);
   const [posts, setPosts] = useState<
 ActivityPost[]>(initialPosts);
   const [courses, setCourses] = useState<Course[]>(initialCourses);
@@ -644,6 +690,7 @@ ActivityPost[]) => {
   const [editBirthdate, setEditBirthdate] = useState(userProfile.birthdate || "1998-07-06");
   const [editCerts, setEditCerts] = useState(userProfile.certifications?.join(", ") || "");
   const [editAvatar, setEditAvatar] = useState(userProfile.avatar || "");
+  const [editTheme, setEditTheme] = useState<"light" | "dark" | "system">(userProfile.theme || "light");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Sync edit state with user profile whenever drawer opens or profile changes
@@ -655,8 +702,31 @@ ActivityPost[]) => {
       setEditBirthdate(userProfile.birthdate || "1998-07-06");
       setEditCerts(userProfile.certifications?.join(", ") || "");
       setEditAvatar(userProfile.avatar || "");
+      setEditTheme(userProfile.theme || "light");
     }
   }, [isProfileOpen, userProfile]);
+
+  // 24-hour Session Expiry Check
+  React.useEffect(() => {
+    const checkSessionExpiry = () => {
+      const expiry = localStorage.getItem("estarr_session_expiry");
+      if (expiry && isAuthenticated) {
+        if (Date.now() > Number(expiry)) {
+          console.log("24-hour session expired. Logging out...");
+          firebaseSignOut(auth).then(() => {
+            localStorage.removeItem("estarr_session_expiry");
+            localStorage.removeItem("estarr_session_user");
+            setActiveTab("home");
+            alert("🔒 Your secure 24-hour session has expired. You have been automatically logged out for security.");
+          }).catch(err => console.error("Error signing out after expiry:", err));
+        }
+      }
+    };
+
+    checkSessionExpiry();
+    const interval = setInterval(checkSessionExpiry, 15000); // Check every 15 seconds
+    return () => clearInterval(interval);
+  }, [isAuthenticated]);
 
   // Listen for Firebase auth state changes
   React.useEffect(() => {
@@ -771,7 +841,8 @@ ActivityPost>("posts", initialPosts);
       skills: editSkills.split(",").map(s => s.trim()).filter(Boolean),
       birthdate: editBirthdate,
       certifications: editCerts.split(",").map(c => c.trim()).filter(Boolean),
-      avatar: editAvatar
+      avatar: editAvatar,
+      theme: editTheme
     };
     setUserProfile(updatedProfile);
     
@@ -817,15 +888,21 @@ ActivityPost>("posts", initialPosts);
             try {
               const userCredential = await createUserWithEmailAndPassword(auth, authEmail, authPassword);
               const user = userCredential.user;
+              const isVettedNow = authAccountType === "independent" && fastTrackVetting;
+              const vettedUntilDate = isVettedNow ? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() : "";
+
               await saveUserProfile(user.uid, {
-            name: authName || authEmail.split("@")[0],
-            email: authEmail,
-            birthdate: authBirthdate || "1998-07-06",
-            accountType: authAccountType,
-            profession: authAccountType === "independent" ? (applyingAs ? `${applyingAs} Specialist` : "Professional Independent") : (selectedRoleType ? `Hiring: ${selectedRoleType}` : "Job Provider / Client"),
-            walletBalance: 0,
-            history: [],
-          });
+                name: authName || authEmail.split("@")[0],
+                email: authEmail,
+                birthdate: authBirthdate || "1998-07-06",
+                accountType: authAccountType,
+                profession: authAccountType === "independent" ? (applyingAs ? `${applyingAs} Specialist` : "Professional Independent") : (selectedRoleType ? `Hiring: ${selectedRoleType}` : "Job Provider / Client"),
+                walletBalance: 0,
+                history: [],
+                isVetted24h: isVettedNow,
+                vettedUntil: vettedUntilDate,
+                staySignedIn24h: staySignedIn24h
+              });
               // Send signup welcome email
               try {
                 fetch("/api/send-welcome", {
@@ -854,6 +931,9 @@ ActivityPost>("posts", initialPosts);
         try {
           const userCredential = await createUserWithEmailAndPassword(auth, authEmail, authPassword);
           const user = userCredential.user;
+          const isVettedNow = authAccountType === "independent" && fastTrackVetting;
+          const vettedUntilDate = isVettedNow ? new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() : "";
+
           await saveUserProfile(user.uid, {
             name: authName,
             email: authEmail,
@@ -862,6 +942,9 @@ ActivityPost>("posts", initialPosts);
             profession: authAccountType === "independent" ? (applyingAs ? `${applyingAs} Specialist` : "Professional Independent") : (selectedRoleType ? `Hiring: ${selectedRoleType}` : "Job Provider / Client"),
             walletBalance: 0,
             history: [],
+            isVetted24h: isVettedNow,
+            vettedUntil: vettedUntilDate,
+            staySignedIn24h: staySignedIn24h
           });
           // Send signup welcome email
           try {
@@ -877,7 +960,11 @@ ActivityPost>("posts", initialPosts);
           } catch (e) {}
           
           if (authAccountType === "independent") {
-            setShowVettingModal(true);
+            if (fastTrackVetting) {
+              alert("🎉 Instant 24-Hour Express Access Granted! Your account is fully unblocked and verified.");
+            } else {
+              setShowVettingModal(true);
+            }
           }
         } catch (signUpErr: any) {
           if (signUpErr.code === "auth/email-already-in-use") {
@@ -906,6 +993,12 @@ ActivityPost>("posts", initialPosts);
             throw signUpErr;
           }
         }
+      }
+      if (staySignedIn24h) {
+        const expiryTime = Date.now() + 24 * 60 * 60 * 1000;
+        localStorage.setItem("estarr_session_expiry", expiryTime.toString());
+      } else {
+        localStorage.removeItem("estarr_session_expiry");
       }
       setShowAuthModal(false);
     } catch (error: any) {
@@ -939,6 +1032,7 @@ ActivityPost>("posts", initialPosts);
       items: [
         { id: "home", label: "Home", desc: "Digital ecosystem overview", icon: Home },
         { id: "ai-lab", label: "ESTARR AI Lab", desc: "Train, Validate & Evaluate Models", icon: BrainCircuit },
+        { id: "ai-vetting", label: "AI Vetting Center", desc: "Interactive proctored assessments", icon: ShieldCheck },
         { id: "portfolio", label: "Talent Portfolios", desc: "Showcase skills & consultancy", icon: Briefcase },
       ]
     },
@@ -972,9 +1066,23 @@ ActivityPost>("posts", initialPosts);
       ]
     },
     {
-      title: "Help & Documentation",
+      title: "Help & Resources",
       items: [
-        { id: "help-docs", label: "Help & Docs", desc: "Guides and documentation", icon: HelpCircle }
+        { id: "help-docs", label: "Help & Docs", desc: "Guides and documentation", icon: HelpCircle },
+        { id: "decentralized-escrows", label: "Escrow Pipeline", desc: "Decentralized Escrows and Multi-sig", icon: Lock },
+        { id: "program-guidelines", label: "Program Guidelines", desc: "Vetting standards and SLAs", icon: ShieldCheck },
+        { id: "escrow-faqs", label: "Escrow FAQs", desc: "Frequently Asked Questions", icon: HelpCircle },
+        { id: "contractor-directory", label: "Contractor Directory", desc: "Pre-vetted expert roster", icon: Users },
+        { id: "platform-status", label: "Platform Status", desc: "Real-time system health status", icon: Activity },
+      ]
+    },
+    {
+      title: "Legal & Audits",
+      items: [
+        { id: "terms-conditions", label: "Terms & Conditions", desc: "Facilitation and Escrow rules", icon: FileText },
+        { id: "privacy-cookies", label: "Privacy & Cookies", desc: "GDPR and cookie policy", icon: FileText },
+        { id: "data-collection", label: "Data Policy", desc: "Anonymized evaluation criteria", icon: FileText },
+        { id: "compliance-audits", label: "Compliance Audits", desc: "SOC2 and Smart Contract audits", icon: ShieldCheck },
       ]
     }
   ];
@@ -999,6 +1107,7 @@ ActivityPost>("posts", initialPosts);
       items: [
         { id: "connect", label: "Talent Network", desc: "Search & connect with pros", icon: Users },
         { id: "portfolio", label: "View Portfolios", desc: "Review previous work", icon: Sparkles },
+        { id: "ai-vetting", label: "AI Vetting Center", desc: "Browse pre-vetted scorecards", icon: ShieldCheck },
       ]
     },
     {
@@ -1014,9 +1123,23 @@ ActivityPost>("posts", initialPosts);
       ]
     },
     {
-      title: "Help & Documentation",
+      title: "Help & Resources",
       items: [
-        { id: "help-docs", label: "Help & Docs", desc: "Guides and documentation", icon: HelpCircle }
+        { id: "help-docs", label: "Help & Docs", desc: "Guides and documentation", icon: HelpCircle },
+        { id: "decentralized-escrows", label: "Escrow Pipeline", desc: "Decentralized Escrows and Multi-sig", icon: Lock },
+        { id: "program-guidelines", label: "Program Guidelines", desc: "Vetting standards and SLAs", icon: ShieldCheck },
+        { id: "escrow-faqs", label: "Escrow FAQs", desc: "Frequently Asked Questions", icon: HelpCircle },
+        { id: "contractor-directory", label: "Contractor Directory", desc: "Pre-vetted expert roster", icon: Users },
+        { id: "platform-status", label: "Platform Status", desc: "Real-time system health status", icon: Activity },
+      ]
+    },
+    {
+      title: "Legal & Audits",
+      items: [
+        { id: "terms-conditions", label: "Terms & Conditions", desc: "Facilitation and Escrow rules", icon: FileText },
+        { id: "privacy-cookies", label: "Privacy & Cookies", desc: "GDPR and cookie policy", icon: FileText },
+        { id: "data-collection", label: "Data Policy", desc: "Anonymized evaluation criteria", icon: FileText },
+        { id: "compliance-audits", label: "Compliance Audits", desc: "SOC2 and Smart Contract audits", icon: ShieldCheck },
       ]
     }
   ];
@@ -1087,9 +1210,22 @@ ActivityPost>("posts", initialPosts);
             {showVettingModal && (
         <VettingProtocolModal 
           onClose={() => setShowVettingModal(false)}
-          onApply={() => {
+          onApply={async () => {
+            if (auth.currentUser) {
+              const updatedProfile = {
+                ...userProfile,
+                isVetted24h: true,
+                vettedUntil: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+              };
+              try {
+                await saveUserProfile(auth.currentUser.uid, updatedProfile);
+                setUserProfile(updatedProfile);
+              } catch (err) {
+                console.error("Failed to update profile for vetting bypass:", err);
+              }
+            }
             setShowVettingModal(false);
-            alert("Application submitted! Check your email for the CCAT link.");
+            alert("🎉 Fast-Track Vetting Activated! Your account is fully unblocked and verified with a 24-Hour Express Pass.");
           }}
         />
       )}
@@ -1401,6 +1537,37 @@ ActivityPost>("posts", initialPosts);
                       </div>
                     )}
 
+                    {/* Stay Signed In & Fast Track Options */}
+                    <div className="bg-slate-50 border border-slate-100 rounded-lg p-2.5 flex flex-col gap-2 mt-1">
+                      <label className="flex items-start gap-2 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={staySignedIn24h}
+                          onChange={(e) => setStaySignedIn24h(e.target.checked)}
+                          className="mt-0.5 rounded border-slate-300 text-purple-600 focus:ring-purple-500 w-3.5 h-3.5 cursor-pointer"
+                        />
+                        <div className="flex flex-col">
+                          <span className="text-[10px] font-bold text-slate-800 leading-none">Stay signed in for 24 hours</span>
+                          <span className="text-[8px] text-slate-400 mt-0.5 font-sans">Maintain an active secure session for 24 hours.</span>
+                        </div>
+                      </label>
+                      <label className="flex items-start gap-2 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={fastTrackVetting}
+                          onChange={(e) => setFastTrackVetting(e.target.checked)}
+                          className="mt-0.5 rounded border-slate-300 text-purple-600 focus:ring-purple-500 w-3.5 h-3.5 cursor-pointer"
+                        />
+                        <div className="flex flex-col">
+                          <span className="text-[10px] font-bold text-slate-800 leading-none flex items-center gap-1">
+                            Fast-Track 24h Express Pass
+                            <span className="text-[7px] font-mono font-bold bg-emerald-100 text-emerald-800 px-1 py-0.2 rounded-sm uppercase tracking-wider">Unblocked</span>
+                          </span>
+                          <span className="text-[8px] text-slate-400 mt-0.5 font-sans">Instantly unblock and auto-vet account.</span>
+                        </div>
+                      </label>
+                    </div>
+
                     <div className="text-[10px] text-slate-500 leading-relaxed mt-2">
                       By submitting, you acknowledge and agree to ESTARR's <span className="text-purple-600 hover:underline cursor-pointer">Terms and Conditions</span> and <span className="text-purple-600 hover:underline cursor-pointer">Privacy Policy</span>.
                     </div>
@@ -1617,6 +1784,39 @@ ActivityPost>("posts", initialPosts);
                     </div>
                   )}
 
+                  {/* Stay Signed In / Fast Track Options */}
+                  <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 flex flex-col gap-2">
+                    <label className="flex items-start gap-2.5 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={staySignedIn24h}
+                        onChange={(e) => setStaySignedIn24h(e.target.checked)}
+                        className="mt-0.5 rounded border-slate-300 text-purple-600 focus:ring-purple-500 w-3.5 h-3.5 cursor-pointer"
+                      />
+                      <div className="flex flex-col">
+                        <span className="text-[10px] font-bold text-slate-800 leading-none">Stay signed in for 24 hours</span>
+                        <span className="text-[8px] text-slate-400 mt-0.5 font-sans">Maintain an active secure session for 24 hours.</span>
+                      </div>
+                    </label>
+                    {authMode === "signup" && authAccountType === "independent" && (
+                      <label className="flex items-start gap-2.5 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={fastTrackVetting}
+                          onChange={(e) => setFastTrackVetting(e.target.checked)}
+                          className="mt-0.5 rounded border-slate-300 text-purple-600 focus:ring-purple-500 w-3.5 h-3.5 cursor-pointer"
+                        />
+                        <div className="flex flex-col">
+                          <span className="text-[10px] font-bold text-slate-800 leading-none flex items-center gap-1">
+                            Fast-Track 24h Express Pass
+                            <span className="text-[7px] font-mono font-bold bg-emerald-100 text-emerald-800 px-1 py-0.2 rounded-sm uppercase tracking-wider">Unblocked</span>
+                          </span>
+                          <span className="text-[8px] text-slate-400 mt-0.5 font-sans">Instantly unblock and auto-vet account.</span>
+                        </div>
+                      </label>
+                    )}
+                  </div>
+
                   <button
                     id="btn-auth-submit"
                     type="submit"
@@ -1711,17 +1911,19 @@ ActivityPost>("posts", initialPosts);
       )}
 
       {/* Dynamic Header */}
-      <header className="sticky top-0 bg-black border-b border-slate-800 z-40 px-6 py-4 flex justify-between items-center shadow-lg">
-        <div className="flex items-center gap-3">
-          <button 
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="lg:hidden text-white hover:text-purple-400 p-2 cursor-pointer transition-colors"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
-          <button onClick={() => setActiveTab("home")} className="flex items-center gap-3 text-left cursor-pointer hover:opacity-90">
-            <div className="group relative w-11 h-11 flex items-center justify-center transition-all duration-500 hover:-translate-y-0.5">
-            <svg width="44" height="44" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-11 h-11 drop-shadow-md">
+      <header className="sticky top-0 bg-black border-b border-slate-800 z-40 px-3 sm:px-6 py-3 sm:py-4 flex justify-between items-center shadow-lg">
+        <div className="flex items-center gap-1.5 sm:gap-3">
+          {isAuthenticated && (
+            <button 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="lg:hidden text-white hover:text-purple-400 p-1.5 sm:p-2 cursor-pointer transition-colors"
+            >
+              <Menu className="w-5 h-5 sm:w-6 sm:h-6" />
+            </button>
+          )}
+          <button onClick={() => setActiveTab("home")} className="flex items-center gap-2 sm:gap-3 text-left cursor-pointer hover:opacity-90">
+            <div className="group relative w-8 h-8 sm:w-11 sm:h-11 flex items-center justify-center transition-all duration-500 hover:-translate-y-0.5">
+            <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 sm:w-11 sm:h-11 drop-shadow-md">
               <defs>
                 <linearGradient id="brand-grad" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor="#9d50bb" />
@@ -1733,122 +1935,124 @@ ActivityPost>("posts", initialPosts);
             </svg>
           </div>
           <div>
-            <h1 className="font-display font-bold text-sm md:text-base uppercase tracking-tight text-white">ESTARR</h1>
-            <p className="text-[10px] text-slate-400 font-medium tracking-wide font-bold">{translations[globalLanguage].heroSubtitle}</p>
+            <h1 className="font-display font-bold text-xs sm:text-sm md:text-base uppercase tracking-tight text-white leading-tight">ESTARR</h1>
+            <p className="hidden sm:block text-[10px] text-slate-400 font-medium tracking-wide font-bold">{translations[globalLanguage].heroSubtitle}</p>
           </div>
         </button>
 
         </div>
         {/* Global Navigation Buttons in the Middle of Header */}
-        <nav className="hidden md:flex items-center gap-1 bg-slate-950 border border-slate-800/80 px-2.5 py-1.5 rounded-full shadow-inner">
-          <button
-            onClick={() => setActiveTab("home")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold transition-all uppercase tracking-wider cursor-pointer ${
-              activeTab === "home"
-                ? "bg-purple-600 text-white shadow-md shadow-purple-500/20"
-                : "text-slate-400 hover:text-white hover:bg-slate-900/40"
-            }`}
-          >
-            <Home className="w-3 h-3" />
-            <span>Home</span>
-          </button>
-          
-          <button
-            onClick={() => {
-              if (!isAuthenticated) {
-                setAuthMode("signup");
-                setShowAuthModal(true);
-              } else {
-                setActiveTab("connect");
-              }
-            }}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold transition-all uppercase tracking-wider cursor-pointer ${
-              activeTab === "connect"
-                ? "bg-purple-600 text-white shadow-md shadow-purple-500/20"
-                : "text-slate-400 hover:text-white hover:bg-slate-900/40"
-            }`}
-          >
-            <Users className="w-3 h-3" />
-            <span className="flex items-center gap-1">
-              Connect
-            </span>
-          </button>
-          <button
-            onClick={() => {
-              if (!isAuthenticated) {
-                setAuthMode("signup");
-                setShowAuthModal(true);
-              } else {
-                setActiveTab("ai-lab");
-              }
-            }}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold transition-all uppercase tracking-wider cursor-pointer ${
-              activeTab === "ai-lab"
-                ? "bg-purple-600 text-white shadow-md shadow-purple-500/20"
-                : "text-slate-400 hover:text-white hover:bg-slate-900/40"
-            }`}
-          >
-            <BrainCircuit className="w-3 h-3" />
-            <span className="flex items-center gap-1">
-              ESTARR AI Lab
-            </span>
-          </button>
+        {isAuthenticated && (
+          <nav className="hidden md:flex items-center gap-1 bg-slate-950 border border-slate-800/80 px-2.5 py-1.5 rounded-full shadow-inner">
+            <button
+              onClick={() => setActiveTab("home")}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold transition-all uppercase tracking-wider cursor-pointer ${
+                activeTab === "home"
+                  ? "bg-purple-600 text-white shadow-md shadow-purple-500/20"
+                  : "text-slate-400 hover:text-white hover:bg-slate-900/40"
+              }`}
+            >
+              <Home className="w-3 h-3" />
+              <span>Home</span>
+            </button>
+            
+            <button
+              onClick={() => {
+                if (!isAuthenticated) {
+                  setAuthMode("signup");
+                  setShowAuthModal(true);
+                } else {
+                  setActiveTab("connect");
+                }
+              }}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold transition-all uppercase tracking-wider cursor-pointer ${
+                activeTab === "connect"
+                  ? "bg-purple-600 text-white shadow-md shadow-purple-500/20"
+                  : "text-slate-400 hover:text-white hover:bg-slate-900/40"
+              }`}
+            >
+              <Users className="w-3 h-3" />
+              <span className="flex items-center gap-1">
+                Connect
+              </span>
+            </button>
+            <button
+              onClick={() => {
+                if (!isAuthenticated) {
+                  setAuthMode("signup");
+                  setShowAuthModal(true);
+                } else {
+                  setActiveTab("ai-lab");
+                }
+              }}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold transition-all uppercase tracking-wider cursor-pointer ${
+                activeTab === "ai-lab"
+                  ? "bg-purple-600 text-white shadow-md shadow-purple-500/20"
+                  : "text-slate-400 hover:text-white hover:bg-slate-900/40"
+              }`}
+            >
+              <BrainCircuit className="w-3 h-3" />
+              <span className="flex items-center gap-1">
+                ESTARR AI Lab
+              </span>
+            </button>
 
-          <button
-            onClick={() => {
-              if (!isAuthenticated) {
-                setAuthMode("signup");
-                setShowAuthModal(true);
-              } else {
-                setActiveTab("annotation-workspace");
-              }
-            }}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold transition-all uppercase tracking-wider cursor-pointer ${
-              activeTab === "annotation-workspace"
-                ? "bg-purple-600 text-white shadow-md shadow-purple-500/20"
-                : "text-slate-400 hover:text-white hover:bg-slate-900/40"
-            }`}
-          >
-            <Square className="w-3 h-3" />
-            <span className="flex items-center gap-1">
-              Annotation Workspace
-            </span>
-          </button>
+            <button
+              onClick={() => {
+                if (!isAuthenticated) {
+                  setAuthMode("signup");
+                  setShowAuthModal(true);
+                } else {
+                  setActiveTab("annotation-workspace");
+                }
+              }}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold transition-all uppercase tracking-wider cursor-pointer ${
+                activeTab === "annotation-workspace"
+                  ? "bg-purple-600 text-white shadow-md shadow-purple-500/20"
+                  : "text-slate-400 hover:text-white hover:bg-slate-900/40"
+              }`}
+            >
+              <Square className="w-3 h-3" />
+              <span className="flex items-center gap-1">
+                Annotation Workspace
+              </span>
+            </button>
 
-          <button
-            onClick={() => {
-              if (!isAuthenticated) {
-                setAuthMode("signup");
-                setShowAuthModal(true);
-              } else {
-                setActiveTab("marketplace");
-              }
-            }}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold transition-all uppercase tracking-wider cursor-pointer ${
-              activeTab === "marketplace"
-                ? "bg-purple-600 text-white shadow-md shadow-purple-500/20"
-                : "text-slate-400 hover:text-white hover:bg-slate-900/40"
-            }`}
-          >
-            <ShoppingCart className="w-3 h-3" />
-            <span className="flex items-center gap-1">
-              Storefront
-            </span>
-          </button>
+            <button
+              onClick={() => {
+                if (!isAuthenticated) {
+                  setAuthMode("signup");
+                  setShowAuthModal(true);
+                } else {
+                  setActiveTab("marketplace");
+                }
+              }}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold transition-all uppercase tracking-wider cursor-pointer ${
+                activeTab === "marketplace"
+                  ? "bg-purple-600 text-white shadow-md shadow-purple-500/20"
+                  : "text-slate-400 hover:text-white hover:bg-slate-900/40"
+              }`}
+            >
+              <ShoppingCart className="w-3 h-3" />
+              <span className="flex items-center gap-1">
+                Storefront
+              </span>
+            </button>
 
-        </nav>
+          </nav>
+        )}
 
         {/* Global User Profile Indicator */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1.5 sm:gap-3">
           {/* Globalizer Widget */}
           <div className="relative">
             <button
               onClick={() => setIsGlobalDropdownOpen(!isGlobalDropdownOpen)}
-              className="bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 px-3 py-1.5 rounded-xl cursor-pointer transition-colors shadow-sm flex items-center gap-1.5 text-[10px] font-bold"
+              className="bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-800 p-2 sm:px-3 sm:py-1.5 rounded-xl cursor-pointer transition-colors shadow-sm flex items-center gap-1.5 text-[10px] font-bold shrink-0"
               title="Global Settings (Currency & Language)"
             >
-              <Globe className="w-3.5 h-3.5 text-purple-400 animate-pulse shrink-0" />
-              <span className="font-mono text-[10px] tracking-wider uppercase">{globalLanguage} | {globalCurrency}</span>
+              <Globe className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-purple-400 animate-pulse shrink-0" />
+              <span className="hidden sm:inline font-mono text-[10px] tracking-wider uppercase">{globalLanguage} | {globalCurrency}</span>
             </button>
 
             {isGlobalDropdownOpen && (
@@ -1917,7 +2121,7 @@ ActivityPost>("posts", initialPosts);
             <>
               <button
                 onClick={() => setIsNotificationsOpen(true)}
-                className="relative bg-slate-900 hover:bg-slate-800 text-white border border-slate-800 p-2 rounded-xl cursor-pointer transition-colors shadow-sm"
+                className="relative bg-slate-900 hover:bg-slate-800 text-white border border-slate-800 p-1.5 sm:p-2 rounded-xl cursor-pointer transition-colors shadow-sm shrink-0"
               >
                 <Bell className="w-4 h-4" />
                 <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-black"></span>
@@ -1925,12 +2129,19 @@ ActivityPost>("posts", initialPosts);
               <button
                 id="btn-edit-profile-main"
                 onClick={() => setIsProfileOpen(true)}
-                className="flex items-center gap-2 text-left bg-slate-900 hover:bg-slate-800 p-1 border border-slate-800 cursor-pointer transition-all pr-3 rounded-xl"
+                className="flex items-center gap-2 text-left bg-slate-900 hover:bg-slate-800 p-1 border border-slate-800 cursor-pointer transition-all pr-1 sm:pr-3 rounded-xl shrink-0"
               >
                 <img src={userProfile.avatar} alt="avatar" className="w-7 h-7 object-cover border border-slate-700 rounded-lg" />
                 <div className="hidden sm:block text-[10px]">
                   <span className="font-bold text-white block leading-tight uppercase tracking-tight">{userProfile.name}</span>
-                  <span className="text-purple-400 font-bold block leading-tight text-[8px] uppercase tracking-wider">Configure Profile</span>
+                  {userProfile.isVetted24h ? (
+                    <span className="text-emerald-400 font-bold block leading-tight text-[8px] uppercase tracking-wider flex items-center gap-1">
+                      <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                      24h Express Pass
+                    </span>
+                  ) : (
+                    <span className="text-purple-400 font-bold block leading-tight text-[8px] uppercase tracking-wider">Configure Profile</span>
+                  )}
                 </div>
               </button>
               <button
@@ -1942,32 +2153,33 @@ ActivityPost>("posts", initialPosts);
                     console.error("Logout error:", error);
                   }
                 }}
-                className="flex items-center justify-center w-9 h-9 bg-slate-900 hover:bg-rose-950/30 text-slate-400 hover:text-rose-500 border border-slate-800 rounded-xl transition-colors shadow-sm"
+                className="hidden sm:flex items-center justify-center w-9 h-9 bg-slate-900 hover:bg-rose-950/30 text-slate-400 hover:text-rose-500 border border-slate-800 rounded-xl transition-colors shadow-sm shrink-0"
                 title="Sign Out"
               >
                 <LogOut className="w-4 h-4" />
               </button>
             </>
           ) : (
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
               <button 
                 onClick={() => { setAuthMode("signin"); setShowAuthModal(true); }}
-                className="text-slate-400 hover:text-white text-xs font-semibold cursor-pointer transition-colors"
+                className="text-slate-400 hover:text-white text-[11px] sm:text-xs font-semibold cursor-pointer transition-colors shrink-0"
               >
                 Sign In
               </button>
               <button 
                 onClick={() => { setAuthMode("signup"); setShowAuthModal(true); }}
-                className="text-white hover:text-[#00D285] font-display font-bold text-xs md:text-sm tracking-tight transition-all cursor-pointer hover:underline underline-offset-4"
+                className="hidden md:block text-white hover:text-[#00D285] font-display font-bold text-xs md:text-sm tracking-tight transition-all cursor-pointer hover:underline underline-offset-4 shrink-0"
               >
                 Apply as a Talent
               </button>
               <div className="relative flex items-center gap-1.5">
                 <button 
                   onClick={() => { setAuthMode("signup"); setShowAuthModal(true); }}
-                  className="bg-gradient-to-r from-[#9d50bb] to-[#6e48aa] hover:from-[#a85ec5] hover:to-[#7b55be] text-white font-display font-bold text-xs md:text-sm px-5 py-2.5 rounded-lg transition-all cursor-pointer shadow-sm active:scale-95 flex items-center justify-center min-h-[44px]"
+                  className="bg-gradient-to-r from-[#9d50bb] to-[#6e48aa] hover:from-[#a85ec5] hover:to-[#7b55be] text-white font-display font-bold text-[10px] sm:text-xs md:text-sm px-3 sm:px-5 py-1.5 sm:py-2 rounded-lg transition-all cursor-pointer shadow-sm active:scale-95 flex items-center justify-center min-h-[36px] sm:min-h-[40px] shrink-0"
                 >
-                  Hire Top Talent
+                  <span className="sm:hidden">Hire</span>
+                  <span className="hidden sm:inline">Hire Top Talent</span>
                 </button>
                 <button
                   type="button"
@@ -1975,7 +2187,7 @@ ActivityPost>("posts", initialPosts);
                     e.stopPropagation();
                     setShowHireTooltip(!showHireTooltip);
                   }}
-                  className="group relative w-11 h-11 flex items-center justify-center transition-all duration-500 hover:-translate-y-0.5 cursor-pointer bg-slate-900 border border-slate-800 rounded-lg text-slate-400 hover:text-white min-w-[44px] min-h-[44px]"
+                  className="hidden sm:flex group relative w-11 h-11 items-center justify-center transition-all duration-500 hover:-translate-y-0.5 cursor-pointer bg-slate-900 border border-slate-800 rounded-lg text-slate-400 hover:text-white min-w-[44px] min-h-[44px]"
                   title="Learn more"
                 >
                   <HelpCircle className="w-4 h-4" />
@@ -2060,9 +2272,9 @@ ActivityPost>("posts", initialPosts);
       </header>
 
       {/* Main Container Layout */}
-      <div className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 relative z-10">
+      <div className={`flex-1 w-full mx-auto relative z-10 ${isAuthenticated ? "max-w-7xl p-4 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8" : "max-w-none p-0 grid grid-cols-1"}`}>
         {/* Navigation Rail Sidebar */}
-        {!isSidebarHidden && (<nav className={`hidden lg:flex lg:col-span-3 flex-col gap-4 p-4 h-fit shadow-xs rounded-xl transition-all duration-300 ${sidebarStyles[sidebarTheme].navClass}`}>
+        {!isSidebarHidden && isAuthenticated && (<nav className={`hidden lg:flex lg:col-span-3 flex-col gap-4 p-4 h-fit shadow-xs rounded-xl transition-all duration-300 ${sidebarStyles[sidebarTheme].navClass}`}>
           <div className={`flex flex-col gap-2 border-b pb-3 mb-1 ${sidebarStyles[sidebarTheme].borderClass}`}>
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-mono font-bold uppercase tracking-widest">
@@ -2161,9 +2373,9 @@ ActivityPost>("posts", initialPosts);
         </nav>)}
 
         {/* Dynamic Workspace Panel */}
-        <main className={`${isSidebarHidden ? "lg:col-span-12" : "lg:col-span-9"} flex flex-col gap-6 min-h-[500px]`}>
+        <main className={`${(isSidebarHidden || !isAuthenticated) ? "lg:col-span-12" : "lg:col-span-9"} flex flex-col ${isAuthenticated ? "gap-6" : "gap-0"} min-h-[500px]`}>
           {activeTab === "home" && (
-            <div className="flex flex-col gap-6 animate-fade-in">
+            <div className={`flex flex-col ${isAuthenticated ? "gap-6" : "gap-0"} animate-fade-in`}>
               {isAuthenticated ? (
                 <UserDashboard 
                   userProfile={userProfile} 
@@ -2176,159 +2388,14 @@ ActivityPost>("posts", initialPosts);
                   onUpdateJobs={handleUpdateJobs}
                 />
               ) : (
-                <>
-                  {/* Main Hero Area */}
-                  <div className="grid grid-cols-1 lg:grid-cols-12 border border-slate-200 bg-slate-50 shadow-sm hover:shadow-md transition-shadow rounded-xl">
-                {/* Hero Left: Typography Focus */}
-<div className="lg:col-span-12 p-8 md:p-24 flex flex-col items-center text-center border-slate-200 bg-white rounded-xl relative overflow-hidden min-h-[650px]">
-                  {/* Background Video Loop with Tech Grid & Glow Fallbacks */}
-                  <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none z-0" />
-                  <video
-                    ref={heroVideoRef}
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    preload="auto"
-                    onPause={(e) => {
-                      e.currentTarget.play().catch(() => {});
-                    }}
-                    onEnded={(e) => {
-                      e.currentTarget.play().catch(() => {});
-                    }}
-                    className="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none opacity-25 transition-opacity duration-1000"
-                  >
-                    <source
-                      src="https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-nodes-connecting-in-space-32599-large.mp4"
-                      type="video/mp4"
-                    />
-                    <source
-                      src="https://vjs.zencdn.net/v/oceans.mp4"
-                      type="video/mp4"
-                    />
-                  </video>
-                  {/* Gradient Overlay for Premium Contrast */}
-                  <div className="absolute inset-0 bg-gradient-to-tr from-white/80 via-white/50 to-transparent z-0 pointer-events-none" />
-
-                  {/* Decorative Abstract Shapes */}
-                  <div className="absolute right-8 top-8 text-purple-400/60 pointer-events-none rotate-12 z-0">
-                    <svg width="160" height="160" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="3">
-                      <circle cx="50" cy="50" r="40" strokeDasharray="8 8" />
-                    </svg>
-                  </div>
-                  <div className="absolute right-12 bottom-12 text-blue-400/10 pointer-events-none rotate-[25deg] z-0">
-                    <svg width="140" height="140" viewBox="0 0 100 100" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round">
-                      <path d="M 50 10 V 90 M 10 50 H 90" />
-                    </svg>
-                  </div>
-                  <div className="absolute left-8 bottom-8 text-rose-400/10 pointer-events-none -rotate-[20deg] z-0">
-                    <svg width="120" height="120" viewBox="0 0 100 100" fill="currentColor">
-                      <polygon points="50,10 90,90 10,90" />
-                    </svg>
-                  </div>
-
-                                    <div className="relative z-10 flex flex-col items-center h-full w-full max-w-6xl">
-                    <motion.div
-                      initial={{ opacity: 0, y: 30 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.8, ease: "easeOut" }}
-                      className="flex flex-col items-center"
-                    >
-                      <div className="inline-flex items-center gap-3 px-5 py-2 bg-slate-900/5 backdrop-blur-md border border-slate-200 rounded-full text-[11px] font-black tracking-[0.2em] mb-12 uppercase text-purple-600">
-                        <ShieldCheck className="w-4 h-4" />
-                        <span>Elite Talent Network</span>
-                      </div>
-                      <h1 className="text-5xl md:text-7xl lg:text-8xl leading-tight font-black tracking-tighter mb-12 text-slate-900 uppercase font-display">
-                        Top 3% <br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600">
-                          Talent Pool
-                        </span>
-                      </h1>
-                    </motion.div>
-                    
-                    <motion.div 
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ duration: 0.6, delay: 0.2 }}
-                      className="max-w-3xl"
-                    >
-                      <p className="text-2xl md:text-3xl leading-relaxed text-slate-500 font-medium tracking-tight">
-                        Build your verified remote portfolio, match with premium global contracts, and coordinate under strict milestone escrows.
-                      </p>
-                    </motion.div>
-
-                    <div className="mt-auto w-full pt-16 border-t border-slate-100">
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-16 justify-items-center">
-                        <div className="flex flex-col items-center">
-                          <div className="flex items-center gap-4 mb-3 text-purple-600">
-                            <Cpu className="w-8 h-8" />
-                            <p className="text-5xl font-black text-slate-900 tracking-tighter tabular-nums">128+</p>
-                          </div>
-                          <p className="text-xs uppercase font-black tracking-[0.2em] text-slate-400 font-mono">Infrastructure Nodes</p>
-                        </div>
-                        <div className="flex flex-col items-center">
-                          <div className="flex items-center gap-4 mb-3 text-emerald-600">
-                            <
-  Activity className="w-8 h-8" />
-                            <p className="text-5xl font-black text-slate-900 tracking-tighter tabular-nums">0.04ms</p>
-                          </div>
-                          <p className="text-xs uppercase font-black tracking-[0.2em] text-slate-400 font-mono">Contract Velocity</p>
-                        </div>
-                        <div className="hidden md:flex flex-col items-center">
-                          <div className="flex items-center gap-4 mb-3 text-indigo-600">
-                            <ShieldCheck className="w-8 h-8" />
-                            <p className="text-5xl font-black text-slate-900 tracking-tighter tabular-nums">$4.2M+</p>
-                          </div>
-                          <p className="text-xs uppercase font-black tracking-[0.2em] text-slate-400 font-mono">Escrow Protected</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-
-              </div>
-
-              {/* Bottom Interactive Grid */}
-              <ServicesCarousel
-                isAuthenticated={isAuthenticated}
-                onAuthRequest={() => { setAuthMode("signup"); setShowAuthModal(true); }}
-                onSelect={(tabId) => {
-                  if (!isAuthenticated) {
-                    setAuthMode("signup");
-                    setShowAuthModal(true);
-                  } else {
-                    setActiveTab(tabId);
-                  }
-                }}
-              />
-              
-                            <HomeMarketing 
-                onStartEarning={() => {
-                  setActiveTab("home");
-                  if (!isAuthenticated) {
-                    setAuthMode("signup");
-                    setShowAuthModal(true);
-                  }
-                }} 
-                onStartCollabing={() => {
-                  setActiveTab("consultancy");
-                  if (!isAuthenticated) {
-                    setAuthMode("signup");
-                    setShowAuthModal(true);
-                  }
-                }}
-                onNavigate={(tabId) => {
-                  setActiveTab(tabId as any);
-                  if (!isAuthenticated) {
-                    setAuthMode("signup");
-                    setShowAuthModal(true);
-                  }
-                }}
-              />
-                </>
+                <MvpLandingPage 
+                  onSignIn={() => { setAuthMode("signin"); setShowAuthModal(true); }} 
+                  onSignUp={() => { setAuthMode("signup"); setShowAuthModal(true); }} 
+                  onNavigateToTab={(tab) => {
+                    setActiveTab(tab as any);
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                />
               )}
             </div>
           )}
@@ -2344,6 +2411,10 @@ ActivityPost>("posts", initialPosts);
           )}
           {activeTab === "ai-lab" && (
             <AILabSection userProfile={userProfile} onUpdateProfile={handleUpdateProfile} />
+          )}
+
+          {activeTab === "ai-vetting" && (
+            <AIVettingCenter userProfile={userProfile} />
           )}
 
           {activeTab === "marketplace" && (
@@ -2443,6 +2514,17 @@ ActivityPost>("posts", initialPosts);
           {activeTab === "teams" && <TeamsSection />}
           {activeTab === "careers" && <JobsSection userProfile={userProfile} jobs={jobs} onUpdateJobs={handleUpdateJobs} onUpdateProfile={handleUpdateProfile} token={token} />}
           {activeTab === "how-it-works" && <HowItWorksSection />}
+
+          {/* New High-Fidelity Ecosystem & Legal Pages */}
+          {activeTab === "decentralized-escrows" && <DecentralizedEscrowsSection />}
+          {activeTab === "program-guidelines" && <ProgramGuidelinesSection />}
+          {activeTab === "escrow-faqs" && <EscrowFaqsSection />}
+          {activeTab === "contractor-directory" && <ContractorDirectorySection />}
+          {activeTab === "platform-status" && <PlatformStatusSection />}
+          {activeTab === "terms-conditions" && <TermsConditionsSection />}
+          {activeTab === "privacy-cookies" && <PrivacyCookiesSection />}
+          {activeTab === "data-collection" && <DataCollectionPolicySection />}
+          {activeTab === "compliance-audits" && <ComplianceAuditsSection />}
         </main>
       </div>
 
@@ -2548,6 +2630,25 @@ ActivityPost>("posts", initialPosts);
                 </div>
               );
             })}
+            {isAuthenticated && (
+              <div className="mt-auto pt-4 border-t border-slate-800/60 shrink-0">
+                <button
+                  onClick={async () => {
+                    try {
+                      await firebaseSignOut(auth);
+                      setActiveTab("home");
+                      setIsMobileMenuOpen(false);
+                    } catch (error: any) {
+                      console.error("Logout error:", error);
+                    }
+                  }}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-rose-950/20 hover:bg-rose-900/40 text-rose-400 hover:text-rose-300 border border-rose-900/30 hover:border-rose-800/50 rounded-xl transition-colors font-semibold text-xs uppercase tracking-wider cursor-pointer"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Sign Out</span>
+                </button>
+              </div>
+            )}
           </nav>
         </div>
       )}
@@ -2619,6 +2720,16 @@ ActivityPost>("posts", initialPosts);
                   </span>
                 </div>
 
+                {userProfile.isVetted24h && (
+                  <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-3 flex items-center gap-2.5 shadow-sm">
+                    <span className="flex-shrink-0 w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <div className="flex flex-col">
+                      <span className="text-[10px] font-bold text-emerald-800 uppercase tracking-wider leading-none">24h Express Vetting Active</span>
+                      <span className="text-[8px] text-emerald-600 font-semibold mt-0.5 font-sans">Your account is fully unblocked and authenticated.</span>
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex flex-col gap-1">
                   <label className="font-bold uppercase tracking-wider text-slate-900 text-[10px]">Profession / Title</label>
                   <input
@@ -2673,6 +2784,51 @@ ActivityPost>("posts", initialPosts);
                     placeholder="e.g. Google Cloud Professional Cloud Architect, Solidity Smart Contract Auditor"
                   />
                   <span className="text-[9px] text-slate-500">Celebrate your credentials on the Certification Board!</span>
+                </div>
+
+                <div className="flex flex-col gap-2 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                  <label className="font-bold uppercase tracking-wider text-slate-900 text-[10px]">Global Application Theme</label>
+                  <div className="grid grid-cols-3 gap-2 mt-1">
+                    <button
+                      type="button"
+                      onClick={() => setEditTheme("light")}
+                      className={`flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-xl border transition-all text-center cursor-pointer ${
+                        editTheme === "light"
+                          ? "border-purple-600 bg-purple-50/50 text-purple-700 font-semibold shadow-sm"
+                          : "border-slate-200 bg-slate-50 hover:bg-slate-100/70 text-slate-600 font-medium"
+                      }`}
+                    >
+                      <Sun className={`w-4 h-4 ${editTheme === "light" ? "text-purple-600" : "text-slate-400"}`} />
+                      <span className="text-[10px]">Light</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEditTheme("dark")}
+                      className={`flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-xl border transition-all text-center cursor-pointer ${
+                        editTheme === "dark"
+                          ? "border-purple-600 bg-purple-50/50 text-purple-700 font-semibold shadow-sm"
+                          : "border-slate-200 bg-slate-50 hover:bg-slate-100/70 text-slate-600 font-medium"
+                      }`}
+                    >
+                      <Moon className={`w-4 h-4 ${editTheme === "dark" ? "text-purple-600" : "text-slate-400"}`} />
+                      <span className="text-[10px]">Dark</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setEditTheme("system")}
+                      className={`flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-xl border transition-all text-center cursor-pointer ${
+                        editTheme === "system"
+                          ? "border-purple-600 bg-purple-50/50 text-purple-700 font-semibold shadow-sm"
+                          : "border-slate-200 bg-slate-50 hover:bg-slate-100/70 text-slate-600 font-medium"
+                      }`}
+                    >
+                      <Monitor className={`w-4 h-4 ${editTheme === "system" ? "text-purple-600" : "text-slate-400"}`} />
+                      <span className="text-[10px]">System</span>
+                    </button>
+                  </div>
+                  <span className="text-[9px] text-slate-500 mt-0.5 leading-normal">
+                    Choose your viewing preference. System theme automatically synchronizes with your device's light or dark mode.
+                  </span>
                 </div>
               </div>
             </div>

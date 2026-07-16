@@ -196,7 +196,7 @@ export function HomeMarketing({
       borderColor: "border-blue-100",
       textColor: "text-blue-600",
       expert: {
-        name: "Ezenwa Okafor",
+        name: "Emeka Okafor",
         role: "Senior Cloud & Node Architect",
         stats: "Ex-Stripe • 8+ Years Exp",
         location: "Lagos, Nigeria",
@@ -250,7 +250,7 @@ export function HomeMarketing({
         role: "Principal AI Architect",
         stats: "Cloud Native Expert • 12+ Years Exp",
         location: "Accra, Ghana",
-        avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
+        avatar: "https://images.unsplash.com/photo-1540569014015-19a7be504e3a?w=150&auto=format&fit=crop&q=80",
         bio: "Builds production-grade AI agents and robust RAG systems that integrate seamlessly into existing enterprise clouds.",
         avail: "Available for Q3 Booking"
       }
@@ -300,7 +300,7 @@ export function HomeMarketing({
         role: "Lead Commerce Infrastructure Engineer",
         stats: "Talent Ops Specialist • 10+ Years Exp",
         location: "Nairobi, Kenya",
-        avatar: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80",
+        avatar: "https://images.unsplash.com/photo-1522529599102-193c0d76b5b6?w=150&auto=format&fit=crop&q=80",
         bio: "Architects sophisticated talent deployment models and automated commerce management systems for high-throughput digital markets.",
         avail: "Available Now"
     }
@@ -418,7 +418,7 @@ export function HomeMarketing({
       author: "Adewale Mensah",
       role: "Lead Full-Stack Creator",
       location: "Accra, Ghana",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80"
+      avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&auto=format&fit=crop&q=80"
     },
     {
       quote: "Being part of the elite 3% network gives me access to premier international brands. No bidding wars, no chasing unpaid invoices. Pure execution.",
