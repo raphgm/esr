@@ -210,8 +210,8 @@ export function DjinniAnonymousSection({ userProfile, jobs, onUpdateProfile }: D
         candidateId: pitchTargetCandidate.id,
         candidateUserId: pitchTargetCandidate.userId,
         employerUserId: currentUserId,
-        employerName: userProfile.name || "REMOGIGS Partner",
-        employerEmail: userProfile.email || "partner@remogigs.co",
+        employerName: userProfile.name || "ESTARR Partner",
+        employerEmail: userProfile.email || "partner@estarr.co",
         jobTitle,
         proposedSalary: proposedSalaryStr || "$95/hr",
         message: pitchMessage || `Hi, we reviewed your anonymous profile on our Anonymous Board and would love to connect about the ${jobTitle} role!`,
@@ -716,7 +716,7 @@ export function DjinniAnonymousSection({ userProfile, jobs, onUpdateProfile }: D
                                 <p className="text-slate-400 text-xs">Since the candidate accepted, you can schedule an interview directly.</p>
                                 <div className="flex items-center gap-1.5 text-[11px] text-blue-400 mt-1">
                                   <Mail className="w-3.5 h-3.5 text-blue-400" />
-                                  <span>{pitch.employerEmail || "unlocked@contact.remogigs.app"}</span>
+                                  <span>{pitch.employerEmail || "unlocked@contact.estarr.app"}</span>
                                 </div>
                               </div>
                             </div>
@@ -763,7 +763,7 @@ export function DjinniAnonymousSection({ userProfile, jobs, onUpdateProfile }: D
                       {isAccepted && (
                         <div className="flex flex-col gap-1.5 w-full">
                           <a 
-                            href={`mailto:${isEmployer ? "candidate@remogigs.app" : pitch.employerEmail}`}
+                            href={`mailto:${isEmployer ? "candidate@estarr.app" : pitch.employerEmail}`}
                             className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-3 rounded-xl text-xs uppercase tracking-wider text-center flex items-center justify-center gap-1 transition-colors"
                           >
                             <Mail className="w-3.5 h-3.5" /> Start Thread

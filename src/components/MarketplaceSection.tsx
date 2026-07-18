@@ -113,7 +113,7 @@ export default function MarketplaceSection({
         newProdImg ||
         "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=300",
       description:
-        newProdDesc || "Premium quality item listed on REMOGIGS.",
+        newProdDesc || "Premium quality item listed on ESTARR.",
       reviews: [],
     };
 
@@ -123,7 +123,7 @@ export default function MarketplaceSection({
     setNewProdPrice("");
     setNewProdDesc("");
     setNewProdImg("");
-    alert("Listing published successfully! You are now selling on REMOGIGS.");
+    alert("Listing published successfully! You are now selling on ESTARR.");
   };
 
   return (
@@ -140,7 +140,7 @@ export default function MarketplaceSection({
               onClick={() => setIsSellOpen(true)}
               className="bg-[#059669] hover:bg-[#047857] text-white px-5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 cursor-pointer transition-colors shadow-md"
             >
-              <Plus className="w-4 h-4" /> Sell on REMOGIGS
+              <Plus className="w-4 h-4" /> Sell on ESTARR
             </button>
             <button
               id="btn-open-cart"
@@ -163,7 +163,7 @@ export default function MarketplaceSection({
       <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex gap-3 items-start text-xs text-emerald-900">
         <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
         <div>
-          <h4 className="font-bold text-emerald-950">REMOGIGS 100% Escrow Protection Guard</h4>
+          <h4 className="font-bold text-emerald-950">ESTARR 100% Escrow Protection Guard</h4>
           <p className="text-emerald-800 mt-0.5">
             Your money stays securely locked in escrow until the supplier
             delivers your items or completes the service. Upon verification, the
@@ -287,14 +287,14 @@ export default function MarketplaceSection({
       {/* AI recommendation sidebar-integration hook */}
       <div className="bg-slate-950 border border-slate-800 rounded-xl p-6 flex items-start gap-4 shadow-sm">
         <div className="bg-slate-900 text-white p-2.5 rounded-xl font-bold font-mono text-xs">
-          REMOGIGS AI
+          ESTARR AI
         </div>
         <div className="flex-1 flex flex-col gap-2">
           <h4 className="font-display font-bold text-sm text-white">
             Looking for a specific supplier, service, or talent asset?
           </h4>
           <p className="text-xs text-slate-400 leading-relaxed">
-            REMOGIGS AI can suggest local wholesale hubs, estimate bulk pricing,
+            ESTARR AI can suggest local wholesale hubs, estimate bulk pricing,
             analyze importation rates, or write delivery logistics and proposals.
           </p>
           <div className="flex flex-wrap gap-2 mt-1">
@@ -695,7 +695,7 @@ export default function MarketplaceSection({
                           "Bank Transfer",
                           "Debit Card",
                           "Mobile Money",
-                          "REMOGIGS Wallet",
+                          "ESTARR Wallet",
                         ].map((method) => (
                           <button
                             key={method}
@@ -715,7 +715,7 @@ export default function MarketplaceSection({
 
                     <div className="bg-slate-950 border border-slate-800 rounded-xl p-4 text-[11px] text-slate-400">
                       <p className="font-bold mb-1 text-slate-400">
-                        🔒 REMOGIGS Escrow Agreement
+                        🔒 ESTARR Escrow Agreement
                       </p>
                       <p className="leading-relaxed">
                         By placing this order, your payment will be held in a

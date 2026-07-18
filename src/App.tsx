@@ -126,63 +126,63 @@ const currencyRates: Record<string, number> = {
 
 const translations = {
   EN: {
-    heroTitle: "REMOGIGS",
-    heroSubtitle: "Top 3% Talent Pool",
-    allInOne: "Elite Talent & AI Ecosystem",
+    heroTitle: "ESTARR",
+    heroSubtitle: "Top 3% African Remote Gigs & Talent Pool",
+    allInOne: "Elite Remote Gigs & AI Talent Ecosystem",
     askAi: "ASK AI CO-PILOT",
-    intelligence: "REMOGIGS Intelligence",
+    intelligence: "ESTARR Intelligence",
     configureProfile: "Configure Profile",
     noActiveConsultancy: "No active consultancy",
     seedDemo: "Seed Demo Infrastructure",
     createFirst: "Start First Consultancy"
   },
   ES: {
-    heroTitle: "REMOGIGS",
+    heroTitle: "ESTARR",
     heroSubtitle: "Hub de Comercio para Creadores y Pros de TI",
     activeEscrow: "Canal de Escrow Activo",
     secure: "Seguro",
     allInOne: "Protección de Escrow y Ecosistema de Talento IA",
     askAi: "PREGUNTAR AL CO-PILOTO IA",
-    intelligence: "Inteligencia REMOGIGS",
+    intelligence: "Inteligencia ESTARR",
     configureProfile: "Configurar Perfil",
     noActiveConsultancy: "Sin consultoría activa",
     seedDemo: "Sembrar Contratos de Demostración",
     createFirst: "Iniciar Primera Consultoría"
   },
   FR: {
-    heroTitle: "REMOGIGS",
+    heroTitle: "ESTARR",
     heroSubtitle: "Hub de Commerce pour Créateurs & Pros de l'IT",
     activeEscrow: "Pipeline d'Escrow Actif",
     secure: "Sécurisé",
     allInOne: "Protection d'Escrow & Écosystème de Talent IA",
     askAi: "DEMANDER AU CO-PILOTE IA",
-    intelligence: "Intelligence REMOGIGS",
+    intelligence: "Intelligence ESTARR",
     configureProfile: "Configurer le Profil",
     noActiveConsultancy: "Aucune consultation active",
     seedDemo: "Générer les Contrats Démo",
     createFirst: "Lancer la Première Consultation"
   },
   SW: {
-    heroTitle: "REMOGIGS",
+    heroTitle: "ESTARR",
     heroSubtitle: "Kitovu cha Biashara cha IT Pro na Muumba",
     activeEscrow: "Mfumo Amilifu wa Escrow",
     secure: "Salama",
     allInOne: "Ulinzi wa Escrow na Ekolojia ya Talent ya AI",
     askAi: "ULIZA MSAIDIZI WA AI",
-    intelligence: "Akili ya REMOGIGS",
+    intelligence: "Akili ya ESTARR",
     configureProfile: "Sanidi Wasifu",
     noActiveConsultancy: "Hakuna ushauri amilifu",
     seedDemo: "Weka Mikataba ya Demo",
     createFirst: "Anza Ushauri wa Kwanza"
   },
   HI: {
-    heroTitle: "REMOGIGS",
+    heroTitle: "ESTARR",
     heroSubtitle: "आईटी प्रो और क्रिएटर ट्रेड हब",
     activeEscrow: "सक्रिय एस्क्रो पाइपलाइन",
     secure: "सुरक्षित",
     allInOne: "एस्क्रो सुरक्षा और एआई टैलेंट इकोसिस्टम",
     askAi: "एआई को-पायलट से पूछें",
-    intelligence: "REMOGIGS इंटेलिजेंस",
+    intelligence: "ESTARR इंटेलिजेंस",
     configureProfile: "प्रोफ़ाइल कॉन्फ़िगर करें",
     noActiveConsultancy: "कोई सक्रिय परियोजना नहीं",
     seedDemo: "डेमो अनुबंध लोड करें",
@@ -198,7 +198,7 @@ export default function App() {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showVettingModal, setShowVettingModal] = useState(false);
   const [authMode, setAuthMode] = useState<"signin" | "signup">("signin");
-  const [authEmail, setAuthEmail] = useState("chinedu@remogigs.com");
+  const [authEmail, setAuthEmail] = useState("chinedu@estarrapp.com");
   const [authPassword, setAuthPassword] = useState("password123");
   const [authName, setAuthName] = useState("Chinedu Okafor");
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success'>('idle');
@@ -484,7 +484,7 @@ ActivityPost[]>(initialPosts);
         if (provider === "linkedin" || provider === "github") {
           // For this environment, we simulate authentication by updating local state
           // and optionally saving a placeholder profile if needed.
-          const email = oauthUser?.email || `${provider}_user@remogigs.com`;
+          const email = oauthUser?.email || `${provider}_user@estarrapp.com`;
           const name = oauthUser?.name || oauthUser?.login || "OAuth User";
           
           const updatedProfile = {
@@ -591,7 +591,7 @@ ActivityPost[]) => {
   const handleUpdateTasks = async (updatedTasks: ConsultancyTask[]) => {
     const currentUser = auth.currentUser;
     const userEmail = currentUser?.email?.toLowerCase().trim();
-    const isNewUser = currentUser && userEmail !== "chinedu@remogigs.com";
+    const isNewUser = currentUser && userEmail !== "chinedu@estarrapp.com";
     
     const tasksToSave = updatedTasks.map(t => {
       if (isNewUser && !t.userId) {
@@ -709,13 +709,13 @@ ActivityPost[]) => {
   // 24-hour Session Expiry Check
   React.useEffect(() => {
     const checkSessionExpiry = () => {
-      const expiry = localStorage.getItem("remogigs_session_expiry");
+      const expiry = localStorage.getItem("estarr_session_expiry");
       if (expiry && isAuthenticated) {
         if (Date.now() > Number(expiry)) {
           console.log("24-hour session expired. Logging out...");
           firebaseSignOut(auth).then(() => {
-            localStorage.removeItem("remogigs_session_expiry");
-            localStorage.removeItem("remogigs_session_user");
+            localStorage.removeItem("estarr_session_expiry");
+            localStorage.removeItem("estarr_session_user");
             setActiveTab("home");
             alert("🔒 Your secure 24-hour session has expired. You have been automatically logged out for security.");
           }).catch(err => console.error("Error signing out after expiry:", err));
@@ -819,7 +819,7 @@ ActivityPost>("posts", initialPosts);
     return () => unsubscribe();
   }, []);
 
-  // REMOGIGS AI Drawer State
+  // ESTARR AI Drawer State
   const [isAiOpen, setIsAiOpen] = useState(false);
   const [showAiFloat, setShowAiFloat] = useState(true);
   const [aiPrompt, setAiPrompt] = useState("");
@@ -996,9 +996,9 @@ ActivityPost>("posts", initialPosts);
       }
       if (staySignedIn24h) {
         const expiryTime = Date.now() + 24 * 60 * 60 * 1000;
-        localStorage.setItem("remogigs_session_expiry", expiryTime.toString());
+        localStorage.setItem("estarr_session_expiry", expiryTime.toString());
       } else {
-        localStorage.removeItem("remogigs_session_expiry");
+        localStorage.removeItem("estarr_session_expiry");
       }
       setShowAuthModal(false);
     } catch (error: any) {
@@ -1031,7 +1031,7 @@ ActivityPost>("posts", initialPosts);
       title: "Intelligence & Insights Hub",
       items: [
         { id: "home", label: "Home", desc: "Digital ecosystem overview", icon: Home },
-        { id: "ai-lab", label: "REMOGIGS AI Lab", desc: "Train, Validate & Evaluate Models", icon: BrainCircuit },
+        { id: "ai-lab", label: "ESTARR AI Lab", desc: "Train, Validate & Evaluate Models", icon: BrainCircuit },
         { id: "ai-vetting", label: "AI Vetting Center", desc: "Interactive proctored assessments", icon: ShieldCheck },
         { id: "portfolio", label: "Talent Portfolios", desc: "Showcase skills & consultancy", icon: Briefcase },
       ]
@@ -1054,7 +1054,7 @@ ActivityPost>("posts", initialPosts);
       title: "Network & Social Ecosystem",
       items: [
         { id: "connect", label: "Peer Connect", desc: "Professional network & peers", icon: Users },
-        { id: "community", label: "RemoGigs Community", desc: "Cohorts & discussion boards", icon: Heart },
+        { id: "community", label: "Estarr Community", desc: "Cohorts & discussion boards", icon: Heart },
         { id: "events", label: "Live Events", desc: "Masterclasses & ticketing", icon: Calendar },
       ]
     },
@@ -1259,7 +1259,7 @@ ActivityPost>("posts", initialPosts);
                     <path d="M100 45L112.5 83.5H153L120.25 107.5L132.75 146L100 122L67.25 146L79.75 107.5L47 83.5H87.5L100 45Z" fill="white" />
                   </svg>
                   <div>
-                    <h1 className="font-display font-black text-lg tracking-tight text-slate-900 leading-none">REMOGIGS</h1>
+                    <h1 className="font-display font-black text-lg tracking-tight text-slate-900 leading-none">ESTARR</h1>
                     <p className="text-[10px] text-purple-600 font-bold tracking-wide mt-0.5">Hiring Portal</p>
                   </div>
                 </div>
@@ -1297,7 +1297,7 @@ ActivityPost>("posts", initialPosts);
 
                 {/* Blue Banner Notice - Screenshot 2 Style */}
                 <div className="bg-[#EBF3FC] border-l-4 border-[#0066FF] text-[#001A4E] p-4 rounded-r-xl text-[11px] md:text-xs leading-relaxed mb-6 font-medium">
-                  Thanks for your interest in hiring through REMOGIGS! Before we get started, we'd like to ask a few questions to better understand your business needs.
+                  Thanks for your interest in hiring through ESTARR! Before we get started, we'd like to ask a few questions to better understand your business needs.
                 </div>
 
                 {/* Wizard Title */}
@@ -1392,7 +1392,7 @@ ActivityPost>("posts", initialPosts);
                       <path d="M100 45L112.5 83.5H153L120.25 107.5L132.75 146L100 122L67.25 146L79.75 107.5L47 83.5H87.5L100 45Z" fill="white" />
                     </svg>
                     <div>
-                      <h1 className="font-display font-black text-lg tracking-tight text-slate-900 leading-none">REMOGIGS</h1>
+                      <h1 className="font-display font-black text-lg tracking-tight text-slate-900 leading-none">ESTARR</h1>
                       <p className="text-[10px] text-purple-600 font-bold tracking-wide mt-0.5">Talent Networks</p>
                     </div>
                   </div>
@@ -1402,7 +1402,7 @@ ActivityPost>("posts", initialPosts);
                     Apply to Join the World's Top Talent Network
                   </h2>
                   <p className="text-slate-500 text-[11px] leading-relaxed mb-6">
-                    REMOGIGS is an exclusive network of the world's top talent in business, design, marketing, and technology. We provide access to top companies, a community of experts, and resources that can help accelerate your career.
+                    ESTARR is an exclusive network of the world's top talent in business, design, marketing, and technology. We provide access to top companies, a community of experts, and resources that can help accelerate your career.
                   </p>
 
                   {/* Sign Up with LinkedIn */}
@@ -1416,7 +1416,7 @@ ActivityPost>("posts", initialPosts);
                   </button>
 
                   <div className="text-[10px] text-slate-400 text-center mt-2 mb-4 italic">
-                    By clicking <span className="font-semibold">Sign up with LinkedIn</span>, you agree to let REMOGIGS store your LinkedIn profile
+                    By clicking <span className="font-semibold">Sign up with LinkedIn</span>, you agree to let ESTARR store your LinkedIn profile
                   </div>
 
                   {/* Divider */}
@@ -1569,7 +1569,7 @@ ActivityPost>("posts", initialPosts);
                     </div>
 
                     <div className="text-[10px] text-slate-500 leading-relaxed mt-2">
-                      By submitting, you acknowledge and agree to REMOGIGS's <span className="text-purple-600 hover:underline cursor-pointer">Terms and Conditions</span> and <span className="text-purple-600 hover:underline cursor-pointer">Privacy Policy</span>.
+                      By submitting, you acknowledge and agree to ESTARR's <span className="text-purple-600 hover:underline cursor-pointer">Terms and Conditions</span> and <span className="text-purple-600 hover:underline cursor-pointer">Privacy Policy</span>.
                     </div>
 
                     <button
@@ -1587,7 +1587,7 @@ ActivityPost>("posts", initialPosts);
                           <span>Applying...</span>
                         </>
                       ) : (
-                        "Apply to Join REMOGIGS"
+                        "Apply to Join ESTARR"
                       )}
                     </button>
                   </form>
@@ -1645,7 +1645,7 @@ ActivityPost>("posts", initialPosts);
                       <path d="M100 45L112.5 83.5H153L120.25 107.5L132.75 146L100 122L67.25 146L79.75 107.5L47 83.5H87.5L100 45Z" fill="white" className="transition-transform duration-700 origin-center group-hover:scale-110 group-hover:rotate-[144deg]" />
                     </svg>
                   </div>
-                  <h1 className="font-display font-bold text-xl tracking-tight mt-2 text-slate-900">REMOGIGS</h1>
+                  <h1 className="font-display font-bold text-xl tracking-tight mt-2 text-slate-900">ESTARR</h1>
                   <p className="text-[11px] text-purple-600 font-bold tracking-wide mt-0.5">
                     {authAccountType === "jobOwner" ? "Hiring Portal" : "Talent Networks"}
                   </p>
@@ -1748,7 +1748,7 @@ ActivityPost>("posts", initialPosts);
                         type="email"
                         required
                         disabled={isAuthLoading}
-                        placeholder="chinedu@remogigs.com"
+                        placeholder="chinedu@estarrapp.com"
                         value={authEmail}
                         onChange={(e) => setAuthEmail(e.target.value)}
                         className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-3 py-2 focus:outline-none focus:bg-slate-50 text-slate-900 font-medium disabled:opacity-60"
@@ -1833,7 +1833,7 @@ ActivityPost>("posts", initialPosts);
                       </>
                     ) : (
                       authMode === "signin" 
-                        ? "Sign In to REMOGIGS" 
+                        ? "Sign In to ESTARR" 
                         : (authAccountType === "jobOwner" ? "Complete & Match Talent" : "Create Account")
                     )}
                   </button>
@@ -1896,7 +1896,7 @@ ActivityPost>("posts", initialPosts);
                 <div className="mt-6 pt-5 border-t border-slate-100 flex gap-3 items-start text-[10px] text-slate-500 bg-slate-50/50 -mx-6 px-6 -mb-6 rounded-b-xl pb-6">
                   <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
                   <div>
-                    <h4 className="font-bold text-slate-900 uppercase tracking-tight">REMOGIGS 100% Escrow Protection Guard</h4>
+                    <h4 className="font-bold text-slate-900 uppercase tracking-tight">ESTARR 100% Escrow Protection Guard</h4>
                     <p className="text-slate-500 mt-1 leading-relaxed">
                       Your money stays securely locked in escrow until the supplier
                       delivers your items or completes the service. Upon verification, the
@@ -1935,7 +1935,7 @@ ActivityPost>("posts", initialPosts);
             </svg>
           </div>
           <div>
-            <h1 className="font-display font-bold text-xs sm:text-sm md:text-base uppercase tracking-tight text-white leading-tight">REMOGIGS</h1>
+            <h1 className="font-display font-bold text-xs sm:text-sm md:text-base uppercase tracking-tight text-white leading-tight">ESTARR</h1>
             <p className="hidden sm:block text-[10px] text-slate-400 font-medium tracking-wide font-bold">{translations[globalLanguage].heroSubtitle}</p>
           </div>
         </button>
@@ -1993,7 +1993,7 @@ ActivityPost>("posts", initialPosts);
             >
               <BrainCircuit className="w-3 h-3" />
               <span className="flex items-center gap-1">
-                REMOGIGS AI Lab
+                ESTARR AI Lab
               </span>
             </button>
 
@@ -2278,7 +2278,7 @@ ActivityPost>("posts", initialPosts);
           <div className={`flex flex-col gap-2 border-b pb-3 mb-1 ${sidebarStyles[sidebarTheme].borderClass}`}>
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-mono font-bold uppercase tracking-widest">
-                REMOGIGS ECOSYSTEM
+                ESTARR ECOSYSTEM
               </span>
               <span className={`text-[9px] font-mono font-bold tracking-wider px-2 py-0.5 rounded-full bg-[#E9D5FF] text-[#7E22CE]`}>
                 13 MODULES
@@ -2464,7 +2464,7 @@ ActivityPost>("posts", initialPosts);
             <PaymentsSection 
               userProfile={userProfile}
               onUpdateProfile={handleUpdateProfile}
-              isNewAccount={isAuthenticated && userProfile.email?.toLowerCase().trim() !== "chinedu@remogigs.com"} 
+              isNewAccount={isAuthenticated && userProfile.email?.toLowerCase().trim() !== "chinedu@estarrapp.com"} 
             />
           )}
 
@@ -2539,7 +2539,7 @@ ActivityPost>("posts", initialPosts);
             <div className={`flex flex-col gap-2 border-b pb-3 mb-1 ${sidebarStyles[sidebarTheme].borderClass}`}>
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-mono font-bold uppercase tracking-widest">
-                  REMOGIGS ECOSYSTEM
+                  ESTARR ECOSYSTEM
                 </span>
                 <button 
                   onClick={() => setIsMobileMenuOpen(false)}
@@ -2666,7 +2666,7 @@ ActivityPost>("posts", initialPosts);
             <div>
               <div className="flex justify-between items-center mb-6 pb-4 border-b-2 border-slate-200">
                 <h3 className="font-display font-bold text-lg text-slate-900 flex items-center gap-2 uppercase tracking-tight">
-                  <Settings className="w-5 h-5 text-purple-500" /> Configure REMOGIGS Profile
+                  <Settings className="w-5 h-5 text-purple-500" /> Configure ESTARR Profile
                 </h3>
                 <button
                   type="button"
@@ -2920,7 +2920,7 @@ ActivityPost>("posts", initialPosts);
             <button onClick={() => setActiveTab("help-docs")} className="hover:text-indigo-400 transition-colors uppercase cursor-pointer">Help & Documentation</button>
           </div>
           <div className="text-[10px] text-center md:text-right font-mono tracking-widest uppercase opacity-50">
-            REMOGIGS • SSLABS 2026 ALL RIGHTS RESERVED • 100% OFF-CHAIN SECURED ECOSYSTEM
+            ESTARR • SSLABS 2026 ALL RIGHTS RESERVED • 100% OFF-CHAIN SECURED ECOSYSTEM
           </div>
         </div>
       </footer>

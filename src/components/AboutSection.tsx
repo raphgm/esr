@@ -5,12 +5,12 @@ export function AboutSection() {
     <div className="flex flex-col gap-6 animate-fade-in">
       <div className="p-8 border border-slate-200 bg-white shadow-sm hover:shadow-md transition-shadow rounded-xl">
         <h2 className="text-3xl font-bold uppercase tracking-tight text-slate-900 mb-6">
-          About REMOGIGS
+          About ESTARR
         </h2>
         <div className="grid md:grid-cols-2 gap-12">
           <div>
             <p className="text-sm font-medium leading-relaxed text-slate-700 mb-6">
-              REMOGIGS is dedicated to empowering professional growth through practical digital ecosystems. We build bridges between learning and earning, transforming theoretical knowledge into sustainable professional success.
+              ESTARR is dedicated to empowering professional growth through practical digital ecosystems. We build bridges between learning and earning, transforming theoretical knowledge into sustainable professional success.
             </p>
             <p className="text-sm font-medium leading-relaxed text-slate-700">
               Our vision is to cultivate a trusted network of verified professionals, merchants, and learners, facilitating secure commerce and enterprise-level consultancy coordination globally.

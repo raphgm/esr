@@ -122,7 +122,7 @@ export function ServicesCarousel({ onSelect, isAuthenticated, onAuthRequest }: S
       icon: Award,
       badge: "42 CLASSES LIVE",
       color: "bg-blue-50 text-blue-600 border-blue-100 group-hover:bg-blue-600 group-hover:text-white",
-      stats: "REMOGIGS Certified",
+      stats: "ESTARR Certified",
       accent: "#3B82F6"
     },
     {
@@ -157,7 +157,7 @@ export function ServicesCarousel({ onSelect, isAuthenticated, onAuthRequest }: S
     },
     {
       id: "community",
-      label: "RemoGigs Community",
+      label: "Estarr Community",
       desc: "Collaborative learning cohorts, group boards, and peer discussion hubs for scaling talent.",
       icon: Heart,
       badge: "COHORTS IN SESSION",
@@ -714,7 +714,7 @@ export function ServicesCarousel({ onSelect, isAuthenticated, onAuthRequest }: S
                   <div className="bg-emerald-50 border border-emerald-100 p-4 rounded-xl text-center text-xs text-emerald-800 font-bold flex flex-col items-center justify-center gap-1.5 animate-scale-in">
                     <CheckSquare className="w-6 h-6 text-emerald-600 animate-bounce" />
                     <span>Proposal transmitted directly to {selectedPartner.name}!</span>
-                    <p className="text-[10px] text-emerald-600 font-normal">Our escrow router generated transaction hash: <span className="font-mono">tx_remogigs_{Math.random().toString(36).substring(3, 10)}</span></p>
+                    <p className="text-[10px] text-emerald-600 font-normal">Our escrow router generated transaction hash: <span className="font-mono">tx_estarr_{Math.random().toString(36).substring(3, 10)}</span></p>
                   </div>
                 ) : (
                   <form onSubmit={handleSendPitch} className="space-y-3">

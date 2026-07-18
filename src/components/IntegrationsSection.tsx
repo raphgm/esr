@@ -65,7 +65,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({ userPr
   const [webhooks, setWebhooks] = useState([
     {
       id: "wh-1",
-      url: "https://api.mycompany.com/v1/remogigs-webhooks",
+      url: "https://api.mycompany.com/v1/estarr-webhooks",
       events: ["applicant.vetted", "escrow.funded"],
       status: "active",
       secret: "whsec_99a88b77c66d"
@@ -88,7 +88,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({ userPr
       id: "log-102",
       timestamp: "Just Now",
       event: "applicant.vetted",
-      url: "https://api.mycompany.com/v1/remogigs-webhooks",
+      url: "https://api.mycompany.com/v1/estarr-webhooks",
       status: 200,
       payload: JSON.stringify({
         event: "applicant.vetted",
@@ -109,7 +109,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({ userPr
       id: "log-101",
       timestamp: "5 mins ago",
       event: "escrow.funded",
-      url: "https://api.mycompany.com/v1/remogigs-webhooks",
+      url: "https://api.mycompany.com/v1/estarr-webhooks",
       status: 200,
       payload: JSON.stringify({
         event: "escrow.funded",
@@ -135,7 +135,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({ userPr
       icon: Slack,
       accent: "from-pink-500 to-amber-500",
       connected: true,
-      config: { channel: "#remogigs-talent-feed", events: ["Applicant Verified", "Contract Funded"] }
+      config: { channel: "#estarr-talent-feed", events: ["Applicant Verified", "Contract Funded"] }
     },
     {
       id: "github",
@@ -149,7 +149,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({ userPr
     {
       id: "jira",
       name: "Jira Taskmaster",
-      desc: "Synchronize approved REMOGIGS IT consultancy tasks as issues in your Jira boards, tracking milestones and automating status syncing upon escrow disbursements.",
+      desc: "Synchronize approved ESTARR IT consultancy tasks as issues in your Jira boards, tracking milestones and automating status syncing upon escrow disbursements.",
       icon: Blocks,
       accent: "from-blue-600 to-indigo-500",
       connected: false,
@@ -176,7 +176,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({ userPr
 
   // API Playground / Sandbox state
   const [sandboxEndpoint, setSandboxEndpoint] = useState<string>("GET /api/v1/talent/list");
-  const [sandboxResponse, setSandboxResponse] = useState<string>("// Select an endpoint and click 'Send Request' to query the REMOGIGS REST API.");
+  const [sandboxResponse, setSandboxResponse] = useState<string>("// Select an endpoint and click 'Send Request' to query the ESTARR REST API.");
   const [isSandboxLoading, setIsSandboxLoading] = useState(false);
   const [sandboxVariables, setSandboxVariables] = useState({
     limit: "5",
@@ -306,7 +306,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({ userPr
       event: eventName,
       timestamp: new Date().toISOString(),
       livemode: false,
-      data: payloadData[eventName] || { info: "Simulated REMOGIGS webhook packet" }
+      data: payloadData[eventName] || { info: "Simulated ESTARR webhook packet" }
     };
 
     const wh = webhooks.find(w => w.url === endpointUrl);
@@ -319,7 +319,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({ userPr
       url: endpointUrl,
       status: 0,
       payload: JSON.stringify(simPayload, null, 2),
-      response: "Dispatching payload through REMOGIGS Webhook Gateway..."
+      response: "Dispatching payload through ESTARR Webhook Gateway..."
     };
     
     setWebhookLogs(prev => [dispatchingLog, ...prev]);
@@ -419,7 +419,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({ userPr
   // Real API Gateway Sandbox runner
   const handleRunSandbox = async () => {
     setIsSandboxLoading(true);
-    setSandboxResponse("// Routing secure pipeline...\n// Dispatched. Querying REMOGIGS Gateway Router...");
+    setSandboxResponse("// Routing secure pipeline...\n// Dispatched. Querying ESTARR Gateway Router...");
 
     try {
       let url = "";
@@ -449,8 +449,8 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({ userPr
       setSandboxResponse(JSON.stringify({
         headers: {
           "Content-Type": "application/json",
-          "X-RemoGigs-Server-Time": new Date().toISOString(),
-          "Server": "REMOGIGS-Gateway/4.11.0",
+          "X-Estarr-Server-Time": new Date().toISOString(),
+          "Server": "ESTARR-Gateway/4.11.0",
           "X-RateLimit-Limit": 1000,
           "X-RateLimit-Remaining": 998
         },
@@ -492,9 +492,9 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({ userPr
     const sizeStr = badgeSize === "small" ? "90px" : badgeSize === "medium" ? "120px" : "150px";
     const typeStr = badgeType;
 
-    return `<!-- REMOGIGS Verified Expert Badge -->
-<div id="remogigs-badge" data-theme="${themeStr}" data-type="${typeStr}" style="width: ${sizeStr}; display: inline-block;">
-  <a href="https://remogigs.com/verify/${userProfile?.email ? encodeURIComponent(userProfile.email) : "expert"}" target="_blank" rel="noopener noreferrer">
+    return `<!-- ESTARR Verified Expert Badge -->
+<div id="estarr-badge" data-theme="${themeStr}" data-type="${typeStr}" style="width: ${sizeStr}; display: inline-block;">
+  <a href="https://estarrapp.com/verify/${userProfile?.email ? encodeURIComponent(userProfile.email) : "expert"}" target="_blank" rel="noopener noreferrer">
     <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: auto;">
       <defs>
         <linearGradient id="badgeGrad-${themeStr}" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -507,7 +507,7 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({ userPr
       <rect width="200" height="200" rx="40" fill="url(#badgeGrad-${themeStr})" />
       <path d="M100 40 L112.5 78.5 H153 L120.25 102.5 L132.75 141 L100 117 L67.25 141 L79.75 102.5 L47 78.5 H87.5 L100 40 Z" fill="white" />
       <text x="100" y="172" fill="white" font-family="system-ui, sans-serif" font-size="14" font-weight="900" letter-spacing="1.5" text-anchor="middle">
-        ${typeStr === "client" ? "REMOGIGS CLIENT" : "VERIFIED EXPERT"}
+        ${typeStr === "client" ? "ESTARR CLIENT" : "VERIFIED EXPERT"}
       </text>
       <circle cx="100" cy="100" r="85" fill="none" stroke="white" stroke-width="1.5" stroke-dasharray="8 8" opacity="0.35" />
     </svg>
@@ -519,9 +519,9 @@ export const IntegrationsSection: React.FC<IntegrationsSectionProps> = ({ userPr
   const codeSnippets = {
     node: `const axios = require('axios');
 
-// Initialize the REMOGIGS Client
-const remogigs = axios.create({
-  baseURL: 'https://api.remogigs.com/v1',
+// Initialize the ESTARR Client
+const estarr = axios.create({
+  baseURL: 'https://api.estarrapp.com/v1',
   headers: {
     'Authorization': 'Bearer ${apiKey}',
     'Content-Type': 'application/json'
@@ -531,7 +531,7 @@ const remogigs = axios.create({
 // Fetch Top Verified Vetted Developers
 async function getVerifiedTalent() {
   try {
-    const response = await remogigs.get('/talent/list', {
+    const response = await estarr.get('/talent/list', {
       params: {
         role: '${sandboxVariables.role}',
         limit: ${sandboxVariables.limit},
@@ -561,7 +561,7 @@ params = {
 }
 
 # Request verified talent list
-url = "https://api.remogigs.com/v1/talent/list"
+url = "https://api.estarrapp.com/v1/talent/list"
 response = requests.get(url, headers=headers, params=params)
 
 if response.status_code == 200:
@@ -570,7 +570,7 @@ if response.status_code == 200:
 else:
     print(f"Error {response.status_code}: {response.text}")`,
 
-    curl: `curl -X GET "https://api.remogigs.com/v1/talent/list?role=${encodeURIComponent(sandboxVariables.role)}&limit=${sandboxVariables.limit}&vettedOnly=true" \\
+    curl: `curl -X GET "https://api.estarrapp.com/v1/talent/list?role=${encodeURIComponent(sandboxVariables.role)}&limit=${sandboxVariables.limit}&vettedOnly=true" \\
   -H "Authorization: Bearer ${apiKey}" \\
   -H "Content-Type: application/json"`,
 
@@ -585,7 +585,7 @@ import (
 )
 
 func main() {
-	baseURL := "https://api.remogigs.com/v1/talent/list"
+	baseURL := "https://api.estarrapp.com/v1/talent/list"
 	params := url.Values{}
 	params.Add("role", "${sandboxVariables.role}")
 	params.Add("limit", "${sandboxVariables.limit}")
@@ -605,7 +605,7 @@ func main() {
 	defer resp.Body.Close()
 
 	body, _ := io.ReadAll(resp.Body)
-	fmt.Println("REMOGIGS API Response status:", resp.Status)
+	fmt.Println("ESTARR API Response status:", resp.Status)
 	fmt.Println("Payload JSON:", string(body))
 }`
   };
@@ -613,9 +613,9 @@ func main() {
   return (
     <div className="flex flex-col gap-6 animate-fade-in">
       <PageBanner
-        title="REMOGIGS Integrations"
+        title="ESTARR Integrations"
         subtitle="Ecosystem Gateway"
-        description="Bridge your local systems with REMOGIGS's vetting pipelines. Synchronize developers into ATS profiles, dispatch Slack alerts for escrow achievements, and trigger real-time webhooks on candidate qualifications."
+        description="Bridge your local systems with ESTARR's vetting pipelines. Synchronize developers into ATS profiles, dispatch Slack alerts for escrow achievements, and trigger real-time webhooks on candidate qualifications."
         icon={Blocks}
       />
 
@@ -771,7 +771,7 @@ func main() {
                             </div>
                             <div>
                               <h3 className="font-bold text-slate-900 text-sm">{app.name}</h3>
-                              <span className="text-[10px] font-mono text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full font-bold">REMOGIGS SDK</span>
+                              <span className="text-[10px] font-mono text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full font-bold">ESTARR SDK</span>
                             </div>
                           </div>
                           
@@ -871,7 +871,7 @@ func main() {
 
                             {app.id === "github" && (
                               <div className="flex flex-col gap-2">
-                                <p className="text-[10px] text-slate-500 leading-relaxed">Connect your organization to automatically verify public repositories, sync developers' contribution metrics, and issue REMOGIGS verified badges to candidate profiles.</p>
+                                <p className="text-[10px] text-slate-500 leading-relaxed">Connect your organization to automatically verify public repositories, sync developers' contribution metrics, and issue ESTARR verified badges to candidate profiles.</p>
                                 <div className="flex gap-2">
                                   <input
                                     type="text"
@@ -1088,7 +1088,7 @@ func main() {
                         <input
                           type="url"
                           required
-                          placeholder="https://yourserver.com/webhooks/remogigs"
+                          placeholder="https://yourserver.com/webhooks/estarr"
                           value={newWebhookUrl}
                           onChange={(e) => setNewWebhookUrl(e.target.value)}
                           className="bg-white border border-slate-200 px-3 py-2 text-slate-800 rounded-lg focus:outline-none focus:border-purple-500 font-mono text-[11px]"
@@ -1210,7 +1210,7 @@ func main() {
 
                 <div className="bg-slate-950 text-slate-300 rounded-xl p-4 border border-slate-900 font-mono text-[11px] leading-relaxed shadow-inner">
                   <div className="flex items-center justify-between border-b border-slate-900 pb-2 mb-2.5">
-                    <span className="text-purple-400 font-bold">📡 REMOGIGS EVENT_BUS TERMINAL</span>
+                    <span className="text-purple-400 font-bold">📡 ESTARR EVENT_BUS TERMINAL</span>
                     <span className="text-[9px] text-slate-500 bg-slate-900 px-2 py-0.5 rounded">STATUS: LISTENING</span>
                   </div>
 
@@ -1264,8 +1264,8 @@ func main() {
               className="flex flex-col gap-6"
             >
               <div>
-                <h2 className="text-xl font-black tracking-tight text-slate-900">Verifiable REMOGIGS Trust Badge</h2>
-                <p className="text-xs text-slate-500 mt-1">Configure and embed a secure verification badge on your corporate website, greenhouse dashboard, or IT portfolio page to display real-time REMOGIGS authentication status.</p>
+                <h2 className="text-xl font-black tracking-tight text-slate-900">Verifiable ESTARR Trust Badge</h2>
+                <p className="text-xs text-slate-500 mt-1">Configure and embed a secure verification badge on your corporate website, greenhouse dashboard, or IT portfolio page to display real-time ESTARR authentication status.</p>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -1373,7 +1373,7 @@ func main() {
                         <rect width="200" height="200" rx="40" fill="url(#badgeGrad-preview)" />
                         <path d="M100 40 L112.5 78.5 H153 L120.25 102.5 L132.75 141 L100 117 L67.25 141 L79.75 102.5 L47 78.5 H87.5 L100 40 Z" fill="white" />
                         <text x="100" y="172" fill="white" fontFamily="system-ui, sans-serif" fontSize="14" fontWeight="900" letterSpacing="1.5" textAnchor="middle">
-                          {badgeType === "client" ? "REMOGIGS CLIENT" : "VERIFIED EXPERT"}
+                          {badgeType === "client" ? "ESTARR CLIENT" : "VERIFIED EXPERT"}
                         </text>
                         <circle cx="100" cy="100" r="85" fill="none" stroke="white" strokeWidth="1.5" strokeDasharray="8 8" opacity="0.35" />
                       </svg>
@@ -1429,7 +1429,7 @@ func main() {
             >
               <div>
                 <h2 className="text-xl font-black tracking-tight text-slate-900">Interactive API Sandbox Playground</h2>
-                <p className="text-xs text-slate-500 mt-1">Interrogate the REMOGIGS platform directly inside our secure sandbox environment. Configure variables, submit requests, and watch our test system deliver live response payloads.</p>
+                <p className="text-xs text-slate-500 mt-1">Interrogate the ESTARR platform directly inside our secure sandbox environment. Configure variables, submit requests, and watch our test system deliver live response payloads.</p>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -1528,7 +1528,7 @@ func main() {
 
                   <div className="bg-slate-950 text-slate-300 rounded-xl p-4 border border-slate-900 font-mono text-[11px] leading-relaxed flex-1 min-h-[300px] flex flex-col">
                     <div className="flex items-center justify-between border-b border-slate-900 pb-2 mb-3 shrink-0">
-                      <span className="text-slate-500 font-bold">⚡ REMOGIGS REST GATEWAY CONSOLE</span>
+                      <span className="text-slate-500 font-bold">⚡ ESTARR REST GATEWAY CONSOLE</span>
                       {isSandboxLoading && <span className="text-amber-500 animate-pulse">● EXECUTING QUERY</span>}
                     </div>
 
@@ -1553,7 +1553,7 @@ func main() {
             >
               <div>
                 <h2 className="text-xl font-black tracking-tight text-slate-900">Developer Quickstart & SDK Guides</h2>
-                <p className="text-xs text-slate-500 mt-1">Copy and paste full integration templates written for Node.js, Python, Go, and pure cURL commands to connect the REMOGIGS API inside your company's server environments.</p>
+                <p className="text-xs text-slate-500 mt-1">Copy and paste full integration templates written for Node.js, Python, Go, and pure cURL commands to connect the ESTARR API inside your company's server environments.</p>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -1580,12 +1580,12 @@ func main() {
 
                   <div className="border border-slate-200 rounded-xl p-4 flex flex-col gap-2 bg-slate-50/30">
                     <h3 className="font-bold text-slate-900 text-xs uppercase tracking-wider text-slate-500">Core Resource Targets</h3>
-                    <a href="https://docs.remogigs.com" target="_blank" rel="noreferrer" className="flex items-center justify-between p-2 hover:bg-slate-50 text-slate-800 font-medium text-xs rounded border border-slate-200 cursor-pointer">
+                    <a href="https://docs.estarrapp.com" target="_blank" rel="noreferrer" className="flex items-center justify-between p-2 hover:bg-slate-50 text-slate-800 font-medium text-xs rounded border border-slate-200 cursor-pointer">
                       <span>Full REST API Docs</span>
                       <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
                     </a>
-                    <a href="https://github.com/remogigs/remogigs-node-sdk" target="_blank" rel="noreferrer" className="flex items-center justify-between p-2 hover:bg-slate-50 text-slate-800 font-medium text-xs rounded border border-slate-200 cursor-pointer">
-                      <span>REMOGIGS Node Github</span>
+                    <a href="https://github.com/estarr/estarr-node-sdk" target="_blank" rel="noreferrer" className="flex items-center justify-between p-2 hover:bg-slate-50 text-slate-800 font-medium text-xs rounded border border-slate-200 cursor-pointer">
+                      <span>ESTARR Node Github</span>
                       <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
                     </a>
                   </div>

@@ -9,7 +9,7 @@ export default function EventsSection() {
   const events = [
     {
       id: 1,
-      title: "REMOGIGS DevCon 2026",
+      title: "ESTARR DevCon 2026",
       type: "hybrid",
       date: "August 12-14, 2026",
       location: "Lagos, NG & Online",
@@ -45,7 +45,7 @@ export default function EventsSection() {
   return (
     <div className="flex flex-col gap-6 animate-fade-in">
       <PageBanner
-        title="REMOGIGS Events"
+        title="ESTARR Events"
         subtitle="LIVE STREAMS & TICKETING"
         description="Host masterclasses, participate in community events, and manage ticketing."
         icon={Calendar}

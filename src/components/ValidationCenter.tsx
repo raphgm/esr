@@ -176,7 +176,7 @@ export const ValidationCenter: React.FC<ValidationCenterProps> = ({ userProfile 
           </div>
           <div className="relative z-10 max-w-xl">
              <h2 className="text-3xl font-display font-black mb-4 tracking-tight">RLHF Validation Center</h2>
-             <p className="text-slate-300 text-lg leading-relaxed">Participate in Reinforcement Learning from Human Feedback. Compare model outputs, rate quality, and earn REMOGIGS points for improving AI accuracy.</p>
+             <p className="text-slate-300 text-lg leading-relaxed">Participate in Reinforcement Learning from Human Feedback. Compare model outputs, rate quality, and earn ESTARR points for improving AI accuracy.</p>
           </div>
           <div className="relative z-10 flex gap-4 w-full md:w-auto">
              <div className="flex-1 md:flex-none bg-[#1c2333] p-6 rounded-2xl border border-[#263045] text-center min-w-[140px] shadow-inner">

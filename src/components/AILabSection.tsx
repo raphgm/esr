@@ -47,22 +47,22 @@ export const AILabSection: React.FC<AILabSectionProps> = ({ userProfile, onUpdat
   
   // Real Localized Africa Payments (Paystack Integration) Settings
   const [paymentMode, setPaymentMode] = useState<"simulated" | "paystack">(
-    () => (localStorage.getItem("remogigs_payment_mode") as any) || "simulated"
+    () => (localStorage.getItem("estarr_payment_mode") as any) || "simulated"
   );
   const [paystackPublicKey, setPaystackPublicKey] = useState(
-    () => localStorage.getItem("remogigs_paystack_public_key") || "pk_test_d6a89461d36be8e4548483f1df29606d649cf10e"
+    () => localStorage.getItem("estarr_paystack_public_key") || "pk_test_d6a89461d36be8e4548483f1df29606d649cf10e"
   );
   const [paymentCurrency, setPaymentCurrency] = useState(
-    () => localStorage.getItem("remogigs_payment_currency") || "USD"
+    () => localStorage.getItem("estarr_payment_currency") || "USD"
   );
   const [paymentExchangeRate, setPaymentExchangeRate] = useState(
-    () => localStorage.getItem("remogigs_payment_exchange_rate") || "1"
+    () => localStorage.getItem("estarr_payment_exchange_rate") || "1"
   );
   const [showConfig, setShowConfig] = useState(false);
   
   // Developer Gate Key lock states for Africa Payment Gateway & Accelerator
   const [isDevUnlocked, setIsDevUnlocked] = useState<boolean>(() => {
-    return localStorage.getItem("remogigs_developer_unlocked") === "true";
+    return localStorage.getItem("estarr_developer_unlocked") === "true";
   });
   const [developerInputKey, setDeveloperInputKey] = useState("");
   const [devUnlockError, setDevUnlockError] = useState("");
@@ -137,20 +137,20 @@ export const AILabSection: React.FC<AILabSectionProps> = ({ userProfile, onUpdat
       if (result.status && result.data) {
         setResolvedAccountName(result.data.account_name);
       } else {
-        setResolvedAccountName("REMOGIGS VERIFIED BUILDER");
+        setResolvedAccountName("ESTARR VERIFIED BUILDER");
       }
     } catch (e) {
-      setResolvedAccountName("REMOGIGS VERIFIED BUILDER");
+      setResolvedAccountName("ESTARR VERIFIED BUILDER");
     } finally {
       setIsResolvingAccount(false);
     }
   };
 
   const handleSavePaymentConfig = () => {
-    localStorage.setItem("remogigs_payment_mode", paymentMode);
-    localStorage.setItem("remogigs_paystack_public_key", paystackPublicKey);
-    localStorage.setItem("remogigs_payment_currency", paymentCurrency);
-    localStorage.setItem("remogigs_payment_exchange_rate", paymentExchangeRate);
+    localStorage.setItem("estarr_payment_mode", paymentMode);
+    localStorage.setItem("estarr_paystack_public_key", paystackPublicKey);
+    localStorage.setItem("estarr_payment_currency", paymentCurrency);
+    localStorage.setItem("estarr_payment_exchange_rate", paymentExchangeRate);
     setShowConfig(false);
   };
 
@@ -187,7 +187,7 @@ export const AILabSection: React.FC<AILabSectionProps> = ({ userProfile, onUpdat
         email: options.email,
         amount: finalAmountSubunits,
         currency: currency,
-        ref: 'remogigs_' + Math.floor((Math.random() * 1000000000) + 1),
+        ref: 'estarr_' + Math.floor((Math.random() * 1000000000) + 1),
         metadata: {
           custom_fields: [
             {
@@ -310,7 +310,7 @@ export const AILabSection: React.FC<AILabSectionProps> = ({ userProfile, onUpdat
     {
       id: "hit-001",
       title: "Evaluate LLM Response Helpfulness (RLHF)",
-      requester: "REMOGIGS Labs",
+      requester: "ESTARR Labs",
       reward: 1.50,
       baseRate: 1.00,
       bonus: 0.50,
@@ -381,7 +381,7 @@ export const AILabSection: React.FC<AILabSectionProps> = ({ userProfile, onUpdat
     {
       id: "hit-005",
       title: "Developer Experience Tech Stack Poll",
-      requester: "REMOGIGS Research",
+      requester: "ESTARR Research",
       reward: 2.00,
       baseRate: 1.50,
       bonus: 0.50,
@@ -432,7 +432,7 @@ export const AILabSection: React.FC<AILabSectionProps> = ({ userProfile, onUpdat
     {
       id: "hit-008",
       title: "LLM Trainer - Agent Function call",
-      requester: "REMOGIGS Labs",
+      requester: "ESTARR Labs",
       reward: 150.00,
       baseRate: 150.00,
       bonus: 0.00,
@@ -483,7 +483,7 @@ export const AILabSection: React.FC<AILabSectionProps> = ({ userProfile, onUpdat
     {
       id: "hit-011",
       title: "Software Engineer - AI Code Evaluation & Benchmarking (US candidates only)",
-      requester: "REMOGIGS Labs",
+      requester: "ESTARR Labs",
       reward: 250.00,
       baseRate: 200.00,
       bonus: 50.00,
@@ -756,7 +756,7 @@ export const AILabSection: React.FC<AILabSectionProps> = ({ userProfile, onUpdat
       <div className="mb-2 mt-4">
         <h1 className="text-3xl font-black text-slate-900 mb-6 font-display uppercase tracking-tight">Explore roles</h1>
 
-        {/* REMOGIGS Fast-Track Income Accelerator */}
+        {/* ESTARR Fast-Track Income Accelerator */}
         <div className="bg-gradient-to-r from-purple-900/10 via-indigo-900/5 to-slate-900/5 border border-purple-200/60 p-6 rounded-2xl relative overflow-hidden shadow-3xs mb-8">
           <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
             <Rocket className="w-48 h-48 text-purple-600" />
@@ -778,7 +778,7 @@ export const AILabSection: React.FC<AILabSectionProps> = ({ userProfile, onUpdat
                     </span>
                   </div>
                   <h2 className="text-xl font-black text-slate-900 tracking-tight uppercase font-display">
-                    REMOGIGS Fast-Track Earning Accelerator
+                    ESTARR Fast-Track Earning Accelerator
                   </h2>
                   <p className="text-xs font-medium text-slate-500 mt-0.5 font-sans">
                     Africa Paystack Local Currency Gateway & Integration Hub is protected by administrative passkeys.
@@ -819,7 +819,7 @@ export const AILabSection: React.FC<AILabSectionProps> = ({ userProfile, onUpdat
                     <div className="flex gap-2">
                       <input
                         type="password"
-                        placeholder="e.g. REMOGIGS-GATE-2026"
+                        placeholder="e.g. ESTARR-GATE-2026"
                         value={developerInputKey}
                         onChange={(e) => {
                           setDeveloperInputKey(e.target.value);
@@ -829,9 +829,9 @@ export const AILabSection: React.FC<AILabSectionProps> = ({ userProfile, onUpdat
                       />
                       <button
                         onClick={() => {
-                          const activeKey = localStorage.getItem("remogigs_developer_key") || "REMOGIGS-GATE-2026";
+                          const activeKey = localStorage.getItem("estarr_developer_key") || "ESTARR-GATE-2026";
                           if (developerInputKey.trim().toUpperCase() === activeKey.trim().toUpperCase()) {
-                            localStorage.setItem("remogigs_developer_unlocked", "true");
+                            localStorage.setItem("estarr_developer_unlocked", "true");
                             setIsDevUnlocked(true);
                             setDevUnlockError("");
                             import("canvas-confetti").then((m) => {
@@ -870,7 +870,7 @@ export const AILabSection: React.FC<AILabSectionProps> = ({ userProfile, onUpdat
                     {((userProfile.email || "").trim().toLowerCase() === "raphdafemomoh@gmail.com" || 
                       (userProfile.email || "").trim().toLowerCase() === "rdgabmomoh@gmail.com" ||
                       userProfile.role === "Administrator" || 
-                      (localStorage.getItem("remogigs_user_role") === "Administrator")) && (
+                      (localStorage.getItem("estarr_user_role") === "Administrator")) && (
                       <div className="bg-purple-50 border border-purple-200 p-3 rounded-xl flex flex-col items-center gap-1.5 animate-pulse mt-1">
                         <span className="text-[9px] font-black uppercase text-purple-700 flex items-center gap-1 font-sans">
                           👑 Admin Privileges Detected
@@ -880,9 +880,9 @@ export const AILabSection: React.FC<AILabSectionProps> = ({ userProfile, onUpdat
                         </p>
                         <button
                           onClick={() => {
-                            const activeKey = localStorage.getItem("remogigs_developer_key") || "REMOGIGS-GATE-2026";
+                            const activeKey = localStorage.getItem("estarr_developer_key") || "ESTARR-GATE-2026";
                             setDeveloperInputKey(activeKey);
-                            localStorage.setItem("remogigs_developer_unlocked", "true");
+                            localStorage.setItem("estarr_developer_unlocked", "true");
                             setIsDevUnlocked(true);
                             setDevUnlockError("");
                             import("canvas-confetti").then((m) => {
@@ -923,7 +923,7 @@ export const AILabSection: React.FC<AILabSectionProps> = ({ userProfile, onUpdat
                     </span>
                   </div>
                   <h2 className="text-xl font-black text-slate-900 tracking-tight uppercase font-display">
-                    REMOGIGS Fast-Track Earning Accelerator
+                    ESTARR Fast-Track Earning Accelerator
                   </h2>
                   <p className="text-xs font-medium text-slate-500 mt-0.5">
                     Onboard live micro-contracts & digital licensing. Seamlessly switch to Paystack checkout to collect real card & mobile money payments in Africa.
@@ -956,7 +956,7 @@ export const AILabSection: React.FC<AILabSectionProps> = ({ userProfile, onUpdat
 
                   <button
                     onClick={() => {
-                      localStorage.removeItem("remogigs_developer_unlocked");
+                      localStorage.removeItem("estarr_developer_unlocked");
                       setIsDevUnlocked(false);
                       setDeveloperInputKey("");
                       setShowConfig(false);
@@ -1433,7 +1433,7 @@ export const AILabSection: React.FC<AILabSectionProps> = ({ userProfile, onUpdat
                     <div className="max-w-md">
                       <h4 className="text-sm font-black text-emerald-900 uppercase">Evaluation Approved & Credited!</h4>
                       <p className="text-xs text-emerald-700 font-medium mt-1">
-                        Your vetting output was processed through REMOGIGS validation consensus. <strong className="font-bold">+$25.00</strong> and <strong className="font-bold">+250 pts</strong> have been added to your profile balance!
+                        Your vetting output was processed through ESTARR validation consensus. <strong className="font-bold">+$25.00</strong> and <strong className="font-bold">+250 pts</strong> have been added to your profile balance!
                       </p>
                     </div>
                     <button
@@ -1503,7 +1503,7 @@ export const AILabSection: React.FC<AILabSectionProps> = ({ userProfile, onUpdat
                         if (paymentMode === "paystack") {
                           triggerPaystackCheckout({
                             amountUsd: p,
-                            email: userProfile.email || "partner@remogigs.com",
+                            email: userProfile.email || "partner@estarrapp.com",
                             description: `IP License: ${selectedTemplate}`,
                             onSuccess: (ref) => {
                               const buyers = ["Aura Logistics Inc", "Solidity Finance", "NileTech Hubs", "Stripe Africa", "Ventures Africa"];
@@ -1554,7 +1554,7 @@ export const AILabSection: React.FC<AILabSectionProps> = ({ userProfile, onUpdat
                         {licensedInfo.ref && <div><strong className="text-slate-700">Paystack Ref:</strong> {licensedInfo.ref}</div>}
                         <div><strong className="text-slate-700">Status:</strong> SECURELY_SETTLED_PAYSTACK</div>
                         <div className="text-emerald-700 font-bold border-t border-slate-100 pt-1 mt-1 flex justify-between">
-                          <span>REMOGIGS ESCROW Payout:</span>
+                          <span>ESTARR ESCROW Payout:</span>
                           <span>+${licensedInfo.payout} USD</span>
                         </div>
                       </div>
@@ -1656,7 +1656,7 @@ export const AILabSection: React.FC<AILabSectionProps> = ({ userProfile, onUpdat
                           if (paymentMode === "paystack") {
                             triggerPaystackCheckout({
                               amountUsd: val,
-                              email: userProfile.email || "client@remogigs.com",
+                              email: userProfile.email || "client@estarrapp.com",
                               description: `Escrow Lock: ${escrowTitle}`,
                               onSuccess: (ref) => {
                                 setRealTxReference(ref);
@@ -1688,7 +1688,7 @@ export const AILabSection: React.FC<AILabSectionProps> = ({ userProfile, onUpdat
                       <span className="text-xs font-mono font-bold text-purple-600">ID: {simulatedEscrowId}</span>
                     </div>
                     <div className="text-xs text-purple-950 font-medium">
-                      Success! <strong className="font-bold">{escrowClient}</strong> has locked <strong className="font-bold">${parseFloat(escrowAmount).toLocaleString()}</strong> in the secure REMOGIGS Smart Escrow Ledger. {realTxReference && <span>Verified Paystack Reference: <strong>{realTxReference}</strong>.</span>} Deliver your files or report completion to unlock.
+                      Success! <strong className="font-bold">{escrowClient}</strong> has locked <strong className="font-bold">${parseFloat(escrowAmount).toLocaleString()}</strong> in the secure ESTARR Smart Escrow Ledger. {realTxReference && <span>Verified Paystack Reference: <strong>{realTxReference}</strong>.</span>} Deliver your files or report completion to unlock.
                     </div>
                     <button
                       onClick={() => {

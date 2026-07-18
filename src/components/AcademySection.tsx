@@ -286,13 +286,13 @@ export default function AcademySection({
       let feedback = "";
       
       if (isYouTuber) {
-        feedback = `REMOGIGS AI Feedback: Outstanding YouTube script draft! Your initial 3-second hook effectively sparks curiosity. The focus on local Lagos entrepreneurship is highly engaging. Recommendation: Inject 1x clear call-to-action mid-video instead of piling everything at the end.`;
+        feedback = `ESTARR AI Feedback: Outstanding YouTube script draft! Your initial 3-second hook effectively sparks curiosity. The focus on local Lagos entrepreneurship is highly engaging. Recommendation: Inject 1x clear call-to-action mid-video instead of piling everything at the end.`;
       } else if (isWhatsApp) {
-        feedback = `REMOGIGS AI Feedback: Beautiful storefront setup plan! The inclusion of direct payment links and categorized product catalogues makes navigation frictionless for buyers. Recommendation: Ensure your automated greeting includes standard business opening hours.`;
+        feedback = `ESTARR AI Feedback: Beautiful storefront setup plan! The inclusion of direct payment links and categorized product catalogues makes navigation frictionless for buyers. Recommendation: Ensure your automated greeting includes standard business opening hours.`;
       } else if (isTailor) {
-        feedback = `REMOGIGS AI Feedback: Highly precise body measurement record table! Storing critical hip-to-hemline balances will prevent sewing misfits. Recommendation: Double-check the chest tape-measure tightness on dynamic fabric structures.`;
+        feedback = `ESTARR AI Feedback: Highly precise body measurement record table! Storing critical hip-to-hemline balances will prevent sewing misfits. Recommendation: Double-check the chest tape-measure tightness on dynamic fabric structures.`;
       } else {
-        feedback = `REMOGIGS AI Feedback: Tremendous work! Your practical submission aligns perfectly with our module parameters. Your layout is clean, and the milestone objectives are clearly stated.`;
+        feedback = `ESTARR AI Feedback: Tremendous work! Your practical submission aligns perfectly with our module parameters. Your layout is clean, and the milestone objectives are clearly stated.`;
       }
 
       setAiGraderScore(randomScore);
@@ -324,13 +324,13 @@ export default function AcademySection({
         id: `user-post-${Date.now()}`,
         authorName: userProfile.name,
         authorAvatar: userProfile.avatar,
-        authorRole: "REMOGIGS Developer",
+        authorRole: "ESTARR Developer",
         courseTitle: selectedCourse?.title || "Tech Practice",
         content: `Just completed my hands-on mission task: "${submissionText}" for ${selectedCourse?.title}! Earned ${selectedCourse?.missions.find(m => m.id === missionId)?.reward || "100"} points!`,
         likes: 1,
         hasLiked: true,
         comments: [
-          { author: "REMOGIGS AI Grader", content: `Approved with ${randomScore}% score! Excellent job.`, time: "Just now" }
+          { author: "ESTARR AI Grader", content: `Approved with ${randomScore}% score! Excellent job.`, time: "Just now" }
         ],
         time: "Just now",
         verifiedWork: true
@@ -593,7 +593,7 @@ export default function AcademySection({
                 AI Training <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-emerald-200">Space</span>
               </h1>
               <p className="text-sm lg:text-base text-slate-400 leading-relaxed max-w-xl">
-                Master the latest artificial intelligence models, tools, and deployment strategies. Train your skills and earn verified AI capabilities for your REMOGIGS profile.
+                Master the latest artificial intelligence models, tools, and deployment strategies. Train your skills and earn verified AI capabilities for your ESTARR profile.
               </p>
             </div>
 
@@ -606,7 +606,7 @@ export default function AcademySection({
                   </div>
                 </div>
                 <div>
-                  <span className="text-[10px] text-slate-400 font-mono uppercase tracking-wider block mb-1">RemoGigs AI Verified</span>
+                  <span className="text-[10px] text-slate-400 font-mono uppercase tracking-wider block mb-1">Estarr AI Verified</span>
                   <span className="text-lg font-black text-white leading-tight">Advanced AI Training</span>
                 </div>
               </div>
@@ -1098,7 +1098,7 @@ export default function AcademySection({
                     <Briefcase className="w-4 h-4 text-emerald-600" /> Active Gig Multipliers
                   </h4>
                   <p className="text-xs text-slate-500 leading-relaxed">
-                    Complete these classes to unlock direct application slots to the high-paying gigs locked in REMOGIGS escrow.
+                    Complete these classes to unlock direct application slots to the high-paying gigs locked in ESTARR escrow.
                   </p>
 
                   <div className="flex flex-col gap-3">
@@ -1186,7 +1186,7 @@ export default function AcademySection({
                           <span>Verified Node</span>
                         </div>
                         <button
-                          onClick={() => alert(`Sharing credential serial with your REMOGIGS network!`)}
+                          onClick={() => alert(`Sharing credential serial with your ESTARR network!`)}
                           className="bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 cursor-pointer transition-colors border border-slate-800"
                         >
                           <Share2 className="w-3 h-3" /> Share
@@ -1413,7 +1413,7 @@ export default function AcademySection({
                     CBT Classroom Competency Quiz
                   </h3>
                   <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                    Score a flawless 100% on the theoretical evaluation to instantly earn and showcase your official AI credential on REMOGIGS!
+                    Score a flawless 100% on the theoretical evaluation to instantly earn and showcase your official AI credential on ESTARR!
                   </p>
                 </div>
 
@@ -1625,7 +1625,7 @@ export default function AcademySection({
                                   {isGrading && (
                                     <div className="flex items-center gap-2 text-xs font-medium text-emerald-400 bg-emerald-500/10 p-3 rounded-xl border border-emerald-500/20">
                                       <span className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-ping" />
-                                      <span>REMOGIGS AI Grader is evaluating your consultancy layout...</span>
+                                      <span>ESTARR AI Grader is evaluating your consultancy layout...</span>
                                     </div>
                                   )}
 
@@ -1670,7 +1670,7 @@ export default function AcademySection({
                       </div>
                       <div className="flex-1 flex flex-col gap-3">
                         <h4 className="font-bold text-lg text-white">
-                          REMOGIGS AI Tutor
+                          ESTARR AI Tutor
                         </h4>
                         <p className="text-sm text-slate-400 leading-relaxed max-w-2xl">
                           Stuck on draft writing or need visual design inspiration? Ask your AI Tutor to explain this lesson in plain English, write templates, or answer questions.
@@ -1692,7 +1692,7 @@ export default function AcademySection({
                             id="btn-ai-mission"
                             onClick={() =>
                               onOpenAiChat(
-                                `Help me draft a robust layout plan for the REMOGIGS tech mission. Give me a clear structure, checklist of details, and high-converting model example.`,
+                                `Help me draft a robust layout plan for the ESTARR tech mission. Give me a clear structure, checklist of details, and high-converting model example.`,
                                 "academy"
                               )
                             }

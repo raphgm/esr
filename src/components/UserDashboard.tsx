@@ -153,7 +153,7 @@ export function UserDashboard({
 
   const recentMilestones = activeTasks.slice(0, 5);
 
-  // Dynamic REMOGIGS Intelligence & Rate Recommendation Engine
+  // Dynamic ESTARR Intelligence & Rate Recommendation Engine
   const calculateRateStats = () => {
     let baseRate = 75;
     const profession = (userProfile.profession || "Consultant").toLowerCase();
@@ -412,7 +412,7 @@ export function UserDashboard({
             <div className="flex items-center gap-2 mb-3">
               <Sparkles className="w-4 h-4 text-purple-600 animate-pulse" />
               <h2 className="text-xs font-black uppercase tracking-widest text-purple-900">
-                REMOGIGS Intelligence
+                ESTARR Intelligence
               </h2>
             </div>
 
@@ -430,7 +430,7 @@ export function UserDashboard({
             </div>
 
             <p className="text-xs font-medium text-purple-800 leading-relaxed mb-4">
-              Your profile as a <strong className="font-bold">{userProfile.profession || 'Consultant'}</strong> leveraging {rateStats.totalSkillsCount} registered skills is fully operational. REMOGIGS AI analyzed local contract supply and recommends a benchmark target rate of <strong className="font-bold">${rateStats.recommendedRate}/hr</strong>.
+              Your profile as a <strong className="font-bold">{userProfile.profession || 'Consultant'}</strong> leveraging {rateStats.totalSkillsCount} registered skills is fully operational. ESTARR AI analyzed local contract supply and recommends a benchmark target rate of <strong className="font-bold">${rateStats.recommendedRate}/hr</strong>.
             </p>
 
             {rateStats.suggestions.length > 0 && (
@@ -454,7 +454,7 @@ export function UserDashboard({
             <button 
               onClick={() => {
                 if (onOpenAiChat) {
-                  const defaultPrompt = `Hello! My profile as a ${userProfile.profession || 'Consultant'} is operational on REMOGIGS with skills: ${userProfile.skills?.slice(0, 5).join(', ') || 'none listed'}. REMOGIGS Intelligence recommends an hourly rate of $${rateStats.recommendedRate}/hr based on current listings. Can you analyze this portfolio and guide me step-by-step on how to add high-demand skills to unlock higher-paying $120+/hr contracts?`;
+                  const defaultPrompt = `Hello! My profile as a ${userProfile.profession || 'Consultant'} is operational on ESTARR with skills: ${userProfile.skills?.slice(0, 5).join(', ') || 'none listed'}. ESTARR Intelligence recommends an hourly rate of $${rateStats.recommendedRate}/hr based on current listings. Can you analyze this portfolio and guide me step-by-step on how to add high-demand skills to unlock higher-paying $120+/hr contracts?`;
                   onOpenAiChat(defaultPrompt, "portfolio");
                 } else {
                   onNavigate("home");

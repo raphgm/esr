@@ -4,9 +4,9 @@ import { BrainCircuit, Database, Server, Activity } from "lucide-react";
 import { getCollectionData } from "../lib/firebase";
 
 const initialMockModels: AIModel[] = [
-  { id: "m1", name: "REMOGIGS-Vision-v2", type: "Computer Vision", status: "Training", accuracy: "-", latency: "-", cost: "-", createdAt: new Date().toISOString() },
-  { id: "m2", name: "REMOGIGS-Chat-7B", type: "LLM", status: "Deployed", accuracy: "92.4%", latency: "45ms", cost: "$0.001/1K", createdAt: new Date().toISOString() },
-  { id: "m3", name: "REMOGIGS-Embeddings", type: "Text Embeddings", status: "Evaluating", accuracy: "89.1%", latency: "12ms", cost: "$0.0001/1K", createdAt: new Date().toISOString() }
+  { id: "m1", name: "ESTARR-Vision-v2", type: "Computer Vision", status: "Training", accuracy: "-", latency: "-", cost: "-", createdAt: new Date().toISOString() },
+  { id: "m2", name: "ESTARR-Chat-7B", type: "LLM", status: "Deployed", accuracy: "92.4%", latency: "45ms", cost: "$0.001/1K", createdAt: new Date().toISOString() },
+  { id: "m3", name: "ESTARR-Embeddings", type: "Text Embeddings", status: "Evaluating", accuracy: "89.1%", latency: "12ms", cost: "$0.0001/1K", createdAt: new Date().toISOString() }
 ];
 
 interface ModelsWorkspaceProps {
@@ -53,7 +53,7 @@ export const ModelsWorkspace: React.FC<ModelsWorkspaceProps> = ({ userProfile })
                         {model.status}
                       </span>
                     </h3>
-                    <p className="text-sm text-slate-500 font-medium">{model.type} • Owner: REMOGIGS Core</p>
+                    <p className="text-sm text-slate-500 font-medium">{model.type} • Owner: ESTARR Core</p>
                  </div>
                </div>
                <div className="grid grid-cols-3 gap-4 text-center md:text-right">
@@ -87,7 +87,7 @@ export const ModelsWorkspace: React.FC<ModelsWorkspaceProps> = ({ userProfile })
                </h3>
              </div>
              <div className="bg-slate-800/50 border border-slate-700 text-slate-300 text-[10px] font-mono p-2 px-2.5 rounded-lg flex-shrink-1 truncate">
-               REMOGIGS-Vision-v2
+               ESTARR-Vision-v2
              </div>
            </div>
            

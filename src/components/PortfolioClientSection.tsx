@@ -50,7 +50,7 @@ export function PortfolioClientSection({ userProfile, onUpdateProfile }: Portfol
       id: 1,
       name: "Sarah Chen",
       handle: "sarah_dev",
-      email: "sarah.chen@remogigs.com",
+      email: "sarah.chen@estarrapp.com",
       role: "Senior Full Stack Engineer",
       location: "San Francisco, CA",
       rate: "$120/hr",
@@ -71,7 +71,7 @@ export function PortfolioClientSection({ userProfile, onUpdateProfile }: Portfol
       ],
       history: [
         { desc: "Deployed v2.0 of Cloud Native Serverless Proxy Router", date: "Jul 08" },
-        { desc: "Completed Milestone 'Front-End Migration' for client RemoGigs", date: "Jun 30" },
+        { desc: "Completed Milestone 'Front-End Migration' for client Estarr", date: "Jun 30" },
         { desc: "Awarded High Endorsement score in React/TypeScript expertise", date: "May 15" }
       ]
     },
@@ -79,7 +79,7 @@ export function PortfolioClientSection({ userProfile, onUpdateProfile }: Portfol
       id: 2,
       name: "Marcus Johnson",
       handle: "marcus_ai",
-      email: "marcus.j@remogigs.com",
+      email: "marcus.j@estarrapp.com",
       role: "AI Integration Specialist",
       location: "London, UK",
       rate: "$150/hr",
@@ -108,7 +108,7 @@ export function PortfolioClientSection({ userProfile, onUpdateProfile }: Portfol
       id: 3,
       name: "Elena Rodriguez",
       handle: "elena_ux",
-      email: "elena.r@remogigs.com",
+      email: "elena.r@estarrapp.com",
       role: "UX/UI Designer",
       location: "Madrid, ES",
       rate: "$95/hr",
@@ -123,12 +123,12 @@ export function PortfolioClientSection({ userProfile, onUpdateProfile }: Portfol
         "Lead Product Designer - Madrid Tech Institute"
       ],
       portfolio: [
-        { id: "p3-1", title: "REMOGIGS Platform Responsive Visual Guild", url: "https://figma.com", category: "Design System", views: 8400, likes: 3200 },
+        { id: "p3-1", title: "ESTARR Platform Responsive Visual Guild", url: "https://figma.com", category: "Design System", views: 8400, likes: 3200 },
         { id: "p3-2", title: "Cryptocurrency Wallet Micro-Interactions", url: "https://figma.com", category: "UI Motion", views: 3800, likes: 1450 },
         { id: "p3-3", title: "Gig Economy User Persona Research Guide", url: "https://figma.com", category: "UX Research", views: 1950, likes: 745 }
       ],
       history: [
-        { desc: "Designed full responsive redesign of REMOGIGS dashboard", date: "Jul 10" },
+        { desc: "Designed full responsive redesign of ESTARR dashboard", date: "Jul 10" },
         { desc: "Published comprehensive research paper on remote designer workflows", date: "Jun 24" }
       ]
     },
@@ -136,7 +136,7 @@ export function PortfolioClientSection({ userProfile, onUpdateProfile }: Portfol
       id: 4,
       name: "David Kim",
       handle: "david_ops",
-      email: "david.k@remogigs.com",
+      email: "david.k@estarrapp.com",
       role: "DevOps Architect",
       location: "Austin, TX",
       rate: "$130/hr",
@@ -163,7 +163,7 @@ export function PortfolioClientSection({ userProfile, onUpdateProfile }: Portfol
       id: 5,
       name: "Priya Patel",
       handle: "priya_app",
-      email: "priya.p@remogigs.com",
+      email: "priya.p@estarrapp.com",
       role: "Mobile App Developer",
       location: "Toronto, CA",
       rate: "$110/hr",
@@ -247,7 +247,7 @@ export function PortfolioClientSection({ userProfile, onUpdateProfile }: Portfol
           id: txId,
           type: "receive" as const,
           amount: amt,
-          sender: userProfile.name || userProfile.email || "REMOGIGS Client",
+          sender: userProfile.name || userProfile.email || "ESTARR Client",
           date: dateStr,
           status: "completed" as const,
           description: paymentDesc || `Direct deposit: ${paymentDesc}`
@@ -410,7 +410,7 @@ export function PortfolioClientSection({ userProfile, onUpdateProfile }: Portfol
                 {/* Cover Pattern & Close */}
                 <div className="h-32 bg-gradient-to-r from-indigo-900 via-purple-950 to-slate-950 relative z-0 flex items-center justify-between px-6">
                   <span className="text-[10px] font-mono font-bold tracking-widest text-indigo-400 uppercase">
-                    REMOGIGS VERIFIED PARTNER PROGRAM
+                    ESTARR VERIFIED PARTNER PROGRAM
                   </span>
                   <button 
                     onClick={() => setSelectedTalent(null)}

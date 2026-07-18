@@ -135,7 +135,7 @@ const vettedCandidates = [
 const interviewWorkflow = [
   {
     step: 1,
-    question: "Hello, welcome to your REMOGIGS AI Cognitive Vetting. I am Maya, your Lead AI Technical Interviewer. Let's start with system design. Describe how you would handle an API key usage limit with a distributed caching architecture under 100,000 requests per second. Write out some sample pseudocode or logic.",
+    question: "Hello, welcome to your ESTARR AI Cognitive Vetting. I am Maya, your Lead AI Technical Interviewer. Let's start with system design. Describe how you would handle an API key usage limit with a distributed caching architecture under 100,000 requests per second. Write out some sample pseudocode or logic.",
     expectedTopic: "Redis, token bucket, rate limiting, system design"
   },
   {
@@ -342,7 +342,7 @@ function fetchBalance(userId) {
   // Code Auditor Handler
   const handleInitiateAudit = async () => {
     setIsAuditing(true);
-    setAuditLogs(["[Initializing] REMOGIGS AI Vetting Proctor Node..."]);
+    setAuditLogs(["[Initializing] ESTARR AI Vetting Proctor Node..."]);
     setAuditReport(null);
 
     const logs = [
@@ -440,7 +440,7 @@ function fetchBalance(userId) {
               <Sparkles className="w-3.5 h-3.5 text-purple-400 animate-pulse" /> Interactive Vetting Engine
             </div>
             <h1 className="text-3xl font-black tracking-tight font-display bg-gradient-to-r from-white via-purple-100 to-purple-300 bg-clip-text text-transparent">
-              REMOGIGS AI Vetting Center
+              ESTARR AI Vetting Center
             </h1>
             <p className="text-slate-400 text-xs sm:text-sm max-w-2xl leading-relaxed">
               Based on the vetted pipelines of <strong className="text-purple-300 font-bold">micro1.ai</strong>. We execute complete mathematical and technical benchmarking on cognitive logic, code accuracy, and speech telemetry.
@@ -1020,7 +1020,7 @@ function fetchBalance(userId) {
                           <InterviewScheduler
                             token={null}
                             candidateName={selectedCandidate.name}
-                            candidateEmail={`${selectedCandidate.name.toLowerCase().replace(/\s+/g, '')}@remogigs.com`}
+                            candidateEmail={`${selectedCandidate.name.toLowerCase().replace(/\s+/g, '')}@estarrapp.com`}
                           />
                         </div>
                       )}
@@ -1062,7 +1062,7 @@ export function SocketWidget() {
   const [data, setData] = useState([]);
   
   useEffect(() => {
-    const ws = new WebSocket("wss://api.remogigs.com/feed");
+    const ws = new WebSocket("wss://api.estarrapp.com/feed");
     ws.onmessage = (e) => setData(e.data);
     
     // Missing websocket cleanup socket.close()!

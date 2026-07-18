@@ -58,14 +58,14 @@ export default function GigsSection({ userProfile, onOpenAiChat, initialCategory
     {
       id: "gig-priority-pro",
       title: "IT Pro & Creator Priority: Hire Top-Tier Skilled Pros for Tech & Content Setup",
-      sellerName: "REMOGIGS IT & Creator Hub",
+      sellerName: "ESTARR IT & Creator Hub",
       sellerAvatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150",
       sellerRating: 5.0,
       reviewsCount: 128,
       deliveryDays: 3,
       price: 45,
       category: "Writing & Content",
-      description: "REMOGIGS is built to ensure IT pros and creators can monetize their talents efficiently and reliably across the continent. By selecting IT Pro & Creator Priority, you get matched instantly with top-tier skilled pros who handle your media kits, technical deployment, escrow configuration, and direct partner pitching.",
+      description: "ESTARR is built to ensure IT pros and creators can monetize their talents efficiently and reliably across the continent. By selecting IT Pro & Creator Priority, you get matched instantly with top-tier skilled pros who handle your media kits, technical deployment, escrow configuration, and direct partner pitching.",
       features: [
         "IT Pro & Creator Priority Fast-Track onboarding",
         "Strategic sponsor pitch & tech contract template setup",
@@ -178,7 +178,7 @@ export default function GigsSection({ userProfile, onOpenAiChat, initialCategory
     {
       id: "gig-train-1",
       title: "I will provide high-precision RLHF & SFT data for LLM training",
-      sellerName: "REMOGIGS AI Labs",
+      sellerName: "ESTARR AI Labs",
       sellerAvatar: "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?auto=format&fit=crop&q=80&w=150",
       sellerRating: 5.0,
       reviewsCount: 412,
@@ -254,7 +254,7 @@ export default function GigsSection({ userProfile, onOpenAiChat, initialCategory
   // Escrow Hiring Flow states
   const [hiringStep, setHiringStep] = useState<"details" | "requirements" | "payment" | "success">("details");
   const [clientRequirements, setClientRequirements] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("REMOGIGS Wallet");
+  const [paymentMethod, setPaymentMethod] = useState("ESTARR Wallet");
 
   // Create Gig states
   const [newTitle, setNewTitle] = useState("");
@@ -375,8 +375,8 @@ export default function GigsSection({ userProfile, onOpenAiChat, initialCategory
     <div className="flex flex-col gap-6 animate-fade-in text-slate-800">
       <PageBanner
         title={<span className="whitespace-nowrap">ELITE TALENT NODES</span>}
-        subtitle="REMOGIGS AI & Creative Ops Marketplace"
-        description="Hire skilled Gen Z creators and vocational experts, or sell your own skills as structured gigs. All orders are backed by REMOGIGS 100% Escrow Protection—payment stays safe until delivery is confirmed."
+        subtitle="ESTARR AI & Creative Ops Marketplace"
+        description="Hire skilled Gen Z creators and vocational experts, or sell your own skills as structured gigs. All orders are backed by ESTARR 100% Escrow Protection—payment stays safe until delivery is confirmed."
         icon={Briefcase}
         actions={
           <div className="flex flex-wrap gap-2">
@@ -389,7 +389,7 @@ export default function GigsSection({ userProfile, onOpenAiChat, initialCategory
             <button
               onClick={() => {
                 onOpenAiChat(
-                  "Explain how the REMOGIGS Gig Escrow Protection workflow ensures that professionals get paid on time and clients get their files safely.",
+                  "Explain how the ESTARR Gig Escrow Protection workflow ensures that professionals get paid on time and clients get their files safely.",
                   "general"
                 );
               }}
@@ -433,7 +433,7 @@ export default function GigsSection({ userProfile, onOpenAiChat, initialCategory
             <div className="flex items-center gap-1.5">
               <Sparkles className="w-4 h-4 text-purple-500 animate-pulse" />
               <span className="text-[10px] font-mono font-bold text-purple-700 uppercase tracking-wider">
-                REMOGIGS AI Gig Builder
+                ESTARR AI Gig Builder
               </span>
             </div>
             <h4 className="font-display font-bold text-xs text-slate-800 leading-tight">
@@ -593,7 +593,7 @@ export default function GigsSection({ userProfile, onOpenAiChat, initialCategory
                             </span>
                             {gig.verified && (
                               <span className="text-[8px] font-mono font-extrabold text-emerald-600 flex items-center gap-0.5 uppercase tracking-wider">
-                                <Award className="w-2.5 h-2.5" /> REMOGIGS Certified
+                                <Award className="w-2.5 h-2.5" /> ESTARR Certified
                               </span>
                             )}
                           </div>
@@ -634,7 +634,7 @@ export default function GigsSection({ userProfile, onOpenAiChat, initialCategory
                           <div className="relative group/tooltip inline-block">
                             <HelpCircle className="w-3.5 h-3.5 text-slate-400 hover:text-purple-600 transition-colors cursor-help" />
                             <div className="absolute right-0 bottom-full mb-2 hidden group-hover/tooltip:block w-48 bg-slate-900 text-white text-[10px] p-2.5 rounded-lg shadow-xl border border-slate-800 font-normal leading-normal text-left z-50 whitespace-normal">
-                              Payments are securely held in the REMOGIGS Escrow Protection system until delivery is verified.
+                              Payments are securely held in the ESTARR Escrow Protection system until delivery is verified.
                               <div className="absolute top-full right-1.5 -mt-1 w-2 h-2 bg-slate-900 rotate-45 border-r border-b border-slate-800"></div>
                             </div>
                           </div>
@@ -681,7 +681,7 @@ export default function GigsSection({ userProfile, onOpenAiChat, initialCategory
                   ⚙️ Service Publish Workspace
                 </span>
                 <h3 className="font-display font-bold text-xl text-slate-900 mt-2">
-                  List Your Gig on REMOGIGS
+                  List Your Gig on ESTARR
                 </h3>
                 <p className="text-xs text-slate-500 mt-1">
                   Put your vocational talents or digital skills to work. Fill out the blueprint to begin receiving direct Escrow orders.
@@ -909,7 +909,7 @@ export default function GigsSection({ userProfile, onOpenAiChat, initialCategory
                       Fund Escrow Contract
                     </h3>
                     <p className="text-xs text-slate-500 mt-1">
-                      Your funds will be stored safely in an REMOGIGS Escrow vault. Only released once the work is delivered and you click verify.
+                      Your funds will be stored safely in an ESTARR Escrow vault. Only released once the work is delivered and you click verify.
                     </p>
                   </div>
 
@@ -935,14 +935,14 @@ export default function GigsSection({ userProfile, onOpenAiChat, initialCategory
                       <div className="grid grid-cols-2 gap-3">
                         <button
                           type="button"
-                          onClick={() => setPaymentMethod("REMOGIGS Wallet")}
+                          onClick={() => setPaymentMethod("ESTARR Wallet")}
                           className={`p-3 rounded-xl border text-left flex flex-col justify-between transition-all cursor-pointer ${
-                            paymentMethod === "REMOGIGS Wallet"
+                            paymentMethod === "ESTARR Wallet"
                               ? "border-purple-600 bg-purple-50/50"
                               : "border-slate-200 hover:bg-slate-50"
                           }`}
                         >
-                          <span className="font-bold text-slate-800 block">REMOGIGS Wallet</span>
+                          <span className="font-bold text-slate-800 block">ESTARR Wallet</span>
                           <span className="text-[10px] font-mono font-bold text-slate-500 mt-1 block">
                             Bal: $0.00
                           </span>
@@ -968,7 +968,7 @@ export default function GigsSection({ userProfile, onOpenAiChat, initialCategory
                     <div className="flex items-start gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200/50">
                       <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
                       <p className="text-[10px] text-slate-500 leading-normal">
-                        Backed by REMOGIGS Corporate Guarantee. In case of dispute, our customer assistance team is available 24/7 to review delivery file iterations.
+                        Backed by ESTARR Corporate Guarantee. In case of dispute, our customer assistance team is available 24/7 to review delivery file iterations.
                       </p>
                     </div>
 

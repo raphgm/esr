@@ -31,7 +31,7 @@ import {
 /* --- DECENTRALIZED ESCROWS SECTION --- */
 export function DecentralizedEscrowsSection() {
   const [escrowAmount, setEscrowAmount] = useState<number>(5000);
-  const [contractorAddress, setContractorAddress] = useState<string>("remogigs-contractor-0x3a2b...f91a");
+  const [contractorAddress, setContractorAddress] = useState<string>("estarr-contractor-0x3a2b...f91a");
   const [simulationStep, setSimulationStep] = useState<number>(0);
   const [simulationLogs, setSimulationLogs] = useState<string[]>([
     "Ready to initialize cryptographic milestone agreement..."
@@ -105,7 +105,7 @@ export function DecentralizedEscrowsSection() {
           Decentralized Escrow Pipeline
         </h1>
         <p className="text-xs text-slate-500 dark:text-slate-400 max-w-3xl leading-relaxed">
-          REMOGIGS safeguards both global clients and elite independent developers with cryptographically secure, multi-sig escrow wallets. Funds are deposited prior to contract execution, locked securely in custom milestone pipelines, and released instantly upon proof-of-work validation.
+          ESTARR safeguards both global clients and elite independent developers with cryptographically secure, multi-sig escrow wallets. Funds are deposited prior to contract execution, locked securely in custom milestone pipelines, and released instantly upon proof-of-work validation.
         </p>
       </div>
 
@@ -269,7 +269,7 @@ export function ProgramGuidelinesSection() {
     },
     {
       title: "3. Diagnostic Sandbox Auditing",
-      desc: "Submit sample code snippets or repositories for real-time automated diagnostic audits. The REMOGIGS audit engine calculates Big-O complexity, evaluates memory footprint, and scans for critical vulnerability vectors.",
+      desc: "Submit sample code snippets or repositories for real-time automated diagnostic audits. The ESTARR audit engine calculates Big-O complexity, evaluates memory footprint, and scans for critical vulnerability vectors.",
       sla: "SLA: Instantaneous",
       tip: "Avoid unhandled exceptions and redundant loops. Write modular code."
     },
@@ -288,10 +288,10 @@ export function ProgramGuidelinesSection() {
           <Award className="w-3.5 h-3.5" /> VERIFICATION CORE
         </span>
         <h1 className="font-display font-black text-2xl md:text-3xl tracking-tight uppercase mt-2 mb-2">
-          REMOGIGS Program Guidelines
+          ESTARR Program Guidelines
         </h1>
         <p className="text-xs text-slate-500 dark:text-slate-400 max-w-3xl leading-relaxed">
-          The REMOGIGS program represents the elite benchmark for global software contractors, designers, and AI engineers. By satisfying rigorous automated assessments and secure peer vetting, members unlock risk-free contracts, higher gig rates, and immediate payouts.
+          The ESTARR program represents the elite benchmark for global software contractors, designers, and AI engineers. By satisfying rigorous automated assessments and secure peer vetting, members unlock risk-free contracts, higher gig rates, and immediate payouts.
         </p>
       </div>
 
@@ -370,7 +370,7 @@ export function EscrowFaqsSection() {
     },
     {
       q: "Are there any gas or transaction fees for escrows?",
-      a: "REMOGIGS operates on zero gas-fee optimization. We subsidize ledger transaction costs behind the scenes. Clients pay a negligible 0.5% escrow security fee upon deposit, and contractors receive 100% of their earnings with zero platform deductions."
+      a: "ESTARR operates on zero gas-fee optimization. We subsidize ledger transaction costs behind the scenes. Clients pay a negligible 0.5% escrow security fee upon deposit, and contractors receive 100% of their earnings with zero platform deductions."
     },
     {
       q: "What digital assets are supported in the escrow wallet?",
@@ -484,7 +484,7 @@ export function ContractorDirectorySection() {
           Contractor Directory
         </h1>
         <p className="text-xs text-slate-500 dark:text-slate-400 max-w-3xl leading-relaxed">
-          Review fully pre-vetted, expert independent developers, design professionals, and fractional consultants of the REMOGIGS elite ecosystem. Directly pitch roles securely.
+          Review fully pre-vetted, expert independent developers, design professionals, and fractional consultants of the ESTARR elite ecosystem. Directly pitch roles securely.
         </p>
       </div>
 
@@ -664,7 +664,7 @@ export function PlatformStatusSection() {
           <Database className="w-3.5 h-3.5" /> DIAGNOSTICS & STATUS
         </span>
         <h1 className="font-display font-black text-2xl md:text-3xl tracking-tight uppercase mt-2 mb-2">
-          REMOGIGS System Health Status
+          ESTARR System Health Status
         </h1>
         <p className="text-xs text-slate-500 dark:text-slate-400 max-w-3xl leading-relaxed">
           Real-time diagnostics and platform status feed for our globally distributed technical validation nodes, compilers, and cryptographic escrow structures.
@@ -741,11 +741,11 @@ export function PlatformStatusSection() {
 /* --- TERMS & CONDITIONS --- */
 export function TermsConditionsSection() {
   const clauses = [
-    { title: "1. Scope of Ecosystem Agreement", content: "By registering an account with REMOGIGS, clients and contractors enter a professional relationship facilitated by decentralized milestone tracking. Platform guidelines mandate absolute cryptographic escrow funding of all active contract milestones prior to assignment commencement. No party shall request work-product dispatch prior to securing equivalent value in the REMOGIGS contract lock." },
+    { title: "1. Scope of Ecosystem Agreement", content: "By registering an account with ESTARR, clients and contractors enter a professional relationship facilitated by decentralized milestone tracking. Platform guidelines mandate absolute cryptographic escrow funding of all active contract milestones prior to assignment commencement. No party shall request work-product dispatch prior to securing equivalent value in the ESTARR contract lock." },
     { title: "2. Cryptographic Escrow & Funding", content: "Clients agree that once a milestone is funded, the locked deposit cannot be unilaterally withdrawn except through mutual contract cancellation or verified non-delivery of work-product. Contractors agree that locked payments are fully released ONLY upon compiling with proof-of-work guidelines, automated diagnostics passing, or Client manual release triggers." },
-    { title: "3. Disbursed Funds and Fees", content: "REMOGIGS facilitates direct wallet-to-wallet disbursements without financial custody. Transactions are facilitated automatically using secure pegged stablecoins or automated credit clearing. A 0.5% escrow security fee is paid by Clients upon funding. Freelance contractors are subject to 0% base commission, retaining 100% of their earned milestone distributions." },
+    { title: "3. Disbursed Funds and Fees", content: "ESTARR facilitates direct wallet-to-wallet disbursements without financial custody. Transactions are facilitated automatically using secure pegged stablecoins or automated credit clearing. A 0.5% escrow security fee is paid by Clients upon funding. Freelance contractors are subject to 0% base commission, retaining 100% of their earned milestone distributions." },
     { title: "4. Intellectual Property & Code Deliverables", content: "Upon cryptographic disbursement approval, intellectual property rights, licenses, and ownership parameters of vetted code snippets, models, and repositories transfer immediately and exclusively to the Client. The contractor guarantees all payloads are free of plagiarism, critical malware, or unannotated copyrighted snippets." },
-    { title: "5. Peer Arbitration", content: "Disputes regarding criteria satisfaction are directed exclusively to the REMOGIGS Decentralized Arbitration Council. Three random, high-reputation members arbitrate the payload deliverables against original milestone specifications. Their majority on-chain vote releases or refunds the escrow deposit. Both parties acknowledge the decision of the Council is legally binding and non-appealable." }
+    { title: "5. Peer Arbitration", content: "Disputes regarding criteria satisfaction are directed exclusively to the ESTARR Decentralized Arbitration Council. Three random, high-reputation members arbitrate the payload deliverables against original milestone specifications. Their majority on-chain vote releases or refunds the escrow deposit. Both parties acknowledge the decision of the Council is legally binding and non-appealable." }
   ];
 
   return (
@@ -758,7 +758,7 @@ export function TermsConditionsSection() {
           Terms & Conditions
         </h1>
         <p className="text-xs text-slate-500 dark:text-slate-400 max-w-3xl leading-relaxed">
-          Please read these standard terms of service carefully. They govern your rights, secure contract rules, multi-sig escrow deposits, and legally binding decentralization arbitrations on the REMOGIGS platform.
+          Please read these standard terms of service carefully. They govern your rights, secure contract rules, multi-sig escrow deposits, and legally binding decentralization arbitrations on the ESTARR platform.
         </p>
       </div>
 
@@ -802,7 +802,7 @@ export function PrivacyCookiesSection() {
           Privacy & Cookies Policy
         </h1>
         <p className="text-xs text-slate-500 dark:text-slate-400 max-w-3xl leading-relaxed">
-          REMOGIGS values your absolute privacy. We anonymize and scrub code repositories, preserve contractor wallet privacy, and comply strictly with GDPR and CCPA benchmarks.
+          ESTARR values your absolute privacy. We anonymize and scrub code repositories, preserve contractor wallet privacy, and comply strictly with GDPR and CCPA benchmarks.
         </p>
       </div>
 
@@ -829,7 +829,7 @@ export function PrivacyCookiesSection() {
         <div className="lg:col-span-4 bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 rounded-2xl p-5 shadow-sm flex flex-col gap-4">
           <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider font-mono">Cookie Preferences</span>
           <p className="text-[11px] text-slate-500 leading-normal">
-            Configure how REMOGIGS handles localized cookie scripts. Necessary items are permanently locked to ensure workspace stability.
+            Configure how ESTARR handles localized cookie scripts. Necessary items are permanently locked to ensure workspace stability.
           </p>
 
           <div className="flex flex-col gap-3 pt-2">
@@ -885,7 +885,7 @@ export function DataCollectionPolicySection() {
           Data Collection Policy
         </h1>
         <p className="text-xs text-slate-500 dark:text-slate-400 max-w-3xl leading-relaxed">
-          REMOGIGS strictly limits technical data collection. Discover how our smart pipelines analyze technical payloads without compromising commercial proprietary source structures.
+          ESTARR strictly limits technical data collection. Discover how our smart pipelines analyze technical payloads without compromising commercial proprietary source structures.
         </p>
       </div>
 
@@ -995,7 +995,7 @@ export function ComplianceAuditsSection() {
       title: "Privacy Diagnostics Auditing",
       auditor: "SOC2 Type II Regulatory Commission",
       date: "March 2026",
-      hash: "SOC2-REMOGIGS-2026",
+      hash: "SOC2-ESTARR-2026",
       score: "SOC2 Compliant Certified",
       details: "Comprehensive operational and platform audit verifying strict workspace isolation, absolute sandbox container termination, and secure encrypted telemetry configurations.",
       checks: [
@@ -1017,7 +1017,7 @@ export function ComplianceAuditsSection() {
           Compliance Audits & Reports
         </h1>
         <p className="text-xs text-slate-500 dark:text-slate-400 max-w-3xl leading-relaxed">
-          REMOGIGS holds itself to the absolute zenith of technical security. Review our physical, operational, smart contract, and cryptographic compliance audits here.
+          ESTARR holds itself to the absolute zenith of technical security. Review our physical, operational, smart contract, and cryptographic compliance audits here.
         </p>
       </div>
 

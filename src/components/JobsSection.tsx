@@ -235,7 +235,7 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile, 
     setTimeout(() => {
       setIsGeneratingPitch(false);
       setGeneratedPitch(
-        `Hi ${job.company} Team,\n\nI'm very interested in the ${job.title} role. Although I'm relatively new to this field, I have recently completed rigorous practical training in the REMOGIGS Academy, including hands-on consultancy directly related to ${job.skillsRequired?.[0] || 'the required skills'}.\n\nI am highly motivated, eager to learn, and ready to deliver value immediately through my strong work ethic and foundational knowledge. Please find my REMOGIGS 'Proof of Work' portfolio attached for a sample of my capabilities.\n\nLooking forward to the opportunity to grow with your team!\n\nBest regards,\n${userProfile.name}`
+        `Hi ${job.company} Team,\n\nI'm very interested in the ${job.title} role. Although I'm relatively new to this field, I have recently completed rigorous practical training in the ESTARR Academy, including hands-on consultancy directly related to ${job.skillsRequired?.[0] || 'the required skills'}.\n\nI am highly motivated, eager to learn, and ready to deliver value immediately through my strong work ethic and foundational knowledge. Please find my ESTARR 'Proof of Work' portfolio attached for a sample of my capabilities.\n\nLooking forward to the opportunity to grow with your team!\n\nBest regards,\n${userProfile.name}`
       );
     }, 1500);
   };
@@ -375,7 +375,7 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile, 
             </div>
             <div>
               <h3 className="text-xl font-bold font-display text-slate-900">AI-Powered Proof-of-Skills Matcher</h3>
-              <p className="text-sm text-slate-500">Evaluate and hire talent based on real consultancy, not resumes. Features formal skills from skill-sch.com and creator skills from REMOGIGS.</p>
+              <p className="text-sm text-slate-500">Evaluate and hire talent based on real consultancy, not resumes. Features formal skills from skill-sch.com and creator skills from ESTARR.</p>
             </div>
           </div>
           
@@ -516,7 +516,7 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile, 
                 </div>
 
                 <div className="bg-white border border-slate-200 rounded-2xl p-5 text-slate-900 mb-6">
-                  <p className="text-[10px] uppercase font-bold tracking-widest text-purple-500 mb-2 font-mono">REMOGIGS Intelligence Insights</p>
+                  <p className="text-[10px] uppercase font-bold tracking-widest text-purple-500 mb-2 font-mono">ESTARR Intelligence Insights</p>
                   <ul className="space-y-2 text-sm">
                     {hasSyncedSkills ? (
                       <>
@@ -729,7 +729,7 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile, 
               </div>
               <div className="flex-1 flex flex-col gap-1.5">
                 <label className="text-[10px] font-bold text-slate-900 uppercase tracking-wide">Company Name</label>
-                <input required type="text" value={newCompany} onChange={e => setNewCompany(e.target.value)} placeholder="e.g. REMOGIGS Tech" className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-sm focus:outline-none focus:border-purple-500" />
+                <input required type="text" value={newCompany} onChange={e => setNewCompany(e.target.value)} placeholder="e.g. ESTARR Tech" className="w-full bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-sm focus:outline-none focus:border-purple-500" />
               </div>
             </div>
             
@@ -817,7 +817,7 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile, 
                     onClick={() => generatePitch(job)}
                     className="bg-indigo-600 text-white px-5 py-2.5 rounded-xl text-xs font-bold hover:bg-indigo-500 transition-all shadow-md shadow-indigo-600/10 flex items-center justify-center gap-1.5 flex-1 md:flex-none"
                   >
-                    Apply via REMOGIGS
+                    Apply via ESTARR
                   </button>
                 </div>
               </div>
@@ -1063,7 +1063,7 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile, 
                     <ShieldCheck className="w-5 h-5 shrink-0 text-blue-650 mt-0.5" />
                     <div>
                       <span className="font-bold block mb-1">Secure Academic Linkage</span>
-                      Synchronizing your skill card from <strong>skill-sch.com</strong> imports accredited qualifications directly into your REMOGIGS verified profile to boost job & gig matching score.
+                      Synchronizing your skill card from <strong>skill-sch.com</strong> imports accredited qualifications directly into your ESTARR verified profile to boost job & gig matching score.
                     </div>
                   </div>
 
@@ -1257,7 +1257,7 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile, 
                 <div className="flex justify-between items-start gap-4 relative z-10">
                   <div>
                     <span className="text-[9px] font-black uppercase tracking-widest text-indigo-300 bg-indigo-950/60 px-2 py-0.5 rounded border border-indigo-800">
-                      🌐 REMOGIGS EXCELLENCE
+                      🌐 ESTARR EXCELLENCE
                     </span>
                     <h4 className="font-display font-black text-lg mt-2 uppercase tracking-tight text-white leading-tight">
                       {selectedShareJob.title}
@@ -1276,7 +1276,7 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile, 
                     Verified Escrow Contract Salary: <strong className="text-emerald-400 font-sans text-xs">{selectedShareJob.salary}</strong>
                   </span>
                   <span className="text-[8px] text-slate-400 font-mono tracking-tighter">
-                    REMOGIGS.WORKSPACE
+                    ESTARR.WORKSPACE
                   </span>
                 </div>
               </div>
@@ -1309,7 +1309,7 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile, 
                   {/* Twitter / X */}
                   <a
                     href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
-                      `Check out this incredible job opening on REMOGIGS: ${selectedShareJob.title} at ${selectedShareJob.company}! 🚀 #REMOGIGS #Web3Jobs`
+                      `Check out this incredible job opening on ESTARR: ${selectedShareJob.title} at ${selectedShareJob.company}! 🚀 #ESTARR #Web3Jobs`
                     )}&url=${encodeURIComponent(
                       selectedShareJob.shareUrl || `${window.location.origin}/jobs?id=${selectedShareJob.id}`
                     )}`}
@@ -1414,7 +1414,7 @@ export function JobsSection({ userProfile, jobs, onUpdateJobs, onUpdateProfile, 
                       const url = selectedShareJob.shareUrl || `${window.location.origin}/jobs?id=${selectedShareJob.id}`;
                       navigator.share({
                         title: selectedShareJob.title,
-                        text: `Apply for ${selectedShareJob.title} at ${selectedShareJob.company} on REMOGIGS Workspace!`,
+                        text: `Apply for ${selectedShareJob.title} at ${selectedShareJob.company} on ESTARR Workspace!`,
                         url: url,
                       }).catch(() => {});
                     }}

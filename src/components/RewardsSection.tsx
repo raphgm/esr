@@ -33,8 +33,8 @@ export function RewardsSection({
   const rewardCatalog = [
     { id: "rw-1", name: "1% Off Escrow Fees", cost: 1000, category: "Fee Discount", desc: "Reduces your next transaction commission to keep more of your hard-earned profits.", icon: ShieldCheck },
     { id: "rw-2", name: "Premium Portfolio Badge", cost: 1500, category: "Profile Flair", desc: "Adds an elite glowing verification crest to your consultant profile.", icon: Award },
-    { id: "rw-3", name: "Exclusive Networking Ticket", cost: 2500, category: "Events", desc: "Pass to the upcoming REMOGIGS digital high-table VIP roundtable event.", icon: Users },
-    { id: "rw-4", name: "1-Hour Strategic Consultation", cost: 3000, category: "Consultancy", desc: "One-on-one strategy session with senior REMOGIGS partners to audit your model.", icon: Gift },
+    { id: "rw-3", name: "Exclusive Networking Ticket", cost: 2500, category: "Events", desc: "Pass to the upcoming ESTARR digital high-table VIP roundtable event.", icon: Users },
+    { id: "rw-4", name: "1-Hour Strategic Consultation", cost: 3000, category: "Consultancy", desc: "One-on-one strategy session with senior ESTARR partners to audit your model.", icon: Gift },
   ];
 
   // Filtering user profile history to find active rewards redemptions
@@ -43,7 +43,7 @@ export function RewardsSection({
 
   const handleCopyLink = () => {
     const userNameClean = userProfile.name?.toLowerCase().replace(/\s+/g, "") || "alex2026";
-    const inviteLink = `remogigs.com/join/r/${userNameClean}`;
+    const inviteLink = `estarrapp.com/join/r/${userNameClean}`;
     navigator.clipboard.writeText(inviteLink);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -131,13 +131,13 @@ export function RewardsSection({
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
           <div>
             <span className="text-[10px] font-mono font-black tracking-widest text-purple-600 uppercase bg-purple-50 px-3 py-1 rounded-full inline-block mb-2">
-              REMOGIGS AMBASSADORS
+              ESTARR AMBASSADORS
             </span>
             <h2 className="text-3xl font-black uppercase tracking-tight text-slate-900 mb-2">
               Ambassadors & Rewards
             </h2>
             <p className="text-sm font-medium text-slate-500 max-w-2xl leading-relaxed">
-              Earn REMOGIGS Points by referring new professionals, completing academy courses, and successfully closing escrow deals. Redeem points for premium features, lower escrow fees, or exclusive networking events.
+              Earn ESTARR Points by referring new professionals, completing academy courses, and successfully closing escrow deals. Redeem points for premium features, lower escrow fees, or exclusive networking events.
             </p>
           </div>
           <div className="flex items-center gap-2 bg-yellow-50 border border-yellow-200 px-4 py-3 rounded-xl max-w-sm">
@@ -207,7 +207,7 @@ export function RewardsSection({
               <div className="text-[10px] font-bold uppercase tracking-wider mb-2 text-slate-400">Your Invite Link</div>
               <div className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 flex justify-between items-center mb-3">
                 <span className="text-xs font-mono text-slate-700 truncate mr-2">
-                  remogigs.com/join/r/{userProfile.name?.toLowerCase().replace(/\s+/g, "") || "alex2026"}
+                  estarrapp.com/join/r/{userProfile.name?.toLowerCase().replace(/\s+/g, "") || "alex2026"}
                 </span>
                 <button 
                   onClick={handleCopyLink}

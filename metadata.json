@@ -1,5 +1,5 @@
 {
-  "name": "RemoGigs",
+  "name": "Estarr",
   "description": "The premium marketplace for remote work, technical gigs, and AI workflows. Connecting the top 3% of IT pros, developers, and AI specialist contractors with secure, milestone-backed contracts.",
   "requestFramePermissions": ["camera", "microphone"],
   "majorCapabilities": [

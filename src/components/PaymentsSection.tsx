@@ -140,7 +140,7 @@ export default function PaymentsSection({ userProfile, onUpdateProfile, isNewAcc
           id: txId,
           type: "receive" as const,
           amount: amountNum,
-          sender: userProfile.name || userProfile.email || "REMOGIGS Member",
+          sender: userProfile.name || userProfile.email || "ESTARR Member",
           date: dateStr,
           status: "completed" as const,
           description: `Transfer from @${userProfile.handle || userProfile.name || "member"}`
@@ -257,7 +257,7 @@ export default function PaymentsSection({ userProfile, onUpdateProfile, isNewAcc
   return (
     <div className="flex flex-col gap-6 animate-fade-in">
       <PageBanner
-        title="REMOGIGS Payments"
+        title="ESTARR Payments"
         subtitle="DIGITAL WALLETS & TRANSFERS"
         description="Secure digital wallets for managing gig income and peer-to-peer transfers."
         icon={Wallet}
@@ -278,7 +278,7 @@ export default function PaymentsSection({ userProfile, onUpdateProfile, isNewAcc
               ${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </h3>
             <p className="text-[10px] text-emerald-400 font-mono mt-3 flex items-center gap-1.5">
-              <ShieldCheck className="w-3.5 h-3.5" /> Insured by REMOGIGS Trust Protocols
+              <ShieldCheck className="w-3.5 h-3.5" /> Insured by ESTARR Trust Protocols
             </p>
           </div>
 
@@ -346,7 +346,7 @@ export default function PaymentsSection({ userProfile, onUpdateProfile, isNewAcc
                     disabled={isTransferLoading}
                     value={transferRecipient}
                     onChange={(e) => setTransferRecipient(e.target.value)}
-                    placeholder="e.g. @chinedu_creates or recipient@remogigs.com"
+                    placeholder="e.g. @chinedu_creates or recipient@estarrapp.com"
                     className="w-full bg-slate-50 border border-slate-200 p-3 text-sm focus:outline-none focus:border-purple-500 focus:bg-white font-medium rounded-lg transition-colors"
                   />
                   <p className="text-[9px] text-slate-400 font-mono italic">

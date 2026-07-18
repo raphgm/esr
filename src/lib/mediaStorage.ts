@@ -1,10 +1,10 @@
 /**
- * REMOGIGS Media Storage Utility
+ * ESTARR Media Storage Utility
  * Manages device-level binary persistence via IndexedDB for videos and photos,
  * and provides client-side image compression to optimize Firestore storage.
  */
 
-const DB_NAME = "RemoGigsMediaDB";
+const DB_NAME = "EstarrMediaDB";
 const STORE_NAME = "media";
 const DB_VERSION = 1;
 
