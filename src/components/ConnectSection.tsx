@@ -801,9 +801,9 @@ export default function ConnectSection({
       id: "user-profile",
       name: userProfile.name,
       email: userProfile.email,
-      profession: userProfile.profession || "ESTARR Member",
+      profession: userProfile.profession || "REMOGIGS Member",
       bio: userProfile.bio,
-      location: userProfile.location || "ESTARR Hub",
+      location: userProfile.location || "REMOGIGS Hub",
       avatar: userProfile.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150",
       skills: userProfile.skills || [],
       interests: userProfile.interests || [],
@@ -946,7 +946,7 @@ export default function ConnectSection({
         author: certifiedStar.name,
         avatar: certifiedStar.avatar,
         role: "Platform Honors",
-        content: `🎓 ESTARR Academy Certified Stars Celebration Wall for ${certifiedStar.name}!`,
+        content: `🎓 REMOGIGS Academy Certified Stars Celebration Wall for ${certifiedStar.name}!`,
         likes: 13,
         comments: [
           ...getCertComments(),
@@ -1033,7 +1033,7 @@ export default function ConnectSection({
         author: certifiedStar.name,
         avatar: certifiedStar.avatar,
         role: "Platform Honors",
-        content: `🎓 ESTARR Academy Certified Stars Celebration Wall for ${certifiedStar.name}!`,
+        content: `🎓 REMOGIGS Academy Certified Stars Celebration Wall for ${certifiedStar.name}!`,
         likes: 12,
         comments: [
           ...getCertComments(),
@@ -1216,7 +1216,7 @@ export default function ConnectSection({
           id: `msg-${Date.now() + 1}`,
           sender: chatPeer.name,
           recipient: "me",
-          text: `Hey there! Thank you for reaching out to me on ESTARR. I've received your message and will review it shortly. Let's build something amazing together!`,
+          text: `Hey there! Thank you for reaching out to me on REMOGIGS. I've received your message and will review it shortly. Let's build something amazing together!`,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         };
         await saveCollectionItem("peer_messages", replyMsg);
@@ -1252,7 +1252,7 @@ export default function ConnectSection({
     return (
       <div id="connect-section" className="flex flex-col gap-6">
         <PageBanner
-          title="ESTARR Professional Hub Setup"
+          title="REMOGIGS Professional Hub Setup"
           subtitle="CONNECT & COLLABORATE"
           description="Grow your professional presence by completing your profile."
           icon={Users}
@@ -1306,9 +1306,9 @@ export default function ConnectSection({
   return (
     <div id="connect-section" className="flex flex-col gap-6">
       <PageBanner
-        title="ESTARR Professional Hub"
+        title="REMOGIGS Professional Hub"
         subtitle="CONNECT & COLLABORATE"
-        description="Grow your professional presence, forge meaningful collaborations, discover mentors, and validate your skills across the ESTARR network."
+        description="Grow your professional presence, forge meaningful collaborations, discover mentors, and validate your skills across the REMOGIGS network."
         icon={Users}
       />
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -1429,7 +1429,7 @@ export default function ConnectSection({
               <div>
                 <h5 className="text-[10px] font-bold text-slate-9000 uppercase tracking-wider mb-2">Popular Hashtags</h5>
                 <div className="flex flex-wrap gap-2">
-                  {["#ESTARR", "#TechTips", "#CreativePreneur", "#BuildInPublic", "#RemoteWork"].map((tag) => (
+                  {["#REMOGIGS", "#TechTips", "#CreativePreneur", "#BuildInPublic", "#RemoteWork"].map((tag) => (
                     <span key={tag} className="text-xs font-medium text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full cursor-pointer hover:bg-emerald-100 transition-colors">
                       {tag}
                     </span>
@@ -1494,7 +1494,7 @@ export default function ConnectSection({
                   }`}
                 >
                   <span className="w-2 h-2 bg-rose-500 rounded-full animate-ping shrink-0" />
-                  🎥 ESTARR TV Shorts / Reels
+                  🎥 REMOGIGS TV Shorts / Reels
                 </button>
               </div>
 
@@ -1784,7 +1784,7 @@ export default function ConnectSection({
                       <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-slate-100">
                         <Video className="w-12 h-12 text-slate-400 mb-4 animate-pulse" />
                         <h4 className="font-bold text-sm text-slate-800 mb-1">No Talent Showcases Yet</h4>
-                        <p className="text-xs text-slate-500 mb-4 leading-relaxed">Be the first to record a tutorial or upload a talent showcase to the ESTARR community!</p>
+                        <p className="text-xs text-slate-500 mb-4 leading-relaxed">Be the first to record a tutorial or upload a talent showcase to the REMOGIGS community!</p>
                         <button
                           type="button"
                           onClick={() => {
@@ -1805,7 +1805,7 @@ export default function ConnectSection({
                       <div>
                         <h4 className="font-display font-bold text-base text-slate-800 flex items-center gap-1.5">
                           <Sparkles className="w-4 h-4 text-amber-500 animate-pulse" />
-                          <span>ESTARR Video Discovery Studio</span>
+                          <span>REMOGIGS Video Discovery Studio</span>
                         </h4>
                       </div>
 
@@ -1942,7 +1942,7 @@ export default function ConnectSection({
                             <div className="bg-purple-50/50 border border-purple-100 rounded-xl p-3 flex flex-col gap-1 text-[10px] text-slate-600">
                               <span className="font-bold text-purple-600 flex items-center gap-1">🧪 Why is this interface viral?</span>
                               <p className="text-slate-600 leading-snug">
-                                **TikTok's full-bleed video** creates total immersion, removing navigation friction. **Background audio tracks** foster collective memes, while **speed manipulation** empowers rapid-paced tutorials. ESTARR leverages this structure to maximize vocational matchmaking and skill discovery.
+                                **TikTok's full-bleed video** creates total immersion, removing navigation friction. **Background audio tracks** foster collective memes, while **speed manipulation** empowers rapid-paced tutorials. REMOGIGS leverages this structure to maximize vocational matchmaking and skill discovery.
                               </p>
                             </div>
                           </div>
@@ -2033,7 +2033,7 @@ export default function ConnectSection({
               ) : (
                 /* Classic Social Feed */
                 <div className="flex flex-col gap-6">
-                  {/* ESTARR Birthday Celebration Hub */}
+                  {/* REMOGIGS Birthday Celebration Hub */}
               <div className="bg-gradient-to-r from-rose-50 to-amber-50 border border-amber-200 rounded-3xl p-6 shadow-sm flex flex-col gap-6 relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
                   <Gift className="w-32 h-32 text-purple-500 animate-pulse" />
@@ -2041,11 +2041,11 @@ export default function ConnectSection({
 
                 <div className="flex flex-col gap-1.5 relative z-10">
                   <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-purple-700 bg-amber-100/50 px-2.5 py-1 rounded-full w-fit">
-                    🍰 ESTARR CONNECT CELEBRATIONS
+                    🍰 REMOGIGS CONNECT CELEBRATIONS
                   </span>
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <h3 className="font-display font-bold text-lg text-slate-800">
-                      ESTARR Birthday Board & Support Network
+                      REMOGIGS Birthday Board & Support Network
                     </h3>
                     <div className="flex items-center gap-1.5 bg-white/80 backdrop-blur-xs border border-amber-200/60 rounded-xl px-2.5 py-1.5 shrink-0 shadow-2xs">
                       <span className="text-[10px] font-bold text-slate-500 font-mono">Select Celebrant:</span>
@@ -2201,7 +2201,7 @@ export default function ConnectSection({
                 </div>
               </div>
 
-              {/* ESTARR Certification Celebration Hub */}
+              {/* REMOGIGS Certification Celebration Hub */}
               <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-3xl p-6 shadow-sm flex flex-col gap-6 relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
                   <Award className="w-32 h-32 text-emerald-600 animate-pulse" />
@@ -2209,11 +2209,11 @@ export default function ConnectSection({
 
                 <div className="flex flex-col gap-1.5 relative z-10">
                   <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-emerald-700 bg-emerald-100/50 px-2.5 py-1 rounded-full w-fit">
-                    🎓 ESTARR ACADEMY HONORS
+                    🎓 REMOGIGS ACADEMY HONORS
                   </span>
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <h3 className="font-display font-bold text-lg text-slate-800">
-                      ESTARR Certification Board & Support Network
+                      REMOGIGS Certification Board & Support Network
                     </h3>
                     <div className="flex items-center gap-1.5 bg-white/80 backdrop-blur-xs border border-emerald-200/60 rounded-xl px-2.5 py-1.5 shrink-0 shadow-2xs">
                       <span className="text-[10px] font-bold text-slate-500 font-mono">Select Champion:</span>
@@ -2270,7 +2270,7 @@ export default function ConnectSection({
                             <div className="min-w-0">
                               <span className="text-[9px] font-mono font-bold uppercase tracking-wider text-emerald-700 block">Passed Certification</span>
                               <span className="text-xs font-semibold text-slate-800 block truncate">
-                                {certifiedStar.certifications?.[0] || "ESTARR Professional Certificate"}
+                                {certifiedStar.certifications?.[0] || "REMOGIGS Professional Certificate"}
                               </span>
                             </div>
                           </div>
@@ -2343,7 +2343,7 @@ export default function ConnectSection({
                                   {grad.name}
                                 </span>
                                 <span className="text-[9px] text-emerald-600 font-semibold block">
-                                  {grad.certifications?.[0] || "ESTARR Graduate"}
+                                  {grad.certifications?.[0] || "REMOGIGS Graduate"}
                                 </span>
                               </div>
                             </div>
@@ -3038,7 +3038,7 @@ export default function ConnectSection({
                             id="btn-mentor-accept"
                             onClick={() =>
                               alert(
-                                `Connection requested! ESTARR AI will notify ${selectedMentor.name}.`,
+                                `Connection requested! REMOGIGS AI will notify ${selectedMentor.name}.`,
                               )
                             }
                             className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-1.5 rounded-xl text-xs font-semibold cursor-pointer transition-colors"
@@ -3098,7 +3098,7 @@ export default function ConnectSection({
                     <UserCheck className="w-6 h-6" />
                   </div>
                   <h4 className="font-display font-bold text-base text-slate-800">
-                    Become a ESTARR Pioneer Mentor
+                    Become a REMOGIGS Pioneer Mentor
                   </h4>
                   <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
                     Have you successfully built a small business or talent? Join
@@ -3110,7 +3110,7 @@ export default function ConnectSection({
                     id="btn-register-mentor"
                     onClick={() =>
                       alert(
-                        "Successfully added to the ESTARR Mentor registry! Peers can now discover you.",
+                        "Successfully added to the REMOGIGS Mentor registry! Peers can now discover you.",
                       )
                     }
                     className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-xl text-xs font-semibold cursor-pointer transition-all mt-2"
@@ -3132,7 +3132,7 @@ export default function ConnectSection({
             <div className="flex items-center justify-between p-6 border-b border-slate-100 bg-slate-50/50">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-emerald-500 rounded-full animate-pulse" />
-                <h3 className="font-display font-bold text-lg text-slate-800">ESTARR Creation Studio</h3>
+                <h3 className="font-display font-bold text-lg text-slate-800">REMOGIGS Creation Studio</h3>
               </div>
               <button
                 type="button"
@@ -3614,7 +3614,7 @@ export default function ConnectSection({
                     <ShieldCheck className="w-5 h-5 shrink-0 text-blue-650 mt-0.5" />
                     <div>
                       <span className="font-bold block mb-1">Secure Academic Linkage</span>
-                      Synchronizing your skill card from <strong>skill-sch.com</strong> imports accredited qualifications directly into your ESTARR verified profile to boost job & gig matching score.
+                      Synchronizing your skill card from <strong>skill-sch.com</strong> imports accredited qualifications directly into your REMOGIGS verified profile to boost job & gig matching score.
                     </div>
                   </div>
 
@@ -3842,7 +3842,7 @@ export default function ConnectSection({
               <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-slate-50/50">
                 <div className="text-center">
                   <span className="text-[10px] bg-slate-100 text-slate-500 px-3 py-1 rounded-full font-mono">
-                    ESTARR Encrypted Handshake Established
+                    REMOGIGS Encrypted Handshake Established
                   </span>
                 </div>
                 

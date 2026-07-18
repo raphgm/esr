@@ -2,7 +2,7 @@ import { Course, Product, BrandCampaign, Job, ActivityPost, CommunityChannel } f
 
 export const initialProfile = {
   name: "Chinedu Okafor",
-  email: "chinedu@estarrapp.com",
+  email: "chinedu@remogigs.com",
   profession: "Principal AI Engineer & Cloud Architect",
   bio: "Helping African startups build scalable infrastructure. Specializes in distributed systems, AI agent development, and enterprise cloud migrations.",
   location: "Lagos, Nigeria",
@@ -13,7 +13,7 @@ export const initialProfile = {
   certifications: [
     "Advanced Prompt Engineering (2025)",
     "Google Cloud Professional Data Engineer (2025)",
-    "estarr.ai: Autonomous Agents Engineer (2026)"
+    "remogigs.ai: Autonomous Agents Engineer (2026)"
   ],
   recommends: 42,
   birthdate: "1998-07-06",
@@ -36,7 +36,7 @@ export const initialPosts: ActivityPost[] = [
     author: "Aisha Yusuf",
     avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150",
     role: "AI Researcher",
-    content: "🎥 SHOWCASE: Check out my new LLM tuning tutorial! I recorded this video directly on the ESTARR app. Let me know what you think of this optimization technique! ✨🤖",
+    content: "🎥 SHOWCASE: Check out my new LLM tuning tutorial! I recorded this video directly on the REMOGIGS app. Let me know what you think of this optimization technique! ✨🤖",
     video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
     poster: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=600",
     videoFilter: "none",
@@ -128,7 +128,7 @@ export const initialPosts: ActivityPost[] = [
     author: "Sarah Johnson",
     avatar: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=150",
     role: "Digital Nomad",
-    content: "Morning routine in Lagos! ☕✨ Grateful for the remote opportunities ESTARR has opened up. Freedom to work, create, and grow. #RemoteWork #LagosLife",
+    content: "Morning routine in Lagos! ☕✨ Grateful for the remote opportunities REMOGIGS has opened up. Freedom to work, create, and grow. #RemoteWork #LagosLife",
     video: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
     poster: "https://images.unsplash.com/photo-1493612276216-ee3925520721?auto=format&fit=crop&q=80&w=600",
     videoFilter: "sepia(30%) contrast(110%)",
@@ -172,7 +172,7 @@ export const initialPosts: ActivityPost[] = [
     content: "Freelancers: What's your biggest challenge right now? For me, it's managing multiple client microservices effectively while trying to launch my own SaaS product.",
     likes: 45,
     comments: [
-      { author: "Kofi Mensah", content: "Time management for sure! Have you tried using our ESTARR escrow? It eliminates the chasing-payments phase completely.", time: "2d ago" },
+      { author: "Kofi Mensah", content: "Time management for sure! Have you tried using our REMOGIGS escrow? It eliminates the chasing-payments phase completely.", time: "2d ago" },
       { author: "Aisha Yusuf", content: "Balancing client architectural needs with my own research. It never ends! 😅", time: "2d ago" }
     ],
     time: "2d ago"
@@ -239,7 +239,7 @@ export const initialCourses: Course[] = [
     id: "course-3",
     title: "Autonomous AI Agents Credential",
     category: "Cloud DevOps",
-    description: "The definitive practical exam for deploying Kubernetes clusters and managing CI/CD pipelines at scale. Mandatory credential for building enterprise AI pipelines on ESTARR.",
+    description: "The definitive practical exam for deploying Kubernetes clusters and managing CI/CD pipelines at scale. Mandatory credential for building enterprise AI pipelines on REMOGIGS.",
     rating: 5.0,
     students: 4100,
     image: "data:image/svg+xml,%3Csvg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 800 500\" width=\"100%\" height=\"100%\"%3E%3Cdefs%3E%3ClinearGradient id=\"bg3\" x1=\"0%25\" y1=\"0%25\" x2=\"100%25\" y2=\"100%25\"%3E%3Cstop offset=\"0%25\" stop-color=\"%233b82f6\"% /%3E%3Cstop offset=\"100%25\" stop-color=\"%231e3a8a\"% /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width=\"800\" height=\"500\" fill=\"url(%23bg3)\"/%3E%3C/svg%3E",

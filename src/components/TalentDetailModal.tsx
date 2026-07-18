@@ -16,7 +16,7 @@ export function TalentDetailModal({ talent, onClose }: {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={onClose}>
       <div className="bg-white rounded-3xl w-full max-w-sm relative max-h-[90vh] overflow-hidden flex flex-col" onClick={e => e.stopPropagation()}>
         <div className="bg-gradient-to-r from-purple-800 to-indigo-900 text-white text-[10px] font-bold tracking-widest uppercase px-6 py-3 w-full">
-            ESTARR VERIFIED PARTNER PROGRAM
+            REMOGIGS VERIFIED PARTNER PROGRAM
         </div>
         <button onClick={onClose} className="absolute top-12 right-6 text-slate-400 hover:text-white transition-colors"><X className="w-6 h-6"/></button>
         <div className="p-8 flex flex-col items-center overflow-y-auto">

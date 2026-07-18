@@ -13,7 +13,7 @@ export const tasks = [
     {
       id: "hit-001",
       title: "Evaluate LLM Response Helpfulness (RLHF)",
-      requester: "ESTARR Labs",
+      requester: "REMOGIGS Labs",
       reward: 1.50,
       baseRate: 1.00,
       bonus: 0.50,
@@ -84,7 +84,7 @@ export const tasks = [
     {
       id: "hit-005",
       title: "Developer Experience Tech Stack Poll",
-      requester: "ESTARR Research",
+      requester: "REMOGIGS Research",
       reward: 2.00,
       baseRate: 1.50,
       bonus: 0.50,
@@ -135,7 +135,7 @@ export const tasks = [
     {
       id: "hit-008",
       title: "LLM Trainer - Agent Function call",
-      requester: "ESTARR Labs",
+      requester: "REMOGIGS Labs",
       reward: 150.00,
       baseRate: 150.00,
       bonus: 0.00,
@@ -185,7 +185,7 @@ export const tasks = [
     {
       id: "hit-011",
       title: "Software Engineer - AI Code Evaluation & Benchmarking (US candidates only)",
-      requester: "ESTARR Labs",
+      requester: "REMOGIGS Labs",
       reward: 250.00,
       baseRate: 200.00,
       bonus: 50.00,

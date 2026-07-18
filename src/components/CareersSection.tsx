@@ -28,7 +28,7 @@ export function CareersSection() {
               Build With Us
             </h2>
             <p className="text-sm font-medium leading-relaxed text-slate-500 max-w-lg opacity-90 text-slate-900">
-              Join the core team at ESTARR. We are looking for
+              Join the core team at REMOGIGS. We are looking for
               ambitious individuals ready to scale the premier digital
               learning and commerce ecosystem.
             </p>

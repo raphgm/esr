@@ -104,7 +104,7 @@ export default function CompanionAppDownload() {
           <div className="flex-1 flex flex-col items-start text-left">
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm mb-6">
               <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-600">ESTARR Companion Sync</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-600">REMOGIGS Companion Sync</span>
             </div>
             
             <h2 className="text-4xl md:text-5xl font-display font-black text-slate-900 tracking-tight leading-[1.1] mb-6">
@@ -161,7 +161,7 @@ export default function CompanionAppDownload() {
                   <div className="w-full flex gap-2">
                     <div className="flex-1 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs py-3 px-4 rounded-xl font-bold flex items-center gap-1.5 justify-center">
                       <Sparkles className="w-4 h-4 text-emerald-500 animate-bounce" />
-                      100 ESTARR points bonus awarded!
+                      100 REMOGIGS points bonus awarded!
                     </div>
                     <button
                       onClick={handleReset}
@@ -201,7 +201,7 @@ export default function CompanionAppDownload() {
                   
                   {/* Internal Status bar */}
                   <div className="flex justify-between items-center mb-4 text-[9px] font-mono tracking-wider text-slate-400">
-                    <span>ESTARR MOBILE</span>
+                    <span>REMOGIGS MOBILE</span>
                     <div className="flex items-center gap-1">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                       <span>SECURE</span>
@@ -211,7 +211,7 @@ export default function CompanionAppDownload() {
                   {/* Header */}
                   <div className="text-center mb-5">
                     <span className="text-[10px] font-mono tracking-widest bg-gradient-to-r from-violet-400 via-indigo-300 to-emerald-400 bg-clip-text text-transparent uppercase font-bold">
-                      ESTARR APP
+                      REMOGIGS APP
                     </span>
                     <h4 className="text-lg font-display font-black tracking-tight mt-0.5 text-white">
                       COMPANION APP
@@ -315,7 +315,7 @@ export default function CompanionAppDownload() {
                         </span>
                         
                         <h5 className="text-sm font-bold text-white mb-2">
-                          ESTARR APP Active
+                          REMOGIGS APP Active
                         </h5>
 
                         <div className="bg-slate-900/90 border border-slate-800/80 rounded-xl p-2.5 text-left text-[9px] font-mono text-slate-300 space-y-1.5 w-full min-w-[160px] shadow-inner">
@@ -349,7 +349,7 @@ export default function CompanionAppDownload() {
                   {/* Bottom App Footer within Phone */}
                   <div className="mt-auto pt-2 border-t border-slate-900 text-center">
                     <div className="text-[8px] font-mono tracking-widest text-slate-500 uppercase">
-                      ESTARR APP © 2026
+                      REMOGIGS APP © 2026
                     </div>
                   </div>
                 </div>
@@ -373,7 +373,7 @@ export default function CompanionAppDownload() {
           </div>
           <h4 className="text-xl font-display font-black text-slate-900 mb-2">Off-chain Ledger Queue</h4>
           <p className="text-xs text-slate-600 mb-4 font-medium leading-relaxed">
-            While offline, ESTARR records micro-payments, escrow checkpoints, and course progress in your secure device sandbox. Sync with our server when connected.
+            While offline, REMOGIGS records micro-payments, escrow checkpoints, and course progress in your secure device sandbox. Sync with our server when connected.
           </p>
 
           <div className="space-y-3">

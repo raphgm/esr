@@ -158,7 +158,7 @@ export const AILabClientSection: React.FC<AILabClientSectionProps> = ({ userProf
         qualifications: [
           { label: "US Residency", status: "pass", detail: "Verified resident in Seattle, WA." },
           { label: "Coding Benchmark Test", status: "pass", detail: "Scored 100/100 on code reasoning evaluation test." },
-          { label: "Security & Confidentiality", status: "pass", detail: "Completed ESTARR identity check and NDA." }
+          { label: "Security & Confidentiality", status: "pass", detail: "Completed REMOGIGS identity check and NDA." }
         ],
         verdict: "qualified",
         verdictReason: "Highly recommended. Perfect match for the US residency requirement and has advanced system benchmarking skills.",
@@ -436,7 +436,7 @@ export const AILabClientSection: React.FC<AILabClientSectionProps> = ({ userProf
               </button>
               <div className="flex items-center gap-2 mb-1">
                 <BrainCircuit className="w-5 h-5 text-indigo-400 animate-pulse" />
-                <span className="text-[10px] font-mono tracking-widest uppercase text-indigo-400 font-bold">ESTARR Vetting Protocol</span>
+                <span className="text-[10px] font-mono tracking-widest uppercase text-indigo-400 font-bold">REMOGIGS Vetting Protocol</span>
               </div>
               <h3 className="text-xl font-black font-display text-white">AI Qualification Report</h3>
               <p className="text-xs text-slate-400 mt-1">
@@ -826,7 +826,7 @@ export const AILabClientSection: React.FC<AILabClientSectionProps> = ({ userProf
     <div className="flex flex-col gap-8 animate-fade-in pb-16 max-w-7xl mx-auto w-full px-4">
       <PageBanner
         title="AI Lab Client Dashboard"
-        subtitle="ESTARR CROWDWORK"
+        subtitle="REMOGIGS CROWDWORK"
         description="Create and manage your AI tasks, review applications, and find the perfect crowd workers."
         icon={BrainCircuit}
       />

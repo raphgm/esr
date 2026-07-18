@@ -18,7 +18,7 @@ const initialMockSurveys: Survey[] = [
     ],
     responsesCount: 1420,
     createdAt: new Date().toISOString(),
-    creatorId: "estarr-core",
+    creatorId: "remogigs-core",
   },
   {
     id: "poll-1",
@@ -30,7 +30,7 @@ const initialMockSurveys: Survey[] = [
     ],
     responsesCount: 845,
     createdAt: new Date().toISOString(),
-    creatorId: "estarr-core",
+    creatorId: "remogigs-core",
   }
 ];
 

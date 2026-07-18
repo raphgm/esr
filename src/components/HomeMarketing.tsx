@@ -414,7 +414,7 @@ export function HomeMarketing({
 
   const testimonials = [
     {
-      quote: "ESTARR changed how I work. The milestone escrow verified my $2.5k contract before I even wrote line one. For remote creators, this level of trust is completely unmatched.",
+      quote: "REMOGIGS changed how I work. The milestone escrow verified my $2.5k contract before I even wrote line one. For remote creators, this level of trust is completely unmatched.",
       author: "Adewale Mensah",
       role: "Lead Full-Stack Creator",
       location: "Accra, Ghana",
@@ -456,7 +456,7 @@ export function HomeMarketing({
       <div>
         <div className="text-center max-w-4xl mx-auto mb-10">
           <span className="text-[10px] font-mono font-bold text-purple-600 bg-purple-50 border border-purple-150 px-3 py-1 rounded-full uppercase tracking-widest">
-            The ESTARR Standard
+            The REMOGIGS Standard
           </span>
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900 mt-3 uppercase font-display lg:whitespace-nowrap">
             Why Elite Talent Choose Our Network
@@ -506,7 +506,7 @@ export function HomeMarketing({
               },
               {
                 icon: BrainCircuit,
-                title: "ESTARR AI Lab",
+                title: "REMOGIGS AI Lab",
                 desc: "Collaboratively train, evaluate, and validate models through RLHF tasks. Contribute to collaborative datasets and earn rewards for shaping the future of AI.",
                 metric: "EARN VIA RLHF",
                 feature: "AI Lab",

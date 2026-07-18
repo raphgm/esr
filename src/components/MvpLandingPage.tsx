@@ -422,7 +422,7 @@ export default function MvpLandingPage({ onSignIn, onSignUp, onNavigateToTab }: 
     {
       icon: Users,
       title: "Verified Professional Network",
-      desc: "ESTARR connects top-tier engineering talent with high-impact initiatives. Every contractor undergoes strict background verification and manual portfolio audits to ensure supreme output quality.",
+      desc: "REMOGIGS connects top-tier engineering talent with high-impact initiatives. Every contractor undergoes strict background verification and manual portfolio audits to ensure supreme output quality.",
       color: "text-purple-600",
       bg: "bg-purple-50 border-purple-100",
       gradient: "bg-gradient-to-br from-purple-100/50 via-white to-purple-100/60 border border-purple-200 shadow-md hover:border-purple-500 hover:shadow-xl hover:shadow-purple-200/40",
@@ -503,7 +503,7 @@ export default function MvpLandingPage({ onSignIn, onSignUp, onNavigateToTab }: 
     },
     {
       title: "Fast-Track 24h Vetting",
-      desc: "Instantly unblock application permissions and bypass prolonged queues using the premium ESTARR Express vetting pass."
+      desc: "Instantly unblock application permissions and bypass prolonged queues using the premium REMOGIGS Express vetting pass."
     }
   ];
 
@@ -651,10 +651,10 @@ export default function MvpLandingPage({ onSignIn, onSignUp, onNavigateToTab }: 
           <div className="text-center max-w-2xl mx-auto mb-16">
             <span className="text-[9px] font-black tracking-widest text-purple-600 uppercase font-mono block">Decentralized Operations</span>
             <h2 className="text-2xl md:text-3.5xl font-black tracking-tight text-slate-900 mt-2 font-display uppercase">
-              The ESTARR Ecosystem
+              The REMOGIGS Ecosystem
             </h2>
             <p className="text-slate-500 mt-3 font-medium text-xs leading-relaxed">
-              ESTARR is the leading professional platform engineered to unite vetted independent contractors with high-caliber machine learning, system advisory, and software development tasks.
+              REMOGIGS is the leading professional platform engineered to unite vetted independent contractors with high-caliber machine learning, system advisory, and software development tasks.
             </p>
           </div>
 
@@ -681,7 +681,7 @@ export default function MvpLandingPage({ onSignIn, onSignUp, onNavigateToTab }: 
           <div className="text-center max-w-2xl mx-auto mb-16">
             <span className="text-[9px] font-black tracking-widest text-purple-600 uppercase font-mono block">Platform Capabilities</span>
             <h2 className="text-2xl md:text-3.5xl font-black tracking-tight text-slate-900 mt-2 font-display uppercase">
-              What you can achieve on ESTARR
+              What you can achieve on REMOGIGS
             </h2>
             <p className="text-slate-500 mt-3 font-medium text-xs leading-relaxed">
               Explore our core pipelines configured for top-tier freelancers, enterprise scale annotators, and smart milestone protection services.
@@ -1201,7 +1201,7 @@ export default function MvpLandingPage({ onSignIn, onSignUp, onNavigateToTab }: 
               Access the Next Tier of Global Talent
             </h3>
             <p className="text-[11px] text-slate-400 leading-relaxed max-w-2xl">
-              Whether you are an elite individual builder looking for risk-free milestone work, or an enterprise scaling deep AI workflows, ESTARR provides the secure ecosystem you need.
+              Whether you are an elite individual builder looking for risk-free milestone work, or an enterprise scaling deep AI workflows, REMOGIGS provides the secure ecosystem you need.
             </p>
           </div>
 
@@ -1253,9 +1253,9 @@ export default function MvpLandingPage({ onSignIn, onSignUp, onNavigateToTab }: 
             </ul>
           </div>
           <div>
-            <span className="text-white font-bold tracking-tight text-xs block mb-4 uppercase">About ESTARR</span>
+            <span className="text-white font-bold tracking-tight text-xs block mb-4 uppercase">About REMOGIGS</span>
             <p className="text-[10px] text-slate-500 leading-relaxed mb-3">
-              ESTARR is the leading decentralized technical validation, annotation, and professional ecosystem protecting global contractors with cryptographically secured milestone escrows.
+              REMOGIGS is the leading decentralized technical validation, annotation, and professional ecosystem protecting global contractors with cryptographically secured milestone escrows.
             </p>
             <div className="flex gap-2">
               <span className="w-8 h-8 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-xs text-white">ES</span>
@@ -1276,7 +1276,7 @@ export default function MvpLandingPage({ onSignIn, onSignUp, onNavigateToTab }: 
               <rect x="20" y="20" width="160" height="160" rx="40" fill="url(#brand-grad)" />
               <path d="M100 45L112.5 83.5H153L120.25 107.5L132.75 146L100 122L67.25 146L79.75 107.5L47 83.5H87.5L100 45Z" fill="white" />
             </svg>
-            © {new Date().getFullYear()} ESTARR Platform Inc. All rights reserved.
+            © {new Date().getFullYear()} REMOGIGS Platform Inc. All rights reserved.
           </span>
           <div className="flex gap-4">
             <span className="hover:text-slate-400 cursor-pointer">Contact Support</span>
@@ -1328,7 +1328,7 @@ export default function MvpLandingPage({ onSignIn, onSignUp, onNavigateToTab }: 
                       Secure Match Request Drafted!
                     </h4>
                     <p className="text-slate-500 text-xs mt-2 leading-relaxed">
-                      Your premium project scope has been compiled with a pre-set escrow allocation of <span className="font-bold text-slate-800">${hireBudgetValue.toLocaleString()}</span>. An ESTARR technical matching director will contact you via email shortly.
+                      Your premium project scope has been compiled with a pre-set escrow allocation of <span className="font-bold text-slate-800">${hireBudgetValue.toLocaleString()}</span>. An REMOGIGS technical matching director will contact you via email shortly.
                     </p>
                   </div>
                   <button
@@ -1400,7 +1400,7 @@ export default function MvpLandingPage({ onSignIn, onSignUp, onNavigateToTab }: 
                   <div className="p-3 bg-indigo-50 border border-indigo-100/50 rounded-xl flex gap-2.5 items-start">
                     <Shield className="w-4 h-4 text-indigo-600 shrink-0 mt-0.5" />
                     <p className="text-[10px] text-indigo-800 leading-relaxed">
-                      <span className="font-bold">ESTARR Guarantee:</span> All contract deliverables are locked in secure milestones. Contractors are only compensated after manual or automated proof-of-work validation.
+                      <span className="font-bold">REMOGIGS Guarantee:</span> All contract deliverables are locked in secure milestones. Contractors are only compensated after manual or automated proof-of-work validation.
                     </p>
                   </div>
 

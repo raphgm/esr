@@ -12,8 +12,8 @@ export const VerifiedBadge = () => {
       setIsSharing(true);
       try {
         await navigator.share({
-          title: 'Estarr Verified Professional',
-          text: 'I am an Estarr Verified professional!',
+          title: 'RemoGigs Verified Professional',
+          text: 'I am an RemoGigs Verified professional!',
           url: window.location.href,
         });
       } catch (err: any) {
@@ -33,7 +33,7 @@ export const VerifiedBadge = () => {
     <div className="flex flex-col items-center p-4 bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200 rounded-2xl shadow-sm w-full max-w-[200px]">
       <div className="flex items-center gap-2 mb-3">
         <ShieldCheck className="w-6 h-6 text-amber-600" />
-        <span className="text-sm font-bold text-amber-900">Estarr Verified</span>
+        <span className="text-sm font-bold text-amber-900">RemoGigs Verified</span>
       </div>
       <button 
         onClick={shareBadge}

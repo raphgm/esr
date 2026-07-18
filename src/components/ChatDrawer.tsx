@@ -21,7 +21,7 @@ export default function ChatDrawer({
   >([
     {
       role: "model",
-      text: "Hello! I am ESTARR AI, your dedicated digital co-pilot. I can assist you with building course summaries, analyzing local supplier pricing, formatting invoices, drafting RFQs, or polishing your career CV. What can we achieve together today?",
+      text: "Hello! I am REMOGIGS AI, your dedicated digital co-pilot. I can assist you with building course summaries, analyzing local supplier pricing, formatting invoices, drafting RFQs, or polishing your career CV. What can we achieve together today?",
     },
   ]);
   const [inputMsg, setInputMsg] = useState("");
@@ -55,7 +55,7 @@ export default function ChatDrawer({
       });
 
       if (!response.ok) {
-        throw new Error("Failed to communicate with ESTARR AI server.");
+        throw new Error("Failed to communicate with REMOGIGS AI server.");
       }
 
       const data = await response.json();
@@ -137,7 +137,7 @@ export default function ChatDrawer({
                 </div>
                 <div>
                   <h3 className="font-display font-bold text-sm uppercase tracking-wider">
-                    ESTARR AI Digital Co-pilot
+                    REMOGIGS AI Digital Co-pilot
                   </h3>
                   <p className="text-[10px] text-white/50 font-mono tracking-widest uppercase">
                     Powered by Gemini • Context: {initialContext.toUpperCase()}
@@ -166,7 +166,7 @@ export default function ChatDrawer({
                   }`}
                 >
                   <span className="text-[9px] text-white/50 font-bold tracking-widest uppercase mb-1">
-                    {msg.role === "user" ? "User" : "ESTARR AI"}
+                    {msg.role === "user" ? "User" : "REMOGIGS AI"}
                   </span>
                   <div
                     className={`p-4 rounded-xl text-xs leading-relaxed whitespace-pre-wrap border ${
@@ -183,7 +183,7 @@ export default function ChatDrawer({
               {isLoading && (
                 <div className="self-start items-start max-w-[85%] flex flex-col">
                   <span className="text-[9px] text-white/50 font-bold tracking-widest uppercase mb-1">
-                    ESTARR AI
+                    REMOGIGS AI
                   </span>
                   <div className="bg-slate-900 border border-white/10 p-4 rounded-xl flex items-center gap-2 shadow-sm">
                     <span className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" />
@@ -203,7 +203,7 @@ export default function ChatDrawer({
               <div className="flex-1 flex items-center bg-slate-900 border border-white/15 rounded-xl pr-2 focus-within:border-purple-600 transition-colors">
                 <input
                   type="text"
-                  placeholder="Ask ESTARR AI anything..."
+                  placeholder="Ask REMOGIGS AI anything..."
                   value={inputMsg}
                   onChange={(e) => setInputMsg(e.target.value)}
                   className="flex-1 bg-transparent px-4 py-3 text-xs text-white placeholder-white/40 focus:outline-none font-medium"

@@ -101,7 +101,7 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
 
 const defaultProfile: UserProfile = {
   name: "Chinedu Okafor",
-  email: "chinedu@estarrapp.com",
+  email: "chinedu@remogigs.com",
   profession: "Principal AI Engineer & Cloud Architect",
   bio: "Helping African startups build scalable infrastructure.",
   location: "Lagos, Nigeria",

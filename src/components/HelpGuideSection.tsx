@@ -41,7 +41,7 @@ export function HelpGuideSection() {
             <Sparkles className="w-5 h-5 text-purple-600 shrink-0 mt-0.5 animate-pulse" />
             <p className="text-xs text-purple-950 leading-relaxed">
               <span className="font-extrabold block text-[13px] mb-0.5 text-purple-900">💡 Platform Posting Policy</span>
-              ESTARR matches elite African technical talent to secure projects. Each posted job requires a designated escrow tier to ensure high response rates from vetted contractors.
+              REMOGIGS matches elite African technical talent to secure projects. Each posted job requires a designated escrow tier to ensure high response rates from vetted contractors.
             </p>
           </div>
 
@@ -85,7 +85,7 @@ export function HelpGuideSection() {
               <div className="flex-1">
                 <h5 className="font-bold text-indigo-950 text-xs flex items-center gap-1.5">Launch & Filter Matching Specialists <span className="text-[9px] bg-indigo-500 text-white px-1.5 py-0.5 rounded-full uppercase">Automatic</span></h5>
                 <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
-                  Submit your listing. ESTARR's automated match protocol analyzes candidate sandbox results, quality scores, and milestone history, notifying matching elite engineers instantly.
+                  Submit your listing. REMOGIGS's automated match protocol analyzes candidate sandbox results, quality scores, and milestone history, notifying matching elite engineers instantly.
                 </p>
               </div>
             </div>
@@ -94,7 +94,7 @@ export function HelpGuideSection() {
           <div className="mt-2 p-3.5 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
-              <span className="text-[10px] font-bold text-slate-600 font-mono">ESTARR VETTING GAURANTEE</span>
+              <span className="text-[10px] font-bold text-slate-600 font-mono">REMOGIGS VETTING GAURANTEE</span>
             </div>
             <span className="text-[10px] text-slate-400">All matched contractors hold standard C2 Elite fluency.</span>
           </div>
@@ -170,7 +170,7 @@ export function HelpGuideSection() {
             <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5 animate-pulse" />
             <p className="text-xs text-emerald-950 leading-relaxed">
               <span className="font-extrabold block text-[13px] mb-0.5 text-emerald-900">🛡️ Multi-Sig Milestone Escrow</span>
-              ESTARR employs a secure holding vault model to align client security with contractor guarantee. No work is started without pre-funding, and no funds are transferred without proof-of-work.
+              REMOGIGS employs a secure holding vault model to align client security with contractor guarantee. No work is started without pre-funding, and no funds are transferred without proof-of-work.
             </p>
           </div>
 
@@ -203,11 +203,11 @@ export function HelpGuideSection() {
               ⚖️ Dispute Resolution & Code Audits
             </h4>
             <p className="text-xs text-slate-600 leading-relaxed">
-              ESTARR ensures transactional peace of mind through a dedicated technical arbitration model:
+              REMOGIGS ensures transactional peace of mind through a dedicated technical arbitration model:
             </p>
             <ul className="list-disc pl-5 text-[11px] text-slate-500 flex flex-col gap-1.5">
               <li>**Arbitration Trigger:** If the client or contractor claims work mismatch, the vault freezes.</li>
-              <li>**Vetting Audits:** A neutral ESTARR Technical Director performs a manual sandbox compile test and quality audit within 48 business hours.</li>
+              <li>**Vetting Audits:** A neutral REMOGIGS Technical Director performs a manual sandbox compile test and quality audit within 48 business hours.</li>
               <li>**Equitable Allocation:** Based on the audit, frozen funds are distributed proportionally to represent the real proof-of-work delivered.</li>
             </ul>
           </div>
@@ -255,7 +255,7 @@ export function HelpGuideSection() {
             </span>
             <h5 className="font-display font-bold text-xs text-slate-100">Our Vetting Mission</h5>
             <p className="text-[10px] text-slate-400 leading-relaxed">
-              Africa hosts some of the world's most brilliant code craftsman. ESTARR bypasses traditional operational challenges, offering frictionless legally-compliant workspaces, robust milestone systems, and instant global payment processing.
+              Africa hosts some of the world's most brilliant code craftsman. REMOGIGS bypasses traditional operational challenges, offering frictionless legally-compliant workspaces, robust milestone systems, and instant global payment processing.
             </p>
           </div>
         </div>
@@ -269,7 +269,7 @@ export function HelpGuideSection() {
         <div className="flex flex-col gap-5">
           <div className="flex flex-col gap-3.5">
             <div className="p-3.5 border border-slate-100 bg-slate-50/50 rounded-xl">
-              <h5 className="font-extrabold text-slate-900 text-xs">How do contractors become ESTARR Certified?</h5>
+              <h5 className="font-extrabold text-slate-900 text-xs">How do contractors become REMOGIGS Certified?</h5>
               <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
                 Candidates undergo a rigorous 3-tiered auditing protocol: a secure container sandbox compilation check to test architectural consistency, an live code-review board, and a comprehensive communication screen verifying C2 Elite proficiency.
               </p>
@@ -278,14 +278,14 @@ export function HelpGuideSection() {
             <div className="p-3.5 border border-slate-100 bg-slate-50/50 rounded-xl">
               <h5 className="font-extrabold text-slate-900 text-xs">What is the platform's standard fee model?</h5>
               <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
-                ESTARR maintains a highly competitive model. Standard job postings are completely free. We charge a nominal **0.5% cryptographic escrow fee** only upon successful milestone release to fund the security arbitration committee.
+                REMOGIGS maintains a highly competitive model. Standard job postings are completely free. We charge a nominal **0.5% cryptographic escrow fee** only upon successful milestone release to fund the security arbitration committee.
               </p>
             </div>
 
             <div className="p-3.5 border border-slate-100 bg-slate-50/50 rounded-xl">
               <h5 className="font-extrabold text-slate-900 text-xs">What happens if a developer misses a deadline?</h5>
               <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
-                Your pre-funded budget remains locked safely in the escrow vault. You can use the dashboard to negotiate timelines directly with the builder, or escalate to ESTARR arbitration to cancel and claim a 100% refund of uncompleted milestones.
+                Your pre-funded budget remains locked safely in the escrow vault. You can use the dashboard to negotiate timelines directly with the builder, or escalate to REMOGIGS arbitration to cancel and claim a 100% refund of uncompleted milestones.
               </p>
             </div>
 
@@ -307,7 +307,7 @@ export function HelpGuideSection() {
         <h2 className="text-xl font-display font-black text-slate-900 uppercase tracking-tight flex items-center gap-2">
           📖 Documentation & Help Guide
         </h2>
-        <p className="text-slate-500 text-xs">Find answers, detailed tutorials, and premium workflow guides to master the ESTARR ecosystem.</p>
+        <p className="text-slate-500 text-xs">Find answers, detailed tutorials, and premium workflow guides to master the REMOGIGS ecosystem.</p>
       </div>
 
       <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">

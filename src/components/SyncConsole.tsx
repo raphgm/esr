@@ -125,7 +125,7 @@ export const SyncConsole: React.FC = () => {
               <Smartphone className="w-8 h-8 text-emerald-600" />
             </div>
             <div>
-              <h2 className="text-2xl font-black text-slate-900 leading-tight">ESTARR Companion Sync</h2>
+              <h2 className="text-2xl font-black text-slate-900 leading-tight">REMOGIGS Companion Sync</h2>
               <p className="text-slate-500 font-medium">Connect Your Device To Earn Everywhere.</p>
             </div>
           </div>
@@ -183,7 +183,7 @@ export const SyncConsole: React.FC = () => {
           </div>
 
           <p className="text-xs text-slate-500 mb-6 leading-relaxed">
-            While offline, ESTARR records micro-payments, escrow checkpoints, and course progress in your secure device sandbox. Sync with our server when connected.
+            While offline, REMOGIGS records micro-payments, escrow checkpoints, and course progress in your secure device sandbox. Sync with our server when connected.
           </p>
 
           <div className="space-y-4">

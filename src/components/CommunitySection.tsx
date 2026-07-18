@@ -32,7 +32,7 @@ interface CommunitySectionProps {
   onUpdateChannels: (channels: CommunityChannel[]) => void;
 }
 
-// Structuring mock data for Estarr Spaces & Channels to match second screenshot
+// Structuring mock data for RemoGigs Spaces & Channels to match second screenshot
 interface SpaceCard {
   id: string;
   title: string;
@@ -42,11 +42,11 @@ interface SpaceCard {
   desc: string;
 }
 
-const ESTARR_SPACES: SpaceCard[] = [
-  { id: "sp-start", title: "Start Here", icon: MapPin, dotColor: "bg-green-400", desc: "Welcome to Estarr Community! Review values, standards, and onboarding tutorials." },
+const REMOGIGS_SPACES: SpaceCard[] = [
+  { id: "sp-start", title: "Start Here", icon: MapPin, dotColor: "bg-green-400", desc: "Welcome to RemoGigs Community! Review values, standards, and onboarding tutorials." },
   { id: "sp-announcements", title: "Announcements", icon: Megaphone, isPrivate: true, desc: "Official announcements, updates, global campaign rolls, and program changes." },
   { id: "sp-events", title: "Events", icon: Calendar, isPrivate: true, desc: "Bootcamps, workshops, local meetups, and developer sourcing webcasts." },
-  { id: "sp-learning", title: "Estarr Learning", icon: BookOpen, dotColor: "bg-cyan-400", desc: "Collaborate on syllabus tracks, share resources, and help cohort peers." },
+  { id: "sp-learning", title: "RemoGigs Learning", icon: BookOpen, dotColor: "bg-cyan-400", desc: "Collaborate on syllabus tracks, share resources, and help cohort peers." },
   { id: "sp-writers", title: "Writer's Room Blog Submissions", icon: Feather, isPrivate: true, desc: "Submit tutorials, case studies, and engineering guidelines for blog reviews." },
   { id: "sp-feedback", title: "Product Feedback", icon: Lightbulb, isPrivate: true, desc: "Submit complaints, feature ideas, and beta testing feedback for the Core Engineering team." },
   { id: "sp-faqs", title: "Resources and FAQs", icon: HelpCircle, isPrivate: true, desc: "Common questions answered, onboarding files, links, and guidelines." },
@@ -72,7 +72,7 @@ interface SpaceChannel {
   }[];
 }
 
-const INITIAL_ESTARR_CHANNELS: SpaceChannel[] = [
+const INITIAL_REMOGIGS_CHANNELS: SpaceChannel[] = [
   {
     id: "ch-intro",
     name: "Introductions",
@@ -162,7 +162,7 @@ const INITIAL_ESTARR_CHANNELS: SpaceChannel[] = [
   },
   {
     id: "ch-ask",
-    name: "Ask-Estarrians",
+    name: "Ask-RemoGigsians",
     emoji: "💬",
     statusDot: "blue",
     desc: "Technical troubleshooting questions, stack recommendations, and debugging help.",
@@ -237,7 +237,7 @@ export default function CommunitySection({
   const [activeNavTab, setActiveNavTab] = useState<"spaces" | "docs">("spaces");
 
   // Rich channels state local tracking
-  const [communityChannels, setCommunityChannels] = useState<SpaceChannel[]>(INITIAL_ESTARR_CHANNELS);
+  const [communityChannels, setCommunityChannels] = useState<SpaceChannel[]>(INITIAL_REMOGIGS_CHANNELS);
 
   // Active view target: can be "grid" or specific channel ID/space ID
   const [activeView, setActiveView] = useState<string>("grid");
@@ -260,7 +260,7 @@ export default function CommunitySection({
     {
       category: "Platform Onboarding",
       articles: [
-        { title: "Estarr Community Guideline Standards 2026", duration: "5 mins read", desc: "Core code of conduct, communication norms, and professional standards." },
+        { title: "RemoGigs Community Guideline Standards 2026", duration: "5 mins read", desc: "Core code of conduct, communication norms, and professional standards." },
         { title: "How to Link Your Verified GitHub & Portfolio Repository", duration: "8 mins read", desc: "Link repositories via secure webhooks for automated skill points awards." }
       ]
     },
@@ -282,7 +282,7 @@ export default function CommunitySection({
 
   // Helper: Find active channel or space details
   const currentChannel = communityChannels.find(ch => ch.id === activeView);
-  const currentSpace = ESTARR_SPACES.find(sp => sp.id === activeView);
+  const currentSpace = REMOGIGS_SPACES.find(sp => sp.id === activeView);
 
   // Filter channels based on search query
   const filteredChannels = communityChannels.filter(ch => 
@@ -387,7 +387,7 @@ export default function CommunitySection({
 
       {/* Hero Banner header */}
       <PageBanner
-        title="Estarr Community"
+        title="RemoGigs Community"
         subtitle="COHORTS & DISCUSSIONS"
         description="Interact with professional peers, collaborate on fine-tuning bootcamps, share certifications, and track off-chain developer meetups."
         icon={Users}
@@ -449,7 +449,7 @@ export default function CommunitySection({
             </span>
 
             {[
-              { id: "sp-learning", label: "Estarr Learning", status: "none" },
+              { id: "sp-learning", label: "RemoGigs Learning", status: "none" },
               { id: "sp-feedback", label: "Product Feedback", status: "dot" },
               { id: "sp-faqs", label: "Resources and FAQs", status: "none" },
               { id: "grid", label: "All spaces", status: "none" }
@@ -547,7 +547,7 @@ export default function CommunitySection({
                 exit={{ opacity: 0, scale: 0.98 }}
                 className="grid grid-cols-1 md:grid-cols-3 gap-6"
               >
-                {ESTARR_SPACES.map((space) => {
+                {REMOGIGS_SPACES.map((space) => {
                   const IconComponent = space.icon;
                   return (
                     <div
@@ -874,7 +874,7 @@ export default function CommunitySection({
                   
                   <div className="space-y-6 text-slate-700 leading-relaxed">
                     <p>
-                      This document serves as an official handbook within the ESTARR ecosystem. By accessing this material, you agree to adhere to the strict confidentiality and operational guidelines established for verified community members.
+                      This document serves as an official handbook within the REMOGIGS ecosystem. By accessing this material, you agree to adhere to the strict confidentiality and operational guidelines established for verified community members.
                     </p>
                     <h4 className="font-bold text-slate-900 text-base mt-8 mb-4">1. Core Objectives</h4>
                     <p>
@@ -888,7 +888,7 @@ export default function CommunitySection({
                     </ul>
                     <h4 className="font-bold text-slate-900 text-base mt-8 mb-4">2. Implementation Strategy</h4>
                     <p>
-                      All verified participants are required to familiarize themselves with the protocols outlined in this section. Failure to comply may result in temporary suspension of platform privileges or a reduction in your ESTARR trust score.
+                      All verified participants are required to familiarize themselves with the protocols outlined in this section. Failure to comply may result in temporary suspension of platform privileges or a reduction in your REMOGIGS trust score.
                     </p>
                     <div className="bg-indigo-50/50 border border-indigo-100 rounded-xl p-4 mt-6">
                       <p className="text-sm text-indigo-900 font-medium m-0">

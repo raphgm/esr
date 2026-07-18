@@ -469,7 +469,7 @@ export default function ConsultancySection({
         description={
           <div className="flex flex-col gap-3">
             <p>
-              Draft secure consultancy contracts, view live funds locked in ESTARR escrow, submit deliverables, and trigger secure bank disbursements upon milestone approval.
+              Draft secure consultancy contracts, view live funds locked in REMOGIGS escrow, submit deliverables, and trigger secure bank disbursements upon milestone approval.
             </p>
           </div>
         }
@@ -491,7 +491,7 @@ export default function ConsultancySection({
       <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex gap-3 items-start text-xs text-emerald-900">
         <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
         <div>
-          <h4 className="font-bold text-emerald-950">ESTARR 100% Escrow Protection Guard</h4>
+          <h4 className="font-bold text-emerald-950">REMOGIGS 100% Escrow Protection Guard</h4>
           <p className="text-emerald-800 mt-0.5">
             Your money stays securely locked in escrow until the supplier delivers your items or completes the service. Upon verification, the escrow automatically pays out. Absolutely risk-free!
           </p>
@@ -534,7 +534,7 @@ export default function ConsultancySection({
             <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm flex flex-col gap-4">
               <div>
                 <h4 className="font-display font-bold text-base text-slate-900">
-                  ESTARR AI Deal Builder
+                  REMOGIGS AI Deal Builder
                 </h4>
                 <p className="text-xs text-slate-500 mt-1 leading-relaxed">
                   Struggling to set profitable prices or structure contract milestones? Type your service below and let the AI build a high-yielding offer suitable for the local African ecosystem.
@@ -611,7 +611,7 @@ export default function ConsultancySection({
                   Escrow Smart Contract Logs
                 </h4>
                 <p className="text-xs text-slate-500 mt-1">
-                  Immutable transaction trail of ESTARR Peer-to-Peer payment security.
+                  Immutable transaction trail of REMOGIGS Peer-to-Peer payment security.
                 </p>
               </div>
 

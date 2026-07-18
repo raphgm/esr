@@ -46,10 +46,10 @@ export function AdminSection({
 }: AdminSectionProps) {
   // Mock users in database
   const [dbUsers, setDbUsers] = useState([
-    { id: "u1", name: "Chinedu Okafor", email: "chinedu@estarrapp.com", role: "User", accountType: "Freelancer", status: "Active" },
-    { id: "u2", name: "Aisha Yusuf", email: "aisha.y@estarrapp.com", role: "User", accountType: "Freelancer", status: "Active" },
-    { id: "u3", name: "Emeka Obi", email: "emeka.obi@estarrapp.com", role: "User", accountType: "Client", status: "Active" },
-    { id: "u4", name: "Fatima Bello", email: "fatima@estarrapp.com", role: "User", accountType: "Freelancer", status: "Pending Verification" }
+    { id: "u1", name: "Chinedu Okafor", email: "chinedu@remogigs.com", role: "User", accountType: "Freelancer", status: "Active" },
+    { id: "u2", name: "Aisha Yusuf", email: "aisha.y@remogigs.com", role: "User", accountType: "Freelancer", status: "Active" },
+    { id: "u3", name: "Emeka Obi", email: "emeka.obi@remogigs.com", role: "User", accountType: "Client", status: "Active" },
+    { id: "u4", name: "Fatima Bello", email: "fatima@remogigs.com", role: "User", accountType: "Freelancer", status: "Pending Verification" }
   ]);
 
   // Mock pending verifications
@@ -96,7 +96,7 @@ export function AdminSection({
 
   // Developer Integration Gate Key Management (Afrika Payment Gateway & Accelerator Gate)
   const [devKey, setDevKey] = useState<string>(
-    () => localStorage.getItem("estarr_developer_key") || "ESTARR-GATE-2026"
+    () => localStorage.getItem("remogigs_developer_key") || "REMOGIGS-GATE-2026"
   );
   const [isDevKeyCopied, setIsDevKeyCopied] = useState(false);
   const [isGatewayExpanded, setIsGatewayExpanded] = useState(false);
@@ -306,15 +306,15 @@ export function AdminSection({
                     <button
                       onClick={() => {
                         const keys = [
-                          "ESTARR-AFRICA-PAYSTACK-DEV",
-                          "ESTARR-SECURE-KEY-2026",
-                          "ESTARR-LOCAL-PAYMENTS-AFRICA",
-                          "ESTARR-DEV-9B2F4E7A",
-                          "ESTARR-GATEWAY-AUTH-CODE"
+                          "REMOGIGS-AFRICA-PAYSTACK-DEV",
+                          "REMOGIGS-SECURE-KEY-2026",
+                          "REMOGIGS-LOCAL-PAYMENTS-AFRICA",
+                          "REMOGIGS-DEV-9B2F4E7A",
+                          "REMOGIGS-GATEWAY-AUTH-CODE"
                         ];
                         const newKey = keys[Math.floor(Math.random() * keys.length)];
                         setDevKey(newKey);
-                        localStorage.setItem("estarr_developer_key", newKey);
+                        localStorage.setItem("remogigs_developer_key", newKey);
                         
                         // Push to security logs
                         addLog("success", `Developer gate authorization key rotated to '${newKey}'`);
@@ -352,7 +352,7 @@ export function AdminSection({
                         const val = (document.getElementById("custom-dev-key-input") as HTMLInputElement)?.value?.trim();
                         if (val) {
                           setDevKey(val);
-                          localStorage.setItem("estarr_developer_key", val);
+                          localStorage.setItem("remogigs_developer_key", val);
                           addLog("success", `Developer gate custom authorization key configured: '${val}'`);
                           (document.getElementById("custom-dev-key-input") as HTMLInputElement).value = "";
                           confetti({ particleCount: 20, spread: 40 });
@@ -407,7 +407,7 @@ export function AdminSection({
                   {
                     id: "ivory" as const,
                     name: "Warm Ivory",
-                    desc: "ESTARR Default aesthetic - warm beige tones",
+                    desc: "REMOGIGS Default aesthetic - warm beige tones",
                     bgClass: "bg-[#FAF9F5]",
                     borderClass: "border-[#D9D3C5]",
                     textClass: "text-slate-900",
