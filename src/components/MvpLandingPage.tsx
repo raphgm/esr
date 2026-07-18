@@ -326,7 +326,7 @@ export default function MvpLandingPage({ onSignIn, onSignUp, onNavigateToTab }: 
         role: "Senior Cloud & Node Architect",
         meta: "Ex-Stripe • 8+ Years Exp • Lagos, Nigeria",
         quote: "Specializes in building distributed systems, high-throughput microservices, and setting up bulletproof AWS infrastructures.",
-        avatar: "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?auto=format&fit=crop&q=80&w=200",
+        avatar: "/images/profile_emeka.jpg",
         vetting: "Passed Tech & Soft Skills (100%)",
       }
     },
@@ -346,7 +346,7 @@ export default function MvpLandingPage({ onSignIn, onSignUp, onNavigateToTab }: 
         role: "Lead RLHF Expert & Prompt Architect",
         meta: "Ex-Google Contractor • 5+ Years Exp • Abuja, Nigeria",
         quote: "Passionate about training LLMs to output reliable structured data and crafting rigorous safety validation datasets.",
-        avatar: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&q=80&w=200",
+        avatar: "/images/profile_amara.jpg",
         vetting: "Passed Cognition & Reasoning Audits (100%)",
       }
     },
@@ -366,7 +366,7 @@ export default function MvpLandingPage({ onSignIn, onSignUp, onNavigateToTab }: 
         role: "Autonomous Agents & Vector Architect",
         meta: "Ex-Andela • 6+ Years Exp • Nairobi, Kenya",
         quote: "I build autonomous workflows that turn unstructured document lakes into deterministic, action-ready database systems.",
-        avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=200",
+        avatar: "/images/profile_tariq.jpg",
         vetting: "Passed Agent Sandbox Deployments (100%)",
       }
     },
@@ -386,7 +386,7 @@ export default function MvpLandingPage({ onSignIn, onSignUp, onNavigateToTab }: 
         role: "Fractional CTO & Delivery Director",
         meta: "Ex-Microsoft • 12+ Years Exp • Accra, Ghana",
         quote: "Translating complex scaling issues into step-by-step deliverable tracks backed by transparent verification escrow contracts.",
-        avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=200",
+        avatar: "/images/profile_nia.jpg",
         vetting: "Passed Enterprise Leadership Audits (100%)",
       }
     },
@@ -406,7 +406,7 @@ export default function MvpLandingPage({ onSignIn, onSignUp, onNavigateToTab }: 
         role: "Head of Algorithmic & Design Auditing",
         meta: "Ex-Toptal Evaluator • 10+ Years Exp • Kumasi, Ghana",
         quote: "Ensuring we only certify builders who demonstrate clean architectural separation, flawless testing habits, and robust problem solving.",
-        avatar: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80&w=200",
+        avatar: "/images/profile_kofi.jpg",
         vetting: "Passed Evaluation Standard Board Checks (100%)",
       }
     }
@@ -452,7 +452,7 @@ export default function MvpLandingPage({ onSignIn, onSignUp, onNavigateToTab }: 
       desc: "Expert fine-tuning, dynamic prompt engineering, and premium reinforcement learning with human feedback.",
       icon: BrainCircuit,
       tags: ["LLMs", "RAG Systems", "RLHF Fine-Tuning"],
-      img: "https://images.unsplash.com/photo-1531538606174-0f90ff5dce83?auto=format&fit=crop&q=80&w=400"
+      img: "/images/ai-dev.jpg"
     },
     {
       id: "annotation",
@@ -460,7 +460,7 @@ export default function MvpLandingPage({ onSignIn, onSignUp, onNavigateToTab }: 
       desc: "Designing secure high-velocity data labeling tasks with rigorous, multi-agent validation criteria.",
       icon: Square,
       tags: ["Dataset Quality", "Labeling Nodes", "Model Vetting"],
-      img: "https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&q=80&w=400"
+      img: "/images/data-pipeline.jpg"
     },
     {
       id: "decentralized",
@@ -468,7 +468,7 @@ export default function MvpLandingPage({ onSignIn, onSignUp, onNavigateToTab }: 
       desc: "Engineering secure cryptographic escrows, multisig protection, and decentralized contractor rails.",
       icon: ShieldCheck,
       tags: ["Smart Contracts", "Cryptography", "Secure Payments"],
-      img: "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&q=80&w=400"
+      img: "/images/web3-escrow.jpg"
     },
     {
       id: "consultancy",
@@ -476,7 +476,7 @@ export default function MvpLandingPage({ onSignIn, onSignUp, onNavigateToTab }: 
       desc: "Architecting cloud orchestration, SOC2 compliance systems, and high-fidelity product consulting.",
       icon: Cpu,
       tags: ["DevOps", "SOC2 Compliance", "Cloud Networks"],
-      img: "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&q=80&w=400"
+      img: "/images/tech-advisory.jpg"
     }
   ];
 
